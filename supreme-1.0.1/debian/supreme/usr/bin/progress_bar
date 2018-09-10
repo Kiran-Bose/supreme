@@ -1,0 +1,81 @@
+#!/bin/bash
+#kiranbose.kb1@gmail.com
+
+#------------------------------------------------------------------------------------------------
+function kbbar ()
+{
+IFS=$(echo -en "\n\b")
+sleep 1
+if [[ (-d "$2") || (-f "$2") ]]
+then
+	if [[ ("$1" == "/media/$user"*) && ("$2" == "/media/$user"*) ]]
+	then
+	chk1=$(echo "$1" | cut -d '/' -f 1-4 )
+	chk2=$(echo "$2" | cut -d '/' -f 1-4 )
+	else
+	chk1=$(echo "$1" | cut -d '/' -f 1-3 )
+	chk2=$(echo "$2" | cut -d '/' -f 1-3 )
+	fi
+fs1=$(df "$chk1" | awk '{print $1}' | sed 1d)
+fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
+	if [[ ("$fs1" == "$fs2") && ($qbar == 0) ]]
+	then
+	echo -e "\e[91mChanging index table entries[Moving items on same file system]\e[0m"
+	else
+	sptg=0
+	totd=0
+	tots=0
+	arraysz=()
+	arraysz1=()
+	local WIDTH=50
+	local REMAINING="\e[107m \e[0m"
+	local COMPLETED="\e[42m \e[0m"
+	local i
+	ptg=0
+	IFS=$'\n' read -rd '' -a arraysz <<< `ls -Ral "$1" | awk '{print $5}' | sed 's/[^0-9]*//g'`
+	for ((i=0; i<${#arraysz[@]}; i++)); do
+	tots=$(($tots + "${arraysz[$i]}"))	
+	done
+	echo -e "________________________________________________________________________________"
+	echo "$1"
+	ss=$tots
+	echo -en "\e[44;97;10;82m  0%  \e[0m\e[89m \e[0m"
+	for i in `seq 1 $WIDTH`
+	do
+	echo -en "$REMAINING"
+	done
+
+	while echo "($ptg < 99)" | bc | grep -q 1
+	do
+	totd=0
+	IFS=$'\n' read -rd '' -a arraysz1 <<< `ls -Ral "$2" | awk '{print $5}' | sed 's/[^0-9]*//g'`
+		for ((i=0; i<${#arraysz1[@]}; i++)); do
+		totd=$(($totd + "${arraysz1[$i]}"))	
+		done
+	echo -en "\0015"
+	ds=$totd
+	ptg=$( echo "scale=6; $ds/$ss * 100" | bc )
+	sptg=${ptg%.*}
+	clb=$( echo "$ptg/2" | bc )
+	#pclb=$((50 - $clb))
+	echo -en "\e[44;97;10;82m  $sptg% \e[0m\e[89m \e[0m"
+	for i in `seq 1 $clb`
+	do
+	echo -en "$COMPLETED"
+	done
+	sleep 0.1
+	done
+	echo -en "\0015"
+	echo -en "\e[44;97;10;82m 100% \e[0m\e[89m \e[0m"
+	for i in `seq 1 50`
+	do
+	echo -en "$COMPLETED"
+	done
+	echo -e "\n"
+	fi
+else
+echo -e "\e[91mDestination path creation failed or taking long time!!!\nCheck destination folder/source folder and proceed\e[0m"
+fi
+}
+
+#------------------------------------------------------------------------------------------------
