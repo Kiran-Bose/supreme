@@ -3,6 +3,8 @@ Bash script package to copy,move,delete files from phone,usb drive,local from te
 
 Download the deb package to any debian based system and install
 
+Usage: Type 'supreme' and hit enter in the bash terminal. Follow the instructions
+
 Functionality overview
 
 (1)Open Apps                                                                                                                                          
