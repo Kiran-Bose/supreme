@@ -1,0 +1,10 @@
+Package: supreme
+Version: 1.0.3-1
+Architecture: amd64
+Maintainer: kb <kiranbose.kb1@gmail.com>
+Installed-Size: 36
+Section: unknown
+Priority: optional
+Homepage: <insert the upstream URL, if relevant>
+Description: Do it the terminal way
+ The supreme user module for heavy bash users. Open,copy,move,delete,rename files in local drive,phone(android) and usb drive without typing long commands. And more...
