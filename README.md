@@ -21,12 +21,16 @@ Usage: Type 'supreme' and hit enter in the bash terminal. Follow the instruction
 
 Functionality overview
 
-(1)Open Apps                                                                                                                                          
+(1)Open Apps  
+
+
     ----Firefox                                                                                                                                     
     ----Calculator                                                                                                                  
     ----Settings                                                                                                                    
     
-(2)Manage Files                                                                                                                                     
+(2)Manage Files   
+
+
     ----Search                                                                                                                             
     ----Navigate                                                                                                                          
     ----Quick access                                                                                                                
@@ -43,12 +47,16 @@ Functionality overview
                                                   |----Send to Device
                                                   |----Properties
 
-(3)Manage Phone                                                                                                                     
+(3)Manage Phone    
+
+
     ----Move/Copy from phone                                                                                                        
     ----Move/Copy to phone                                                                                                          
     ----Sync folders                                                                                                                                                                                                                              
     
-(4)Manage USB                                                                                                                       
+(4)Manage USB 
+
+
     ----Move/Copy from USB                                                                                                          
     ----Move/Copy to USB                                                                                                            
     
