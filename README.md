@@ -5,6 +5,18 @@ Supreme helps you open,copy,move,delete,rename files from phone(Android),usb dri
 
 Download the deb package to any debian based system and install
 
+You may also add it from PPA:
+For bionic and precise, do the following:
+
+    sudo add-apt-repository ppa:kiran.kb/supreme
+    sudo apt-get update
+    sudo apt-get install supreme
+    
+For other ubuntu versions, this PPA can be added to your system manually by copying the lines below and adding them to your system's software sources.
+
+    deb http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main 
+    deb-src http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main
+
 Usage: Type 'supreme' and hit enter in the bash terminal. Follow the instructions
 
 Functionality overview
