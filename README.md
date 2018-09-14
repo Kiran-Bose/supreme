@@ -52,7 +52,7 @@ Functionality overview
 
     ----Move/Copy from phone          
     ----Move/Copy to phone            
-    ----Sync folders                                                                                                                              
+    ----Sync folders                          
     
 (4)Manage USB 
 
