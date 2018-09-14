@@ -31,9 +31,9 @@ Functionality overview
 (2)Manage Files   
 
 
-    ----Search                                                                                                                             
-    ----Navigate                                                                                                                          
-    ----Quick access                                                                                                                
+    ----Search                        
+    ----Navigate                
+    ----Quick access         
     
                     |----Select File(s)
                     |----Inverse Selection
@@ -50,13 +50,13 @@ Functionality overview
 (3)Manage Phone    
 
 
-    ----Move/Copy from phone                                                                                                        
-    ----Move/Copy to phone                                                                                                          
-    ----Sync folders                                                                                                                                                                                                                              
+    ----Move/Copy from phone          
+    ----Move/Copy to phone            
+    ----Sync folders                                                                                                                              
     
 (4)Manage USB 
 
 
-    ----Move/Copy from USB                                                                                                          
-    ----Move/Copy to USB                                                                                                            
+    ----Move/Copy from USB        
+    ----Move/Copy to USB       
     
