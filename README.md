@@ -24,9 +24,9 @@ Functionality overview
 (1)Open Apps  
 
 
-    ----Firefox                                                                                                                                     
-    ----Calculator                                                                                                                  
-    ----Settings                                                                                                                    
+    ----Firefox                                  
+    ----Calculator          
+    ----Settings               
     
 (2)Manage Files   
 
