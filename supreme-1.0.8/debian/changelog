@@ -1,0 +1,12 @@
+supreme (1.0.8-1) unstable; urgency=medium
+
+  * Add kcm
+  * Bug fix (Closes: #822799)
+
+ -- kiran <kiran.vkvr@gmail.com>  Sat, 22 Sep 2018 13:00:58 +0530
+
+supreme (1.0.7-1) unstable; urgency=medium
+
+  * Initial release (Closes: #822793)
+
+ -- kiran <kiran.vkvr@gmail.com>  Sat, 22 Sep 2018 13:00:58 +0530
