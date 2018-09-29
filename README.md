@@ -8,6 +8,7 @@ Download the deb package to any debian based system and install
 Supreme(V1.1.22) uses package 'rclone'(1.42) for cloud storage operations.
 
     If the rclone package installed by deb installer automatically is a lower version, 
+    download the rclone deb package included in this repository and install or 
     visit below link to download latest version.
   https://rclone.org/downloads/ 
 
