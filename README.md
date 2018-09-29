@@ -10,7 +10,7 @@ Supreme(>V1.1.22) uses package 'rclone'(1.42) for cloud storage operations.
     visit below link to download latest version of rclone.
   https://rclone.org/downloads/ 
 
-You may also add it from PPA:
+You may also add supreme from PPA:
 For bionic and xenial, do the following:
 
     sudo add-apt-repository ppa:kiran.kb/supreme
