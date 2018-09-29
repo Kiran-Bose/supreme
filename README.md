@@ -49,6 +49,7 @@ Functionality overview
                                                   |----Delete
                                                   |----Rename
                                                   |----Send to Device
+                                                  |----Upload to cloud
                                                   |----Properties
 
 (3)Manage Phone    
@@ -62,5 +63,12 @@ Functionality overview
 
 
     ----Move/Copy from USB        
-    ----Move/Copy to USB       
+    ----Move/Copy to USB  
+  
+ (5)Manage Cloud
+ 
+    ----Upload to cloud
+    ----Download from cloud
+    ----Delete from cloud
+    ----Move/copy cloud resource
     
