@@ -1,9 +1,13 @@
 # supreme
 Supreme is a command line file manager written in shell script.
 
-Supreme helps you open,copy,move,delete,rename files from phone(Android),usb drive and local drive from terminal(Tested for ubuntu 18.04).
+Supreme helps you open,copy,move,delete,rename files from phone(android),usb drive,cloud storage and local drive(Tested for ubuntu 18.04).
 
 Download the deb package to any debian based system and install
+
+Supreme(V1.1.22) uses package 'rclone'(1.42) for cloud storage operations.
+
+If the rclone package installed by deb installer automatically is a lower version, visit https://rclone.org/downloads/ to download latest version.
 
 You may also add it from PPA:
 For bionic and xenial, do the following:
