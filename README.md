@@ -72,4 +72,4 @@ Functionality overview
     ----Download from cloud
     ----Delete from cloud
     ----Move/copy cloud resource
-    
+    ----Configure cloud
