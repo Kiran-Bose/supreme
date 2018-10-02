@@ -1,0 +1,50 @@
+supreme (1.1.55-1) bionic; urgency=medium
+
+  * Code optimization
+  * Minor improvements
+
+ -- kiran <kiran.vkvr@gmail.com>  Tue, 02 Oct 2018 17:53:34 +0530
+
+supreme (1.1.44-1) bionic; urgency=medium
+
+  * Bug fix
+
+ -- kiran <kiran.vkvr@gmail.com>  Sat, 29 Sep 2018 23:30:28 +0530
+
+supreme (1.1.22-1) bionic; urgency=medium
+
+  * Add cloudupload feature
+  * Add rclone and jq dependency
+
+ -- kiran <kiran.vkvr@gmail.com>  Sat, 29 Sep 2018 13:31:45 +0530
+
+supreme (1.1.11-1) bionic; urgency=medium
+
+  * Improvements
+
+ -- kiran <kiran.vkvr@gmail.com>  Thu, 27 Sep 2018 18:30:32 +0530
+
+supreme (1.1.0-1) bionic; urgency=medium
+
+  * Minor functionality improvements
+
+ -- kiran <kiran.vkvr@gmail.com>  Mon, 24 Sep 2018 23:14:12 +0530
+
+supreme (1.0.9-1) bionic; urgency=medium
+
+  * UI improvements
+
+ -- kiran <kiran.vkvr@gmail.com>  Sun, 23 Sep 2018 18:08:52 +0530
+
+supreme (1.0.8-1) bionic; urgency=medium
+
+  * Add kcm
+  * Bug fix
+
+ -- kiran <kiran.vkvr@gmail.com>  Sat, 22 Sep 2018 13:00:58 +0530
+
+supreme (1.0.7-1) bionic; urgency=medium
+
+  * Initial release
+
+ -- kiran <kiran.vkvr@gmail.com>  Sat, 22 Sep 2018 13:00:58 +0530
