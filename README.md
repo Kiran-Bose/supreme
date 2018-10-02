@@ -41,9 +41,13 @@ Functionality overview
     ----Quick access         
     
                     |----Select File(s)
+                    |----Select all
                     |----Inverse Selection
                     |----Make directory
                     |----Make file
+                    |----Go back
+                    |----Go home
+                                                 
                                                   |----Open
                                                   |----Copy
                                                   |----Move
@@ -52,6 +56,7 @@ Functionality overview
                                                   |----Send to Device
                                                   |----Upload to cloud
                                                   |----Properties
+
 
 (3)Manage Phone    
 
