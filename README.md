@@ -5,9 +5,9 @@ Supreme helps you open,copy,move,delete,rename files from phone(android),usb dri
 
 Download the deb package to any debian based system and install
 
-Supreme(>V1.1.22) uses package 'rclone'(1.42) for cloud storage operations.
+Supreme(>V1.1.22) uses package 'rclone'(1.42) for cloud storage operations.  rclone will be downloaded and installed automatically.
 
-    visit below link to download latest version of rclone.
+    visit below link to download latest version of rclone incase rclone fails to install. 
   https://rclone.org/downloads/ 
 
 You may also add supreme from PPA:
