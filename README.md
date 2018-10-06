@@ -1,7 +1,7 @@
 # supreme
 Supreme is a command line file manager written in shell script.
 
-Supreme helps you open,copy,move,delete,rename files from phone(android),usb drive,cloud storage and local drive(Tested for ubuntu 18.04).
+Supreme supports file management operations on phone(android),usb drive,cloud storage and local drive(Tested for ubuntu 18.04).
 
 Download the deb package to any debian based system and install
 
