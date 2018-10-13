@@ -78,3 +78,11 @@ Functionality overview
     ----Delete from cloud
     ----Move/copy cloud resource
     ----Configure cloud
+    
+ (6)Manage Custom Scripts
+ 
+    ----Add Script
+    ----Remove Script(s)
+    ----Modify Script
+    ----Execute Script
+    ----Run Commands
