@@ -1,0 +1,15 @@
+Source: supreme
+Section: utils
+Priority: optional
+Maintainer: kiran <kiran.vkvr@gmail.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 4.1.2
+Homepage: https://github.com/Kiran-Bose/supreme
+#Vcs-Git: https://anonscm.debian.org/git/collab-maint/supreme.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/supreme.git
+
+Package: supreme
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, rclone, jq
+Description: Do it the terminal way
+ Supreme is a commandline file manager written in shell script. It helps you open,copy,move,delete,rename files in local drive,phone(android),cloud storage and usb drive without typing long commands.Cloud operation uses package 'rclone'. And more...
