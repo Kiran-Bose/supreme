@@ -25,6 +25,11 @@ For bionic and xenial, do the following:
    If it throws error for gpg keys, run the following in a terminal window
    
     sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E021E2DC3302D8CE
+    
+   And then run the following:
+   
+    sudo apt-get update
+    sudo apt-get install supreme
 
 Usage: Type 'supreme' and hit enter in the bash terminal. Follow the instructions
 
