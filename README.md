@@ -17,10 +17,14 @@ For bionic and xenial, do the following:
     sudo apt-get update
     sudo apt-get install supreme
     
- This PPA can be added to your system manually by copying the lines below and adding them to your system's software sources.
+ For other ubuntu versions,this PPA can be added to your system manually by copying the lines below and adding them to your system's software sources.
 
     deb http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main 
     deb-src http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main
+    
+   If it throws error for gpg keys, run the following in a terminal window
+   
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E021E2DC3302D8CE
 
 Usage: Type 'supreme' and hit enter in the bash terminal. Follow the instructions
 
