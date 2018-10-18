@@ -17,7 +17,7 @@ For bionic and xenial, do the following:
     sudo apt-get update
     sudo apt-get install supreme
     
-For other ubuntu versions, this PPA can be added to your system manually by copying the lines below and adding them to your system's software sources.
+ This PPA can be added to your system manually by copying the lines below and adding them to your system's software sources.
 
     deb http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main 
     deb-src http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main
