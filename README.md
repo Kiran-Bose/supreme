@@ -72,7 +72,7 @@ Functionality overview
 (3)Manage Phone    
 
 
-    ----Phone File explorer           
+    ----Phone File Explorer           
     ----Sync folders                          
     
 (4)Manage USB 
