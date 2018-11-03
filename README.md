@@ -54,8 +54,8 @@ Functionality overview
                     |----Inverse Selection
                     |----Make directory
                     |----Make file
-                    |----Go back
-                    |----Go home
+                    |----back
+                    |----home
                                                  
                                                   |----Open
                                                   |----Copy
@@ -63,30 +63,28 @@ Functionality overview
                                                   |----Delete
                                                   |----Rename
                                                   |----Send to Device
-                                                  |----Upload to cloud
+                                                  |----Upload to Cloud
+                                                  |----Move to Cloud
                                                   |----Properties
+                                                  |----Go Home
 
 
 (3)Manage Phone    
 
 
-    ----Move/Copy from phone          
-    ----Move/Copy to phone            
+    ----Phone File explorer           
     ----Sync folders                          
     
 (4)Manage USB 
 
 
-    ----Move/Copy from USB        
-    ----Move/Copy to USB  
+    ----USB File Explorer
+    ----Format
   
  (5)Manage Cloud
  
-    ----Upload to cloud
-    ----Download from cloud
-    ----Delete from cloud
-    ----Move/copy cloud resource
-    ----Configure cloud
+    ----Cloud File Explorer
+    ----Configure Cloud
     
  (6)Manage Custom Scripts
  
@@ -95,3 +93,5 @@ Functionality overview
     ----Modify Script
     ----Execute Script
     ----Run Commands
+  
+ (X)Exit
