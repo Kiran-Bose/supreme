@@ -93,5 +93,10 @@ Functionality overview
     ----Modify Script
     ----Execute Script
     ----Run Commands
+   
+ (p)Preferences
+    
+    ----Configure Quick Access Folders
+    ----Themes
   
  (X)Exit
