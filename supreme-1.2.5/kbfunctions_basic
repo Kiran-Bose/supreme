@@ -1,0 +1,769 @@
+#!/bin/bash
+#kiran.vkvr@gmail.com
+#https://github.com/Kiran-Bose/supreme
+
+#------------------------------------------------------------------------------------------------
+function numval ()
+{
+re='^[0-9, ]+$'
+if ! [[ $1 =~ $re ]] ; then
+   echo "f"
+else
+   echo "p"
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function srch ()
+{
+arraysrch=()
+arraystep=()
+srcharr=( "$@" )
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+for srchemt in "${srcharr[@]}"
+do
+	case "$optdir1" in
+	D)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /mnt /home/"$user"/Downloads /home/"$user"/Documents /home/"$user"/Pictures /home/"$user"/Music /home/"$user"/Videos /media/"$user" -iname  "*$srchemt*"`
+	  arraysrch+=( "${arraystep[@]}" );;
+	NOUSB)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /mnt /home/"$user"/Downloads /home/"$user"/Documents /home/"$user"/Pictures /home/"$user"/Music /home/"$user"/Videos -iname  "*$srchemt*"`
+	      arraysrch+=( "${arraystep[@]}" );;
+	USBONLY)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /media/"$user" -iname  "*$srchemt*"`
+		arraysrch+=( "${arraystep[@]}" );;
+	UD)if [[ -z "$srch11" ]]
+	   then
+	   instfmt "Input Path"
+	   read srch11
+	   fi
+	   IFS=$'\n' read -rd '' -a arraystep <<< `sudo find "$srch11" -iname  "*$srchemt*"`
+	   arraysrch+=( "${arraystep[@]}" );;
+	*)return;;
+	esac
+done
+arraysrch=( $(remove_array_dups "${arraysrch[@]}") )
+IFS=$SAVEIFS
+colorfmt "${arraysrch[@]}"
+unset srch11
+if [ "${#arraysrch[@]}" == 0 ]
+then
+flag=0
+echo -e "\e[91mNo match found\e[0m"
+return
+else
+flag=1
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function slct ()
+{
+slctarr=( "$@" )
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+OUTPUT=""
+case "$navdoor" in
+DOOR)for srchemt1 in "${slctarr[@]}"
+     do
+     OUTPUT="${arraysrch[$srchemt1]}"";""$OUTPUT"
+     done;;
+NAV)for srchemt1 in "${slctarr[@]}"
+    do
+    OUTPUT="${temppath[$srchemt1]}"";""$OUTPUT"
+    done;;
+GDNAV)for srchemt1 in "${slctarr[@]}"
+      do
+      OUTPUT="${newitem[$srchemt1]}"";""$OUTPUT"
+      done;;
+GEN)for srchemt1 in "${slctarr[@]}"
+    do
+    OUTPUT="${genlist[$srchemt1]}"";""$OUTPUT"
+    done;;
+esac
+echo "$OUTPUT"
+IFS=$SAVEIFS
+}
+
+#------------------------------------------------------------------------------------------------
+function door ()
+{
+flag=0
+navdoor="DOOR"
+arraymock=( )
+optdir1="${1:-D}"
+instfmt "enter wildcard(s)"
+read mockwc
+IFS=', ' read -a mockopt <<< "$mockwc"
+fso="y"
+rpt="y"
+while [ "$rpt" == "y" ]
+do
+	case "$fso" in
+	y|Y)qksrch "${mockopt[@]}"
+	    if [ $flag == 0 ]
+	    then
+	    echo -e "\e[91mquick search couldn't locate anything. Executing normal search. Please wait...\e[0m"
+	    srch "${mockopt[@]}"
+	    fi;;
+	*)srch "${mockopt[@]}";;
+	esac
+	if [ $flag == 1 ]
+	then
+	instfmt "Select file(s) | a [Select all] | z [Inverse selection] | s [Normal search] | h [Home]"
+	read srch1
+		case "$srch1" in
+		a|A)rpt="n"
+		    srchopt=()
+		    for ((i=0; i<${#arraysrch[@]}; i++)); do
+		    srchopt+=( "$i" )
+		    done
+		    actionitems
+		    v11="p";;
+		z|Z)rpt="n"
+		    invslct "${arraysrch[@]}"
+		    v11="p";;
+		h|H)rpt="n"
+		    opnr="x"
+		    homekey="y";;
+		s|S)fso="n";;
+		*)rpt="n"
+		  v11=$( echo $(numval "$srch1") )
+		  IFS=', ' read -r -a srchopt <<< "$srch1"
+			if [ "$v11" == "p" ]
+			then
+			actionitems
+			else
+			echo -e "\e[91mBad Input\e[0m"
+			return
+			fi;;
+		esac
+	else
+	return
+	fi
+done
+}
+
+#------------------------------------------------------------------------------------------------
+function actionitems ()
+{
+slctin=$( echo "$(slct "${srchopt[@]}")" )
+mockres=$(echo "${slctin[@]}" | tr ';' '\n' | sort -nr)
+IFS=$'\n' read -rd '' -a arraymock <<< "$mockres"
+colorfmt "${arraymock[@]}"
+echo -e "\e[91mSelected ${#arraymock[@]} item(s)\e[0m"
+}
+
+#------------------------------------------------------------------------------------------------
+function navig ()
+{
+dividerarray=()
+arraymock=()
+flag=1
+navdoor="NAV"
+navpath="${1:-/}"
+check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
+if [ "$check" == "*" ]
+then
+echo -e "\e[91mFolder empty\e[0m"
+temppath=()
+instfmt "b [Back] | m [Make directory] | f [Make file] | h [home]"
+else
+temppath=("$navpath"/*)
+for ((i=0; i<${#temppath[@]}; i++)); do
+Q=$( echo "(${i}) ${temppath[$i]}" | rev | cut -d '/' -f 1 | rev )
+dividerarray+=( "$Q" )	
+done
+colorfmt "${dividerarray[@]}"
+instfmt "Select item(s) | a [Select all] | z [Inverse selection] | n [Navigate] | b [Back] | m [Make directory] | f [Make file] | h [Home]" 
+fi
+read navig1
+v11=$( echo $(numval "$navig1") )
+case "$navig1" in
+n|N)instfmt "Select folder to navigate"
+    read navig2
+    v1000=$( echo $(numval "$navig2") )
+	if [ "$v1000" == "p" ]
+	then
+	navig "${temppath[$navig2]}"
+	else
+	return
+	fi;;
+b|B)backpath="`echo "$navpath" | rev | cut -d/ -f2- | rev`"
+    navig "$backpath";;
+a|A)srchopt=()
+    for ((i=0; i<${#temppath[@]}; i++)); do
+    srchopt+=( "$i" )
+    done
+    actionitems
+    v11="p";;
+z|Z)invslct "${temppath[@]}"
+    v11="p";;
+m|M)instfmt "Enter name for new directory"
+    read navignd
+	if [[ "$navpath" == *"/1000/gvfs/mtp"* ]]
+	then
+	mkdir "$navpath"/"$navignd"
+	else
+	sudo mkdir "$navpath"/"$navignd"
+	fi
+    navig "$navpath";;
+f|F)instfmt "Enter file name"
+    read navignf
+	if [[ "$navpath" == *"/1000/gvfs/mtp"* ]]
+	then
+	touch "$navpath"/"$navignf"
+	else
+	sudo touch "$navpath"/"$navignf"
+	fi
+    navig "$navpath";;
+h|H)opnr="x"
+    homekey="y";;
+*)if [ "$v11" == "p" ]
+  then
+  IFS=', ' read -r -a srchopt <<< "$navig1"
+  actionitems
+  else
+  echo -e "\e[91mBad Input\e[0m"
+  return
+  fi;;
+esac
+}
+
+#------------------------------------------------------------------------------------------------
+function quick ()
+{
+quickarray=()
+qacustomlist=()
+exd="${1:-D}"
+if [ "$exd" == "D" ]
+then
+	if [[ -f /home/"$user"/.supreme_qaconfig.txt ]]
+  	then
+		while read line; do
+		qacustomlist+=( "$line" )
+		done < /home/"$user"/.supreme_qaconfig.txt
+	fi
+	case "${#qacustomlist[@]}" in
+	0)quickarray=( "/home/$user" );;
+	*)quickarray=( "/home/$user" "${qacustomlist[@]}" );;
+	esac
+else
+quickarray=()
+fi
+usb_check
+device=/run/user/1000/gvfs/mtp
+access=( "$device"* )
+path=( "${access[0]}"/* )
+if [[ ("${path[@]}" == *"*"*) && ("${#usbarr[@]}" == 0) ]]
+then
+echo -e "\e[91mNo external quick access folder available\e[0m"
+elif [[ ("${path[@]}" != *"*"*) && ("${#usbarr[@]}" == 0) ]]
+then
+quickarray+=( "${path[@]}" )
+elif [[ ("${#usbarr[@]}" != 0) && ("${path[@]}" == *"*"*) ]]
+then
+quickarray+=( "${usbarr[@]}" )
+elif [[ ("${path[@]}" != *"*"*) &&  ("${#usbarr[@]}" != 0) ]]
+then 
+quickarray+=( "${usbarr[@]}" "${path[@]}" )
+else
+return
+fi
+if [ "${#quickarray[@]}" != 0 ]
+then
+colorfmt "${quickarray[@]}"
+else
+return
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function feeder ()
+{
+unset homekey
+arraymock=()
+instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]"
+read opn1
+case "$opn1" in
+s|S)instfmt "Select an option"
+    echo -e "(1)Default (limited number of folders)\n(2)Path specific (Opt for 2 and enter '/' to search entire system)"
+    read opn4
+    case "$opn4" in
+    1)door;;
+    2)door UD;;
+    *)return;;
+    esac;;
+n|N)opnr="x"
+    navig /;;
+h|H)opnr="x"
+    homekey="y";;
+q|Q)quick
+	if [ "${#quickarray[@]}" != 0 ]
+	then
+	instfmt "Select an option | b [Back] | h [Home]"
+	read opn15
+	v101=$( echo $(numval "$opn15") )
+		case "$opn15" in
+		b|B)feeder;;
+		h|H)opnr="x"
+		    homekey="y";;
+		*)if [[ "$v101" == "p" ]]
+		  then
+			  if (($opn15<$j)) > /dev/null 2>&1
+			  then
+			  navig "${quickarray[$opn15]}"
+			  fi
+		  else
+		  return
+		  fi;;
+		esac
+	else
+	return
+	fi;;
+*)return;;
+esac
+}
+
+#------------------------------------------------------------------------------------------------
+function invslct ()
+{
+if [[ $# -ne 0 ]]
+then
+invarr=( "$@" )
+srchopt=()
+srchopt1=()
+	for ((i=0; i<${#invarr[@]}; i++)); do
+	srchopt1+=( "$i" )
+	done
+instfmt "Select file(s) that need to be excluded | h [Home]"
+read srch27
+v27=$( echo $(numval "$srch27") )
+	case "$srch27" in
+	h|H)homekey="y";;
+	*)if [ "$v27" == "p" ]
+	  then
+	  IFS=', ' read -r -a invopt <<< "$srch27"
+	  srchopt=( $(printf "%s\n" "${srchopt1[@]}" "${invopt[@]}" | sort | uniq -u) )
+		if [ "$navdoor" == "GDNAV" ]
+		then
+		actionitems
+		dfsort
+		else
+		actionitems
+		fi
+	  else
+	  echo -e "\e[91mBad Input\e[0m"
+	  return
+	  fi;;
+	esac
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function qksrch ()
+{
+arraysrch=()
+arraystep=()
+SAVEIFS=$IFS
+case "$optdir1" in
+D)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "/mnt|/home/$user/Downloads|/home/$user/Documents|/home/$user/Pictures|/home/$user/Music|/home/$user/Videos|/media/$user"`;;
+NOUSB)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "/mnt|/home/$user/Downloads|/home/$user/Documents|/home/$user/Pictures|/home/$user/Music|/home/$user/Videos"`;;
+USBONLY)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "/media/$user"`;;
+UD)if [[ -z "$srch11" ]]
+   then
+   instfmt "Input Path"
+   read srch11
+   fi
+   IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "$srch11"`;;
+*)return;;
+esac
+IFS=$SAVEIFS
+colorfmt "${arraysrch[@]}"
+if [ "${#arraysrch[@]}" == 0 ]
+then
+flag=0
+echo -e "\e[91mNo match found\e[0m"
+return
+else
+flag=1
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function remove_array_dups () 
+{
+# Usage: remove_array_dups "array"
+declare -A tmp_array
+for i in "$@"; do
+[[ "$i" ]] && IFS=" " tmp_array["${i:- }"]=1
+done
+IFS=$'\n' read -rd '' -a rdarray <<< $( printf '%s\n' "${!tmp_array[@]}" )
+for ((q=0; q<${#rdarray[@]}; q++)); do
+echo "${rdarray["$q"]}"
+done
+}
+
+#------------------------------------------------------------------------------------------------
+function usb_check ()
+{
+usbarr=()
+hotplug=()
+mountpoint=()
+vendor=()
+vendorname=()
+lsblk -O --json > /dev/null 2>&1 || { echo -e "\e[91mlsblk error occured\e[0m" >&2; return 1; }
+usbdev=( "$(lsblk -O --json)" )
+for row in $(echo "${usbdev}" | jq -r '.blockdevices[].children[]? | @base64'); do
+_jq() 
+{
+echo ${row} | base64 --decode | jq -r ${1}
+}
+
+hotplug+=( "$(_jq '.hotplug')" )
+mountpoint+=( "$(_jq '.mountpoint')" )
+vendor+=( "$(_jq '.vendor')" )
+done
+for ((i=0; i<${#hotplug[@]}; i++))
+do
+	if [[ "${hotplug[$i]}" == 1 ]]
+	then
+		if [[ "${mountpoint[$i]}" != "null" ]]
+		then
+		usbarr+=( "${mountpoint[$i]}" )
+		vendorname+=( "${vendor[$i]}" )
+		fi
+	fi
+done
+for row in $(echo "${usbdev}" | jq -r '.blockdevices[]? | @base64'); do
+_jq() 
+{
+echo ${row} | base64 --decode | jq -r ${1}
+}
+hotplug+=( "$(_jq '.hotplug')" )
+mountpoint+=( "$(_jq '.mountpoint')" )
+vendor+=( "$(_jq '.vendor')" )
+done
+for ((i=0; i<${#hotplug[@]}; i++))
+do
+	if [[ "${hotplug[$i]}" == 1 ]]
+	then
+		if [[ "${mountpoint[$i]}" != "null" ]]
+		then
+		usbarr+=( "${mountpoint[$i]}" )
+		vendorname+=( "${vendor[$i]}" )
+		fi
+	fi
+done
+}
+
+#------------------------------------------------------------------------------------------------
+function det ()
+{ 
+filename=$1;
+fname=$( echo "$filename" | rev | cut -d '/' -f 1 | rev )
+dname=$( echo "$filename" | rev | cut -d '/' -f 2- | rev )
+fsys=$( df "$filename" | awk '{print $1}' | sed 1d )
+idn=$( ls -i "$filename" | cut -d ' ' -f 1 )
+if [[ (-d "$filename") && ("$filename" != "/") ]]
+then
+detfeed
+spcon=$(sudo du -sh "$filename" | cut -c 1-4)
+echo -e "\e[39;94;1mDisk Space Consumed\e[0m:$spcon"
+elif [ "$filename" == "/" ]
+then
+detfeed
+spcon=$(sudo df -ah "$filename" | awk '{print $3}' | sed 1d)
+echo -e "\e[39;94;1mDisk Space Consumed\e[0m:$spcon"
+else
+detfeed
+echo -e "\e[39;94;1mPermission Level\e[0m:$( ls -l "$filename" | cut -d ' ' -f 1 )\n\e[39;94;1mInode number\e[0m:$idn"
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function detfeed ()
+{
+if [ -z "$filename" ]
+then
+return
+else
+echo -e "\e[39;94;1mName\e[0m:"$fname"\n\e[39;94;1mDirectory\e[0m:"$dname"\n\e[39;94;1mOwner\e[0m:$(ls -dl "$filename" | cut -f3 -d' ')\n\e[39;94;1mDate Modified\e[0m:$(ls -dl "$filename" | awk '{print $6" "$7" "$8}')\n\e[39;94;1mType\e[0m:$(file "$filename" | cut -f2 -d: | cut -f1 -d,)\n\e[39;94;1mSize\e[0m:$(ls -hld "$filename" | cut -f5 -d' ')"
+echo -e "\e[39;94;1mFileSystem On\e[0m:$fsys"
+	if [ -d "$filename" ]
+	then
+	cd "$filename"
+	nof=$( ls -afq | wc -l )
+	echo -e "\e[39;94;1mChild count\e[0m:$(($nof-2))"
+	cd
+	fi
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function colorfmt ()
+{
+banner
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+holdarray=()
+fmtarray=( "$@" )
+for ((j=0; j<${#fmtarray[@]}; j++))
+do
+holdarray+=( "($j) ${fmtarray[$j]}" )
+done
+col=$(tput cols)
+for ((n=0; n<${#holdarray[@]}; n++))
+do
+len=${#holdarray[$n]}
+	if [[ "$col" -gt "$len" ]]
+	then
+	difr=$(($col-$len))
+	else
+	dif=$(($len-$col))
+		while [[ "$dif" -gt "$col" ]]
+		do
+		dif=$(($dif-$col))
+		done
+	difr=$(($col-$dif))
+	fi
+	if (( $n % 2 == 0 ))
+	then
+	echo -en "$cfmtp1${holdarray[$n]}\e[0m"
+		for ((i=0; i<$difr; i++))
+		do
+		echo -en "$cfmtp1fill"
+		done
+	echo
+	else
+	echo -en "$cfmtp2${holdarray[$n]}\e[0m"
+		for ((i=0; i<$difr; i++))
+		do
+		echo -en "$cfmtp2fill"
+		done
+	echo
+	fi
+done
+echo
+IFS=$SAVEIFS
+}
+
+#------------------------------------------------------------------------------------------------
+function instfmt ()
+{
+instset=()
+instset=( "$*" )
+col=$(tput cols)
+len=${#instset[0]}
+if [[ "$col" -gt "$len" ]]
+then
+difr=$(($col-$len))
+else
+dif=$(($len-$col))
+	while [[ "$dif" -gt "$col" ]]
+	do
+	dif=$(($dif-$col))
+	done
+difr=$(($col-$dif))
+fi
+echo -en "$ifmt${instset[@]}\e[0m"
+for ((i=0; i<$difr; i++))
+do
+echo -en "$ifmtfill"
+done
+echo
+}
+
+#------------------------------------------------------------------------------------------------
+function def_theme ()
+{
+pri="\e[100m \e[0m"
+sec="\e[101m \e[0m"
+logopri="\e[101;93;1;82m"
+logosec="\e[103;91;1;82m"
+userpri="\e[101;97;1;82m"
+cfmtp1="\e[100;37;1;82m"
+cfmtp2="\e[47;90;1;82m"
+cfmtp1fill="\e[100m \e[0m"
+cfmtp2fill="\e[47m \e[0m"
+ifmt="\e[100;93;1;82m"
+ifmtfill="\e[100m \e[0m"
+}
+
+#------------------------------------------------------------------------------------------------
+function banner ()
+{
+tput reset
+user=$(whoami)
+col=$(tput cols)
+pos=$(($col/2-4))
+if [[ -f /home/"$user"/.supremetheme.txt ]]
+then
+paracount=$( wc -l /home/"$user"/.supremetheme.txt | cut -d ' ' -f1 )
+	if (($paracount<11)) > /dev/null 2>&1
+	then
+	def_theme
+	else
+	. /home/"$user"/.supremetheme.txt
+	fi
+else
+def_theme
+fi
+
+for ((i=0; i<$col; i++))
+do
+echo -en "$pri"
+done
+echo -en "\0015"
+for ((i=0; i<$pos; i++))
+do
+echo -en "$pri"
+done
+echo -en "$logopri Supreme \e[0m"
+echo
+for ((i=0; i<$col; i++))
+do
+echo -en "$sec"
+done
+echo -en "\0015"
+for ((i=0; i<$pos; i++))
+do
+echo -en "$sec"
+done
+echo -en "$logosec  1.2.5  \e[0m"
+echo -en "\0015"
+echo -en "$userpri$user\e[0m"
+echo
+echo
+}
+
+
+#------------------------------------------------------------------------------------------------
+function cloudnavig ()
+{
+unset homekey
+SAVEIFS=$IFS
+arraymock=()
+sortindex=()
+sortfile=()
+sortdir=()
+isdir=()
+if [[ (-z "$cldopt") && ($# -eq 0) ]]
+then
+return
+else
+navdoor="GDNAV"
+newitem=()
+gdn1="${1:-$cldopt}"
+gditems=( "$(rclone lsjson "$gdn1")" )
+	for row in $(echo "${gditems}" | jq -r '.[] | @base64'); do
+	    _jq() {
+	     echo ${row} | base64 --decode | jq -r ${1}
+	    }
+
+	    newitem+=( "$(_jq '.Path')" )
+	    isdir+=( "$(_jq '.Size')" )
+
+	done
+colorfmt "${newitem[@]}"
+instfmt "Select item(s) | a [Select all] | z [Inverse selection] | r [Select root folder] | n [Navigate] | b [Back] | u [Upload] | f [View folder structure and navigate] | m [Make directory] | e [Empty Trash] | h [Home]" 
+read gdn2
+v122=$( echo $(numval "$gdn2") )
+	case "$gdn2" in
+	n|N)gdopn="y"
+	    instfmt "Select folder to navigate | b [Back] | h [Home]"
+	    while [ "$gdopn" == "y" ]
+	    do
+	    read gdn3
+	    v1010=$( echo $(numval "$gdn3") )
+		  case "$gdn3" in
+		  b|B)gdopn="f"
+		      backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
+		      cloudnavig "$backpath";;
+		  h|H)gdopn="f"
+		      unset cldopt
+		      unset tempsortdir
+		      unset tempsortfile
+		      unset tempmock
+		      oprpt="n"
+		      homekey="y";;
+		  *)if [[ ("$v1010" == "p") && ("${isdir[$gdn3]}" == -1) ]]
+		    then
+		    gdopn="f"
+			if [ "$gdn1" == "$cldopt" ]
+			then
+			cloudnavig "$gdn1""${newitem[$gdn3]}"
+			else
+			cloudnavig "$gdn1"/"${newitem[$gdn3]}"
+			fi
+		   else
+		   echo -e "\e[91mNot a directory/Bad Input\e[0m"
+		   fi;;
+		   esac
+	    done;;
+	h|H)unset cldopt
+	    unset tempsortdir
+            unset tempsortfile
+            unset tempmock
+	    oprpt="n"
+	    homekey="y";;
+	u|U)feeder
+	    if [[ "$homekey" != "y" ]]
+	    then
+	    cloudupload
+	    fi;;
+	b|B)backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
+	    cloudnavig "$backpath";;
+	f|F)rclone tree $gdn1 -d --full-path
+	    instfmt "Enter path"
+	    read gdn18
+	    cloudnavig $gdn1"$gdn18";;
+	m|M)instfmt "Enter name for new directory"
+	    read gdnnd
+	    rclone mkdir $gdn1/"$gdnnd"
+	    cloudnavig $gdn1;;
+	z|Z)invslct "${newitem[@]}";;
+	a|A)srchopt=()
+	    for ((i=0; i<${#newitem[@]}; i++)); do
+	    srchopt+=( "$i" )
+	    done
+	    actionitems
+	    dfsort;;
+	r|R)colorfmt "$cldopt"
+	    echo -e "\e[91mRoot folder selected(Should only be selected as destination. No other operations are permitted)\e[0m";;
+	e|E)rclone cleanup $cldopt --drive-trashed-only -v;;
+	*)if [ "$v122" == "p" ]
+	  then
+	  IFS=', ' read -r -a srchopt <<< "$gdn2"
+	  actionitems
+	  dfsort
+	  else
+	  echo -e "\e[91mBad Input\e[0m"
+	  unset cldopt
+	  return
+	  fi;;
+	esac
+fi
+IFS=$SAVEIFS
+}
+
+#------------------------------------------------------------------------------------------------
+function dfsort ()
+{
+for sortemt in "${srchopt[@]}"
+do
+	if [ "${isdir[$sortemt]}" == -1 ]	
+	then
+	sortdir+=( "${newitem[$sortemt]}" )
+	sortindex+=( "$sortemt" )
+	fi
+done
+sortfileinp=( $(printf "%s\n" "${srchopt[@]}" "${sortindex[@]}" | sort | uniq -u) )
+for sortemt1 in "${sortfileinp[@]}"
+do
+sortfile+=( "${newitem[$sortemt1]}" )
+done		
+}
+
+
+
+
+
