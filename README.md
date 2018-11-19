@@ -3,13 +3,13 @@ Supreme is a command line file manager written in shell script.
 
 Supreme supports file management operations on phone(android),usb drive,cloud storage and local drive(Tested for ubuntu 18.04).
 
-##Dependencies
+## Dependencies
 
 <details>
 <summary>rclone</summary>
 Supreme(>V1.1.22) uses package 'rclone'(>=1.42) for cloud storage operations. rclone will be downloaded and installed automatically.
 
-####incase rclone fails to install. 
+#### incase rclone fails to install. 
 * Get rclone [here](https://rclone.org/downloads/) 
 
 </details>
@@ -18,7 +18,7 @@ Supreme(>V1.1.22) uses package 'rclone'(>=1.42) for cloud storage operations. rc
 <summary>jq</summary>
 jq is a lightweight and flexible command-line JSON processor. jq will be downloaded and installed automatically.
 
-####incase jq fails to install. 
+#### incase jq fails to install. 
 * Get jq [here](https://stedolan.github.io/jq/download/)
 
 </details>
@@ -27,12 +27,12 @@ jq is a lightweight and flexible command-line JSON processor. jq will be downloa
 <summary>curl</summary>
 command line tool and library for transferring data with URLs. curl comes inbuilt in most of the Linux distros. If not curl will be downloaded and installed automatically.
 
-####incase curl fails to install. 
+#### incase curl fails to install. 
 * Get curl [here](https://curl.haxx.se/download.html)
 
 </details>
 
-##Usage
+## Usage
 
 Type 'supreme' and hit enter in the bash terminal. Follow the instructions 
 
