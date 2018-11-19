@@ -5,6 +5,9 @@
 if [[ -f /usr/bin/kbfunctions_basic ]]
 then
 . /usr/bin/kbfunctions_basic
+elif [[ -f /usr/local/bin/kbfunctions_basic ]]
+then
+. /usr/local/bin/kbfunctions_basic
 else
 buildpath=$(pwd)
 . "$buildpath"/kbfunctions_basic
@@ -42,7 +45,14 @@ v1=$( echo $(numval "$uc55") )
 			    unset arraymock;;
 			  h)homekey="y";;
 			  *)return;;
-			  esac;;
+			  esac
+			  if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
+			  then
+			  opnr="e"
+			  operations
+			  else
+			  return
+			  fi;;
 			2)fsys=$(df -h "${usbarr[$uc55]}" | awk '{print $1}' | sed 1d)
 			  instfmt "Are you sure you want to format ${usbarr[$uc55]}?(y/n)"
 			  echo -e "\e[91mWarning: This is irreversible and will erase everything\e[0m"
@@ -64,13 +74,6 @@ v1=$( echo $(numval "$uc55") )
 			*)echo -e "\e[91mBad input\e[0m"
 			  return;;
 			esac
-			if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
-			then
-			opnr="e"
-			operations
-			else
-			return
-			fi
 		else
 		echo -e "\e[91mBad input\e[0m"
 		fi
@@ -196,14 +199,14 @@ linecount=$( wc -l /home/"$user"/.config/rclone/rclone.conf | cut -d ' ' -f1 )
 	then
 	rclone config
 	fi
-	if [[ -f .supremecloud.txt ]]
+	if [[ -f /home/"$user"/.supremecloud.txt ]]
 	then
-	sudo rm -f .supremecloud.txt
+	sudo rm -f /home/"$user"/.supremecloud.txt
 	fi
 	while read line; do
 		if [[ "$line" == "["*"]" ]]
 		then
-		echo $line | cut -d "[" -f2 | cut -d "]" -f1 >> .supremecloud.txt
+		echo $line | cut -d "[" -f2 | cut -d "]" -f1 >> /home/"$user"/.supremecloud.txt
 		fi
 	done < /home/"$user"/.config/rclone/rclone.conf
 else
@@ -219,7 +222,7 @@ then
 instfmt "Select cloud storage"
 	while read line; do
 	cloudlist+=( "$line" )
-	done < .supremecloud.txt
+	done < /home/"$user"/.supremecloud.txt
 	for ((i=0; i<${#cloudlist[@]}; i++))
 	do
 	echo -e "($i) ${cloudlist[$i]}"
@@ -604,8 +607,8 @@ read opn11
 	5)opnr="f"
 	  Q=$( echo "${arraymock[0]}" | rev | cut -d '/' -f 1 | rev )
 	  R=$( echo "${arraymock[0]}" | rev | cut -d '/' -f2- | rev )
-	  echo -e "\e[93mCurrent Name: $Q\e[0m"
-	  echo -e "\e[93mEnter New Name\e[0m"
+	  instfmt "Current Name: $Q"
+	  instfmt "Enter New Name"
 	  read newname
 	  instfmt "Are you sure you want to rename $Q to $newname?(y/n)"
 	  read opn88
@@ -711,7 +714,7 @@ read opn209
 	fi;;
 	b)opnr="e"
 	  homekey="y";;
-	*)echo -e "\e[91mBad Input\e[0m"
+	*)echo -e "\e[91mBad input\e[0m";;
 	esac
 done
 }
@@ -721,13 +724,13 @@ function select_cs ()
 unset csopt
 navdoor="GEN"
 genlist=()
-if [[ -d .supreme_cs ]]
+if [[ -d /home/"$user"/.supreme_cs ]]
 then
-	for file in .supreme_cs/*
+	for file in /home/"$user"/.supreme_cs/*
 	do
 	genlist+=( "$file" )
 	done
-	if [[ "${#genlist[@]}" != 0 ]] && [[ "${genlist[@]}" != ".supreme_cs/*" ]]
+	if [[ "${#genlist[@]}" != 0 ]] && [[ "${genlist[@]}" != "/home/$user/.supreme_cs/*" ]]
 	then
 	instfmt "Select script"
 		for ((i=0; i<${#genlist[@]}; i++))
@@ -750,18 +753,18 @@ instfmt "Select an option | h [Home]"
 echo -e "(1)Add script\n(2)Remove script(s)\n(3)Modify script\n(4)Execute script\n(5)Run Commands"
 read cs1
 case "$cs1" in
-1)if [[ -d .supreme_cs ]]
+1)if [[ -d /home/"$user"/.supreme_cs ]]
   then
   instfmt "Enter file name"
   read csfn
-  sudo touch .supreme_cs/"$csfn"
-  sudo xdg-open .supreme_cs/"$csfn"
+  sudo touch /home/"$user"/.supreme_cs/"$csfn"
+  sudo xdg-open /home/"$user"/.supreme_cs/"$csfn"
   else
-  sudo mkdir .supreme_cs
+  sudo mkdir /home/"$user"/.supreme_cs
   instfmt "Enter file name"
   read csfn
-  sudo touch .supreme_cs/"$csfn"
-  sudo xdg-open .supreme_cs/"$csfn"
+  sudo touch /home/"$user"/.supreme_cs/"$csfn"
+  sudo xdg-open /home/"$user"/.supreme_cs/"$csfn"
   fi;;
 2)select_cs
   v180=$(echo $(numval "$csopt"))
@@ -830,6 +833,183 @@ esac
 }
 
 #------------------------------------------------------------------------------------------------
+function config_qa ()
+{
+banner
+genlist=()
+arraymock=()
+navdoor="GEN"
+instfmt "Select an option"
+echo -e "(1)Add folder(s) to list\n(2)Remove folder(s) from list"
+read cqa
+case $cqa in
+1)feeder
+  case "${#arraymock[@]}" in
+  0)echo "\e[91mNo items selected\e[0m";;
+  *)lc=0
+    for emt in "${arraymock[@]}"
+    do
+    	if [[ -d "$emt" ]]
+        then
+	genlist+=( "$emt" )
+	lc=$(($lc+1))
+        fi
+    done
+    templist=( "${genlist[@]}" )
+    if [[ -f /home/"$user"/.supreme_qaconfig.txt ]]
+    then
+	while read line; do
+	genlist+=( "$line" )
+	done < /home/"$user"/.supreme_qaconfig.txt
+    SAVEIFS=$IFS
+    IFS=$(echo -en "\n\b")
+    genlist=( $(remove_array_dups "${genlist[@]}") )
+    echo -n > /home/"$user"/.supreme_qaconfig.txt 
+    fi
+    case "${#genlist[@]}" in
+    0)echo -e "\e[91mNo directories selected\e[0m";;
+    *)IFS=$SAVEIFS
+      colorfmt "${templist[@]}"
+      echo -e "\e[91mAdded $lc directorie(s) to list\e[0m"
+      for emt in "${genlist[@]}"
+      do
+      echo "$emt" >> /home/"$user"/.supreme_qaconfig.txt
+      done;;
+    esac
+  esac;;
+2)wc -l /home/"$user"/.supreme_qaconfig.txt > /dev/null 2>&1 || { echo -e "\e[91mNo folder added\e[0m"; return; }
+  linecount=$( wc -l /home/"$user"/.supreme_qaconfig.txt | cut -d ' ' -f1 )
+  if [[ -f /home/"$user"/.supreme_qaconfig.txt ]] && [[ "$linecount" != 0 ]]
+  then
+	while read line; do
+	genlist+=( "$line" )
+	done < /home/"$user"/.supreme_qaconfig.txt
+  colorfmt "${genlist[@]}"
+  instfmt "Select folder(s)"
+  read cqa1
+  v028=$( echo $(numval "$cqa1") )
+	  if [ "$v028" == "p" ]
+	  then
+	  IFS=', ' read -r -a srchopt <<< "$cqa1"
+          actionitems
+          instfmt "Do you want to remove selected folder(s) from list?(y/n)"
+	  read cqa2
+     	  	case "$cqa2" in
+		y|Y)SAVEIFS=$IFS
+		    IFS=$(echo -en "\n\b")
+		    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
+		    IFS=$SAVEIFS;;
+		*)return;;
+		esac
+	  else
+     	  echo -e "\e[91mBad input\e[0m"
+	  fi
+  echo -n > /home/"$user"/.supreme_qaconfig.txt
+	  for emt in "${genlist[@]}"
+	  do
+	  echo "$emt" >> /home/"$user"/.supreme_qaconfig.txt
+	  done
+  else
+  echo -e "\e[91mNo folder added\e[0m"
+  fi;;
+esac
+}
+
+#------------------------------------------------------------------------------------------------
+function config_theme()
+{
+banner
+instfmt "Select a theme"
+echo -e "(1)Aqua\n \e[44m       \e[0m\n \e[46m       \e[0m\n(2)Forest\n \e[42m       \e[0m\n \e[103m       \e[0m\n(3)Classic\n \e[40m       \e[0m\n \e[100m       \e[0m\n(4)Solar\n \e[41m       \e[0m\n \e[103m       \e[0m\n(5)Carbon\n \e[100m       \e[0m\n \e[40m       \e[0m\n(6)Default\n \e[100m       \e[0m\n \e[101m       \e[0m"
+read thm
+if [[ -f /home/"$user"/.supremetheme.txt ]]
+then
+chmod 666 /home/"$user"/.supremetheme.txt
+fi
+case "$thm" in
+1)echo -n > /home/"$user"/.supremetheme.txt
+  echo pri=\""\e[44m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo sec=\""\e[46m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo logopri=\""\e[46;37;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo logosec=\""\e[47;34;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo userpri=\""\e[46;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp1=\""\e[44;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp2=\""\e[100;96;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp1fill=\""\e[44m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp2fill=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo ifmt=\""\e[44;37;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo ifmtfill=\""\e[44m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
+2)echo -n > /home/"$user"/.supremetheme.txt
+  echo pri=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo sec=\""\e[103m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo logopri=\""\e[103;34;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo logosec=\""\e[46;33;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo userpri=\""\e[103;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp1=\""\e[42;37;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp2=\""\e[40;32;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp1fill=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp2fill=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo ifmt=\""\e[42;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo ifmtfill=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
+3)echo -n > /home/"$user"/.supremetheme.txt
+  echo pri=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo sec=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo logopri=\""\e[100;31;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo logosec=\""\e[101;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo userpri=\""\e[100;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp1=\""\e[40;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp2=\""\e[107;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp1fill=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp2fill=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo ifmt=\""\e[40;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo ifmtfill=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
+4)echo -n > /home/"$user"/.supremetheme.txt
+  echo pri=\""\e[41m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo sec=\""\e[103m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo logopri=\""\e[103;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo logosec=\""\e[40;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo userpri=\""\e[103;90;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp1=\""\e[41;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp2=\""\e[107;31;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp1fill=\""\e[41m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp2fill=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo ifmt=\""\e[41;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo ifmtfill=\""\e[41m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
+5)echo -n > /home/"$user"/.supremetheme.txt
+  echo pri=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo sec=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo logopri=\""\e[40;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo logosec=\""\e[100;37;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo userpri=\""\e[40;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp1=\""\e[100;37;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp2=\""\e[40;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp1fill=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo cfmtp2fill=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+  echo ifmt=\""\e[100;36;1;82m"\" >> /home/"$user"/.supremetheme.txt
+  echo ifmtfill=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
+6)sudo rm -f /home/"$user"/.supremetheme.txt;;
+*)echo -e "\e[91mBad input\e[0m";;
+esac
+if [[ -f /home/"$user"/.supremetheme.txt ]]
+then
+chmod 444 /home/"$user"/.supremetheme.txt
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function preferences ()
+{
+instfmt "Select an option"
+echo -e "(1)Configure Quick Access Folders\n(2)Themes"
+read prfn
+case $prfn in
+1)config_qa;;
+2)config_theme;;
+*)echo -e "\e[91mBad input\e[0m";;
+esac
+}
+
+#------------------------------------------------------------------------------------------------
 user=$(whoami)
 if [ "$user" == "root" ]
 then
@@ -845,7 +1025,7 @@ opnr="y"
 banner
 
 instfmt "Select an option"
-echo -e "(1)\e[32m⏏\e[0m  Open Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)📱 Manage Phone\n(4)\e[91m🎞\e[0m  Manage USB\n(5)\e[94m🌩 \e[0m Manage Cloud\n(6)🔗 Manage Custom Scripts\n(x)\e[91m✖\e[0m  Exit"
+echo -e "(1)\e[32m⏏\e[0m  Open Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)📱 Manage Phone\n(4)\e[91m🎞\e[0m  Manage USB\n(5)\e[94m🌩 \e[0m Manage Cloud\n(6)🔗 Manage Custom Scripts\n(p)⚙  Preferences\n(x)\e[91m✖\e[0m  Exit"
 	while [ "$opnr" == "y" ]
 	do
 	read opn2
@@ -887,7 +1067,10 @@ echo -e "(1)\e[32m⏏\e[0m  Open Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)📱
 		  banner
 		  custom_scripts
 		  load_delay;;
-		x)opnr="e"
+		p|P)opnr="e"
+		  preferences
+		  load_delay;;
+		x|X)opnr="e"
 		  instfmt "To report bug: mail to kiran.vkvr@gmail.com or visit https://github.com/Kiran-Bose/supreme"
 		  exec bash
 		  return;;

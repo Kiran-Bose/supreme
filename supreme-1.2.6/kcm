@@ -3,9 +3,13 @@
 #https://github.com/Kiran-Bose/supreme
 
 if [[ -f /usr/bin/kbfunctions_basic ]] && [[ -f /usr/bin/progress_bar ]]
-then
+then 
 . /usr/bin/kbfunctions_basic
 . /usr/bin/progress_bar
+elif [[ -f /usr/local/bin/kbfunctions_basic ]] && [[ -f /usr/local/bin/progress_bar ]]
+then
+. /usr/local/bin/kbfunctions_basic
+. /usr/local/bin/progress_bar
 else
 buildpath=$(pwd)
 . "$buildpath"/kbfunctions_basic
