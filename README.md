@@ -157,6 +157,10 @@ sudo apt-get install supreme
 ```bash
 deb http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main 
 deb-src http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main
+```
+### And then run the following
+
+```bash
 sudo apt-get update
 sudo apt-get install supreme
 ```
