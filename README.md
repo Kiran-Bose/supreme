@@ -145,14 +145,14 @@ install
 <details>
 <summary>Apt Package Manager</summary>
 
-###For bionic and xenial
+### For bionic and xenial
 
 ```bash
 sudo add-apt-repository ppa:kiran.kb/supreme
 sudo apt-get update
 sudo apt-get install supreme
 ```
-###For other ubuntu versions,this PPA can be added to your system manually by copying the lines below and adding them to your system's software sources.
+### For other ubuntu versions,this PPA can be added to your system manually by copying the lines below and adding them to your system's software sources.
 
 ```bash
 deb http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main 
@@ -160,7 +160,7 @@ deb-src http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main
 sudo apt-get update
 sudo apt-get install supreme
 ```
-####If it throws error, run the following
+#### If it throws error, run the following
 
 ```bash
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E021E2DC3302D8CE
@@ -207,7 +207,7 @@ sudo apt upgrade
 <details>
 <summary>Git Update</summary>
 
-####If the package is installed running '. install' mentioned in Git install section, running it again will prompt for update if any.
+#### If the package is installed running '. install' mentioned in Git install section, running it again will prompt for update if any.
 
 * cd into the cloned directory:
 ```bash
