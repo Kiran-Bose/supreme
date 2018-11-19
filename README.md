@@ -7,7 +7,7 @@ Supreme supports file management operations on phone(android),usb drive,cloud st
 
 <details>
 <summary>rclone</summary>
-Supreme(>V1.1.22) uses package 'rclone'(>=1.42) for cloud storage operations. rclone will be downloaded and installed automatically.
+Supreme(>v1.1.22) uses package 'rclone'(>=v1.42) for cloud storage operations. rclone will be downloaded and installed automatically.
 
 #### incase rclone fails to install. 
 * Get rclone [here](https://rclone.org/downloads/) 
