@@ -126,7 +126,7 @@ Type 'supreme' and hit enter in the bash terminal. Follow the instructions
 
 <details>
 <summary>(X)Exit</summary>
-</div>
+</details>
 
 
 
