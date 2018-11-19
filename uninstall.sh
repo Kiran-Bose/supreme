@@ -28,6 +28,6 @@ if command -v supreme &>/dev/null; then
 	*)echo -e "You opted out from uninstalling supreme";;
 	esac
 else
-echo "supreme not installed"
+echo "supreme not installed: Hence not removed"
 fi
     
