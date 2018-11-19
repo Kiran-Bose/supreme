@@ -2,6 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
+currentversion="1.2.6"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -591,19 +592,28 @@ ifmtfill="\e[100m \e[0m"
 #------------------------------------------------------------------------------------------------
 function banner ()
 {
+block=0
 tput reset
 user=$(whoami)
 col=$(tput cols)
 pos=$(($col/2-4))
 if [[ -f /home/"$user"/.supremetheme.txt ]]
 then
-paracount=$( wc -l /home/"$user"/.supremetheme.txt | cut -d ' ' -f1 )
-	if (($paracount<11)) > /dev/null 2>&1
-	then
-	def_theme
-	else
-	. /home/"$user"/.supremetheme.txt
-	fi
+chmod 444 /home/"$user"/.supremetheme.txt
+	while read line; do
+		case "$line" in
+		*sudo*|*source*|*rm*|*.*|*dd*|*cp*|*mv*|*purge*|*delete*|*python*|*make*|*install*|*chmod*|*chown*)
+		def_theme
+		block=1;;
+		esac
+	done < /home/"$user"/.supremetheme.txt
+	case $block in
+	0)paracount=$( wc -l /home/"$user"/.supremetheme.txt | cut -d ' ' -f1 )
+	  case $paracount in
+	  11). /home/"$user"/.supremetheme.txt;;
+	  *)def_theme;;
+	  esac;;
+	esac
 else
 def_theme
 fi
@@ -628,7 +638,7 @@ for ((i=0; i<$pos; i++))
 do
 echo -en "$sec"
 done
-echo -en "$logosec  1.2.5  \e[0m"
+echo -en "$logosec  $currentversion  \e[0m"
 echo -en "\0015"
 echo -en "$userpri$user\e[0m"
 echo

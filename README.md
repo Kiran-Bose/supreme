@@ -3,47 +3,52 @@ Supreme is a command line file manager written in shell script.
 
 Supreme supports file management operations on phone(android),usb drive,cloud storage and local drive(Tested for ubuntu 18.04).
 
-Download the deb package to any debian based system and install
+##Dependencies
 
-Supreme(>V1.1.22) uses package 'rclone'(1.42) for cloud storage operations.  rclone will be downloaded and installed automatically.
+<details>
+<summary>rclone</summary>
+Supreme(>V1.1.22) uses package 'rclone'(>=1.42) for cloud storage operations. rclone will be downloaded and installed automatically.
 
-    visit below link to download latest version of rclone incase rclone fails to install. 
-  https://rclone.org/downloads/ 
+####incase rclone fails to install. 
+* Get rclone [here](https://rclone.org/downloads/) 
 
-You may also add supreme from PPA:
-For bionic and xenial, do the following:
+</details>
 
-    sudo add-apt-repository ppa:kiran.kb/supreme
-    sudo apt-get update
-    sudo apt-get install supreme
-    
- For other ubuntu versions,this PPA can be added to your system manually by copying the lines below and adding them to your system's software sources.
+<details>
+<summary>jq</summary>
+jq is a lightweight and flexible command-line JSON processor. jq will be downloaded and installed automatically.
 
-    deb http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main 
-    deb-src http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main
-    
-   If it throws error for gpg keys, run the following in a terminal window
-   
-    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E021E2DC3302D8CE
-    
-   And then run the following:
-   
-    sudo apt-get update
-    sudo apt-get install supreme
+####incase jq fails to install. 
+* Get jq [here](https://stedolan.github.io/jq/download/)
 
-Usage: Type 'supreme' and hit enter in the bash terminal. Follow the instructions
+</details>
 
-Functionality overview
+<details>
+<summary>curl</summary>
+command line tool and library for transferring data with URLs. curl comes inbuilt in most of the Linux distros. If not curl will be downloaded and installed automatically.
 
-(1)Open Apps  
+####incase curl fails to install. 
+* Get curl [here](https://curl.haxx.se/download.html)
 
+</details>
+
+##Usage
+
+Type 'supreme' and hit enter in the bash terminal. Follow the instructions 
+
+## Functionality Overview
+
+<details>
+<summary>(1)Open Apps</summary>
 
     ----Firefox                                  
     ----Calculator          
-    ----Settings               
-    
-(2)Manage Files   
+    ----Settings
 
+</details>
+
+<details>
+<summary>(2)Manage Files</summary>
 
     ----Search                        
     ----Navigate                
@@ -69,34 +74,214 @@ Functionality overview
                                                   |----Go Home
 
 
-(3)Manage Phone    
 
+</details>
+
+
+<details>
+<summary>(3)Manage Phone</summary>
 
     ----Phone File Explorer           
     ----Sync folders                          
-    
-(4)Manage USB 
 
+</details>
+
+
+<details>
+<summary>(4)Manage USB</summary>
 
     ----USB File Explorer
     ----Format
-  
- (5)Manage Cloud
- 
+
+</details>
+
+
+<details>
+<summary>(5)Manage Cloud</summary>
+
     ----Cloud File Explorer
     ----Configure Cloud
-    
- (6)Manage Custom Scripts
- 
+
+</details>
+
+
+<details>
+<summary>(6)Manage Custom Scripts</summary>
+
     ----Add Script
     ----Remove Script(s)
     ----Modify Script
     ----Execute Script
     ----Run Commands
-   
- (p)Preferences
-    
+
+</details>
+
+<details>
+<summary>(p)Preferences</summary>
+
     ----Configure Quick Access Folders
     ----Themes
-  
- (X)Exit
+
+</details>
+
+<details>
+<summary>(X)Exit</summary>
+</div>
+
+
+
+## Installation
+
+<details>
+<summary>Debian package install</summary>
+
+```bash
+Download debian package amd64.deb/i386.deb from release tab to any debian based Linux
+install
+```
+
+</details>
+
+<details>
+<summary>Apt Package Manager</summary>
+
+###For bionic and xenial
+
+```bash
+sudo add-apt-repository ppa:kiran.kb/supreme
+sudo apt-get update
+sudo apt-get install supreme
+```
+###For other ubuntu versions,this PPA can be added to your system manually by copying the lines below and adding them to your system's software sources.
+
+```bash
+deb http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main 
+deb-src http://ppa.launchpad.net/kiran.kb/supreme/ubuntu bionic main
+sudo apt-get update
+sudo apt-get install supreme
+```
+####If it throws error, run the following
+
+```bash
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E021E2DC3302D8CE
+sudo apt-get update
+sudo apt-get install supreme
+```
+</details>
+
+<details>
+<summary>Git Install</summary>
+
+* First clone the repository:  
+```bash
+git clone https://github.com/Kiran-Bose/supreme
+```
+
+* Then cd into the cloned directory:
+```bash
+cd supreme
+```
+
+* Run the guided install script with
+```bash
+. install.sh
+```
+
+</details>
+
+
+
+
+## Updating
+
+<details>
+<summary>Apt Package Manager</summary>
+
+```bash
+sudo apt update
+sudo apt upgrade
+```
+
+</details>
+
+<details>
+<summary>Git Update</summary>
+
+####If the package is installed running '. install' mentioned in Git install section, running it again will prompt for update if any.
+
+* cd into the cloned directory:
+```bash
+cd supreme
+```
+
+* Run the guided install script with
+```bash
+. install.sh
+```
+</details>
+
+
+
+## Uninstalling
+
+</details>
+
+<details>
+<summary>Apt Package Manager/Debian package uninstall</summary>
+
+```bash
+sudo apt remove supreme
+```
+	OR
+
+```bash
+sudo apt purge supreme
+```
+
+</details>
+
+<details>
+<summary>Git Uninstall</summary>
+
+
+* If you don't have the supreme folder anymore clone the repository:  
+```bash
+git clone https://github.com/Kiran-Bose/supreme
+```
+
+* cd into the supreme directory:
+```bash
+cd supreme
+```
+* run the below command
+```bash
+. uninstall.sh
+```
+
+</details>
+
+
+## Copyright
+
+Copyright (C) 2018 by kiran Bose kiran.vkvr@gmail.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ 
+
+

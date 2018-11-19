@@ -5,6 +5,9 @@
 if [[ -f /usr/bin/kbfunctions_basic ]]
 then
 . /usr/bin/kbfunctions_basic
+elif [[ -f /usr/local/bin/kbfunctions_basic ]]
+then
+. /usr/local/bin/kbfunctions_basic
 else
 buildpath=$(pwd)
 . "$buildpath"/kbfunctions_basic
@@ -919,6 +922,10 @@ banner
 instfmt "Select a theme"
 echo -e "(1)Aqua\n \e[44m       \e[0m\n \e[46m       \e[0m\n(2)Forest\n \e[42m       \e[0m\n \e[103m       \e[0m\n(3)Classic\n \e[40m       \e[0m\n \e[100m       \e[0m\n(4)Solar\n \e[41m       \e[0m\n \e[103m       \e[0m\n(5)Carbon\n \e[100m       \e[0m\n \e[40m       \e[0m\n(6)Default\n \e[100m       \e[0m\n \e[101m       \e[0m"
 read thm
+if [[ -f /home/"$user"/.supremetheme.txt ]]
+then
+chmod 666 /home/"$user"/.supremetheme.txt
+fi
 case "$thm" in
 1)echo -n > /home/"$user"/.supremetheme.txt
   echo pri=\""\e[44m \e[0m"\" >> /home/"$user"/.supremetheme.txt
@@ -983,6 +990,10 @@ case "$thm" in
 6)sudo rm -f /home/"$user"/.supremetheme.txt;;
 *)echo -e "\e[91mBad input\e[0m";;
 esac
+if [[ -f /home/"$user"/.supremetheme.txt ]]
+then
+chmod 444 /home/"$user"/.supremetheme.txt
+fi
 }
 
 #------------------------------------------------------------------------------------------------
