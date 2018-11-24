@@ -130,7 +130,7 @@ Type 'supreme' and hit enter in the bash terminal. Follow the instructions
 
 
 
-## Installation
+## Install
 
 <details>
 <summary>Debian package install</summary>
@@ -196,7 +196,7 @@ cd supreme
 
 
 
-## Updating
+## Update
 
 <details>
 <summary>Apt Package Manager</summary>
@@ -226,7 +226,7 @@ cd supreme
 
 
 
-## Uninstalling
+## Uninstall
 
 </details>
 
