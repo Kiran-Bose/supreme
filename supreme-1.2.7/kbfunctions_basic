@@ -628,7 +628,7 @@ for ((i=0; i<$pos; i++))
 do
 echo -en "$pri"
 done
-echo -en "$logopri Supreme \e[0m"
+echo -en "$logopri SUpreme \e[0m"
 echo
 for ((i=0; i<$col; i++))
 do

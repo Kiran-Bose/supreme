@@ -1,7 +1,7 @@
-# supreme
-Supreme is a command line file manager written in shell script.
+# SUpreme
+SUpreme is a command line file manager written in shell script.
 
-Supreme supports file management operations on phone(android),usb drive,cloud storage and local drive(Tested for ubuntu 18.04).
+SUpreme supports file management operations on phone(android),usb drive,cloud storage and local drive(Tested for ubuntu 18.04).
 
 ## Dependencies
 
