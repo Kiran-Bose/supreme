@@ -1142,7 +1142,7 @@ opnr="y"
 banner
 
 instfmt "Select an option"
-echo -e "(1)\e[36m🔡\e[0m  Manage Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)📱 Manage Phone\n(4)\e[91m🎞\e[0m  Manage USB\n(5)\e[94m🌩 \e[0m Manage Cloud\n(6)🔗 Manage Custom Scripts\n(p)⚙  Preferences\n(x)\e[91m✖\e[0m  Exit"
+echo -e "(1)\e[36m🔡\e[0m Manage Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)📱 Manage Phone\n(4)\e[91m🎞\e[0m  Manage USB\n(5)\e[94m🌩 \e[0m Manage Cloud\n(6)🔗 Manage Custom Scripts\n(p)⚙  Preferences\n(x)\e[91m✖\e[0m  Exit"
 	while [ "$opnr" == "y" ]
 	do
 	read opn2
