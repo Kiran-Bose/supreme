@@ -693,6 +693,7 @@ navdoor="GEN"
 genlist=()
 templist=()
 displaylist=()
+banner
 instfmt "Select an option | h [Home]"
 echo -e "(1)Add app(s) to list\n(2)Remove app(s) from list"
 read cal1
@@ -742,6 +743,7 @@ case $cal1 in
 			"-#"*)templist+=( "$line" );;
 			esac
 		done < /home/"$user"/.supreme_app_config
+	  banner
 	  instfmt "Select apps you want to remove"
 	  genfmt "${genlist[@]}"
 	  read cal4
