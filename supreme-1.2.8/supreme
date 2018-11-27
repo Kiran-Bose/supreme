@@ -700,6 +700,7 @@ case $cal1 in
 1)addnew=y
   while [[ "$addnew" == "y" ]]
   do
+  banner
   genlist=()
   templist=()
   instfmt "Enter command to open app"
@@ -741,7 +742,7 @@ case $cal1 in
 			"-#"*)templist+=( "$line" );;
 			esac
 		done < /home/"$user"/.supreme_app_config
-	  instfmt "Select apps you need to remove"
+	  instfmt "Select apps you want to remove"
 	  genfmt "${genlist[@]}"
 	  read cal4
 	  IFS=', ' read -r -a srchopt <<< "$cal4"
@@ -785,7 +786,8 @@ instfmt "Select an option | h [home]"
 echo -e "(1)Open Apps\n(2)Configure App List"
 read appvar
 case $appvar in
-1)appnamelist=( "\e[94m🌐\e[0m Fire Fox" "\e[93m📅\e[0m Calculator" "🛠  Settings" )
+1)banner
+  appnamelist=( "\e[94m🌐\e[0m Fire Fox" "\e[93m📅\e[0m Calculator" "🛠  Settings" )
   executionlist=( firefox gnome-calculator gnome-control-center )
   if [[ -f /home/"$user"/.supreme_app_config ]]
   then
