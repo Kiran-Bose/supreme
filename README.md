@@ -39,11 +39,10 @@ Type 'supreme' and hit enter in the bash terminal. Follow the instructions
 ## Functionality Overview
 
 <details>
-<summary>(1)Open Apps</summary>
+<summary>(1)Manage Apps</summary>
 
-    ----Firefox                                  
-    ----Calculator          
-    ----Settings
+    ----Open Apps                                  
+    ----Configure App List
 
 </details>
 
