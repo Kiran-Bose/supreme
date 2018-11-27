@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.2.6"
+currentversion="1.2.7"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -141,6 +141,7 @@ do
 	return
 	fi
 done
+unset srch11
 }
 
 #------------------------------------------------------------------------------------------------
@@ -500,6 +501,16 @@ fi
 }
 
 #------------------------------------------------------------------------------------------------
+function genfmt ()
+{
+genarray=( "$@" )
+for ((a=0; a<${#genarray[@]}; a++))
+do
+echo -e "($a) ${genarray[$a]}"
+done
+}
+
+#------------------------------------------------------------------------------------------------
 function colorfmt ()
 {
 banner
@@ -627,7 +638,7 @@ for ((i=0; i<$pos; i++))
 do
 echo -en "$pri"
 done
-echo -en "$logopri Supreme \e[0m"
+echo -en "$logopri SUpreme \e[0m"
 echo
 for ((i=0; i<$col; i++))
 do

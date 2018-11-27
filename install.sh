@@ -73,13 +73,13 @@ instdirchk=("$instsrch"/*)
 		for item in "${instlist[0]}"/*
 		do
 			case "$item" in
-			"${instlist[0]}"/kbfunctions_basic) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/kbfunctions_basic
+			"${instlist[0]}"/kbfunctions_basic) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/kbfunctions_basic &&
 			i=$(($i+1));;
-			"${instlist[0]}"/supreme) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/supreme
+			"${instlist[0]}"/supreme) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/supreme &&
 			i=$(($i+1));;
-			"${instlist[0]}"/kcm) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/kcm
+			"${instlist[0]}"/kcm) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/kcm &&
 			i=$(($i+1));;
-			"${instlist[0]}"/progress_bar) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/progress_bar
+			"${instlist[0]}"/progress_bar) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/progress_bar &&
 			i=$(($i+1));;
 			esac
 		done
@@ -152,7 +152,7 @@ instdirchk=("$instsrch"/*)
 				     1)sudo yum install curl
 				       dependency_check;;
 				     esac;;
-			*SUSE*|*Open*)case $deprc in
+			*SUSE*|*Open*|*SuSE*)case $deprc in
 			       	      1)sudo zypper install rclone
 			         	dependency_check;;
 			              esac
@@ -195,6 +195,8 @@ instdirchk=("$instsrch"/*)
 		  
 		*)echo -e "Unknown error during installation";;
 		esac
+	else
+	echo -e "No installables found"
 	fi
 
 }
