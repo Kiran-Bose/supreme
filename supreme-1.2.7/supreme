@@ -771,7 +771,8 @@ case $cal1 in
   else
   echo -e "\e[91mNo app added to list\e[0m"
   fi;;
-h|H)homekey="y"
+h|H)homekey="y";;
+*)echo -e "\e[91mBad input\e[0m";;
 esac
 }
 
@@ -826,7 +827,8 @@ case $appvar in
 2)config_applist;;
 h|H)opnr="e"
     homekey="y";;
-*)opnr="e";;
+*)opnr="e"
+  echo -e "\e[91mBad input\e[0m";;
 esac
 }
 
@@ -922,7 +924,7 @@ case "$cs1" in
 			case "$cscmd" in
 			h|H)csrpt="n"
 			    homekey="y"
-			   return;;
+			    return;;
 			*)homekey="y"
 			  $cscmd
 			  instfmt "Do you want to continue executing your script?(y/n)"
@@ -942,6 +944,7 @@ case "$cs1" in
   read csrpt
   done;;
 h|H)homekey="y";;
+*)echo -e "\e[91mBad input\e[0m";;
 esac
 }
 
@@ -1025,6 +1028,7 @@ case $cqa in
   else
   echo -e "\e[91mNo folder added\e[0m"
   fi;;
+*)echo -e "\e[91mBad input\e[0m";;
 esac
 }
 
