@@ -1,4 +1,4 @@
-# SUpreme
+# SUpreme <sup>TM</sup>
 SUpreme is a command line file manager written in shell script.
 
 SUpreme supports file management operations on phone(android),usb drive,cloud storage and local drive(Tested for ubuntu 18.04).
