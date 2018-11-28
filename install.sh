@@ -241,7 +241,7 @@ else
 		    		    git clone https://github.com/kiran-bose/supreme && echo "Done"
 				    cd supreme || { echo 'Update Failed'; return 1; }
 				    install_binaries
-					    if [[ -f "$savepath" ]]; then
+					    if [[ -d "$savepath" ]]; then
 					    cd
 					    cd "$savepath"
 					    fi;;
