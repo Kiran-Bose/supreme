@@ -688,152 +688,161 @@ done
 #------------------------------------------------------------------------------------------------
 function config_applist ()
 {
-opnr="e"
+while [[ "$opnr" == "e" ]]
+do
 navdoor="GEN"
 genlist=()
 templist=()
 displaylist=()
 banner
-instfmt "Select an option | h [Home]"
+instfmt "Select an option | p [Previous Menu] | h [Home]"
 echo -e "(1)Add app(s) to list\n(2)Remove app(s) from list"
 read cal1
-case $cal1 in
-1)addnew=y
-  while [[ "$addnew" == "y" ]]
-  do
-  banner
-  genlist=()
-  templist=()
-  instfmt "Enter command to open app"
-  read cal2
-  instfmt "Enter display name for app"
-  read cal3
-	  if [[ -z $cal3 ]] || [[ "$cal3" == "" ]]; then
-	  cal3=$cal2
-	  fi
+	case $cal1 in
+	1)addnew="y"
+	  opnr="x"
+	  while [[ "$addnew" == "y" ]]
+	  do
+	  banner
+	  genlist=()
+	  templist=()
+	  instfmt "Enter command to open app"
+	  read cal2
+	  instfmt "Enter display name for app"
+	  read cal3
+		  if [[ -z $cal3 ]] || [[ "$cal3" == "" ]]; then
+		  cal3=$cal2
+		  fi
+		  if [[ -f /home/"$user"/.supreme_app_config ]]
+		  then
+		  	while read line; do
+				case "$line" in
+				"#+-"*)genlist+=( "$line" );;
+				"-#"*)templist+=( "$line" );;
+				esac
+			done < /home/"$user"/.supreme_app_config
+		  echo -n > /home/"$user"/.supreme_app_config
+		  fi
+	  genlist+=( "#+-""$cal3" )
+	  templist+=( "-#""$cal2" )
+		  for ((i=0; i<${#genlist[@]}; i++))
+		  do
+		  echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
+		  echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
+		  done
+	  instfmt "Do you want to add more apps to list? (y/n)"
+	  read addnew
+	  done;;
+	2)opnr="x"
 	  if [[ -f /home/"$user"/.supreme_app_config ]]
 	  then
-	  	while read line; do
-			case "$line" in
-			"#+-"*)genlist+=( "$line" );;
-			"-#"*)templist+=( "$line" );;
-			esac
-		done < /home/"$user"/.supreme_app_config
-	  echo -n > /home/"$user"/.supreme_app_config
-	  fi
-  genlist+=( "#+-""$cal3" )
-  templist+=( "-#""$cal2" )
-	  for ((i=0; i<${#genlist[@]}; i++))
-	  do
-	  echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
-	  echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
-	  done
-  instfmt "Do you want to add more apps to list? (y/n)"
-  read addnew
-  done;;
-2)if [[ -f /home/"$user"/.supreme_app_config ]]
-  then
-  wc -l /home/"$user"/.supreme_app_config > /dev/null 2>&1 || { echo -e "\e[91mNo app added to list\e[0m"; return; }
-  linecount=$( wc -l /home/"$user"/.supreme_app_config | cut -d ' ' -f1 )
-	  if [[ "$linecount" != 0 ]]
-	  then
-		while read line; do
-			case "$line" in
-			"#+-"*)genlist+=( "$line" );;
-			"-#"*)templist+=( "$line" );;
-			esac
-		done < /home/"$user"/.supreme_app_config
-	  banner
-	  instfmt "Select apps you want to remove"
-	  genfmt "${genlist[@]}"
-	  read cal4
-	  IFS=', ' read -r -a srchopt <<< "$cal4"
-	  actionitems
-	  instfmt "Are you sure you want to remove selected app(s) from list? (y/n)"
-	  read cal5
-	  	case "$cal5" in
-		y|Y)SAVEIFS=$IFS
-		    IFS=$(echo -en "\n\b")
-		    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
-		    for emt in "${srchopt[@]}"
-		    do
-		    remlist+=( "${templist[$emt]}" )
-		    done
-		    templist=( $(printf "%s\n" "${templist[@]}" "${remlist[@]}" | sort | uniq -u) )
-		    IFS=$SAVEIFS
-		    echo -n > /home/"$user"/.supreme_app_config
-		    for ((i=0; i<${#genlist[@]}; i++))
-		    do
-		    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
-		    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
-		    done;;
-		 esac
+	  wc -l /home/"$user"/.supreme_app_config > /dev/null 2>&1 || { echo -e "\e[91mNo app added to list\e[0m"; return; }
+	  linecount=$( wc -l /home/"$user"/.supreme_app_config | cut -d ' ' -f1 )
+		  if [[ "$linecount" != 0 ]]
+		  then
+			while read line; do
+				case "$line" in
+				"#+-"*)genlist+=( "$line" );;
+				"-#"*)templist+=( "$line" );;
+				esac
+			done < /home/"$user"/.supreme_app_config
+		  banner
+		  instfmt "Select apps you want to remove"
+		  genfmt "${genlist[@]}"
+		  read cal4
+		  IFS=', ' read -r -a srchopt <<< "$cal4"
+		  actionitems
+		  instfmt "Are you sure you want to remove selected app(s) from list? (y/n)"
+		  read cal5
+		  	case "$cal5" in
+			y|Y)SAVEIFS=$IFS
+			    IFS=$(echo -en "\n\b")
+			    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
+			    for emt in "${srchopt[@]}"
+			    do
+			    remlist+=( "${templist[$emt]}" )
+			    done
+			    templist=( $(printf "%s\n" "${templist[@]}" "${remlist[@]}" | sort | uniq -u) )
+			    IFS=$SAVEIFS
+			    echo -n > /home/"$user"/.supreme_app_config
+			    for ((i=0; i<${#genlist[@]}; i++))
+			    do
+			    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
+			    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
+			    done;;
+			 esac
+		  else
+		  echo -e "\e[91mNo app added to list\e[0m"
+		  fi
 	  else
 	  echo -e "\e[91mNo app added to list\e[0m"
-	  fi
-  else
-  echo -e "\e[91mNo app added to list\e[0m"
-  fi;;
-h|H)homekey="y";;
-*)echo -e "\e[91mBad input\e[0m";;
-esac
+	  fi;;
+	h|H)opnr="x"
+	    homekey="y";;
+	p|P)opnr="y";;
+	esac
+done
 }
 
 #------------------------------------------------------------------------------------------------
 function manage_apps ()
 {
+while [[ "$opnr" == "y" ]]
+do
+banner
 genlist=()
 templist=()
 instfmt "Select an option | h [home]"
 echo -e "(1)Open Apps\n(2)Configure App List"
 read appvar
-case $appvar in
-1)banner
-  appnamelist=( "\e[94m🌐\e[0m Fire Fox" "\e[93m📅\e[0m Calculator" "🛠  Settings" )
-  executionlist=( firefox gnome-calculator gnome-control-center )
-  if [[ -f /home/"$user"/.supreme_app_config ]]
-  then
-	while read line; do
-	case "$line" in
-	"#+-"*)genlist+=( "$line" );;
-	"-#"*)Q=$( echo "$line" | cut -d '#' -f 2 )
-	      templist+=( "$Q" );;
-	esac
-	done < /home/"$user"/.supreme_app_config
-  appnamelist+=( "${genlist[@]}" )
-  executionlist+=( "${templist[@]}" )
-  fi
-  instfmt "Select an option | h [Home]"
-  genfmt "${appnamelist[@]}"
-  while [ "$opnr" == "y" ]
-  do
-  read opn209
-  v808=$( echo $(numval "$opn209") )
-	case "$v808" in
-	p)if(($opn209<$a)) > /dev/null 2>&1
+	case $appvar in
+	1)appnamelist=( "\e[94m🌐\e[0m Fire Fox" "\e[93m📅\e[0m Calculator" "🛠  Settings" )
+	  executionlist=( firefox gnome-calculator gnome-control-center )
+	  if [[ -f /home/"$user"/.supreme_app_config ]]
 	  then
-          opnr="e"
-		   if command -v ${executionlist[$opn209]} &>/dev/null; then
-		   ${executionlist[$opn209]}
-		   else
-	  	   echo -e "\e[91m${appnamelist[$opn209]} [${executionlist[$opn209]}] not installed\e[0m"
-	  	   fi
- 	   else
-	   echo -e "\e[91mBad input\e[0m"
-	   fi;;
-	*)case "$opn209" in
-	  h|H)opnr="e"
-    	      homekey="y";;
-	  *)echo -e "\e[91mBad input\e[0m";;
-	  esac;;
+		while read line; do
+		case "$line" in
+		"#+-"*)genlist+=( "$line" );;
+		"-#"*)Q=$( echo "$line" | cut -d '#' -f 2 )
+		      templist+=( "$Q" );;
+		esac
+		done < /home/"$user"/.supreme_app_config
+	  appnamelist+=( "${genlist[@]}" )
+	  executionlist+=( "${templist[@]}" )
+	  fi
+	  opnr="z"
+	  while [ "$opnr" == "z" ]
+	  do
+	  banner
+	  instfmt "Select an option | p [Previous Menu] | h [Home]"
+	  genfmt "${appnamelist[@]}"
+	  read opn209
+	  v808=$( echo $(numval "$opn209") )
+		case "$v808" in
+		p)if(($opn209<$a)) > /dev/null 2>&1
+		  then
+		  opnr="e"
+			   if command -v ${executionlist[$opn209]} &>/dev/null; then
+			   ${executionlist[$opn209]}
+			   else
+		  	   echo -e "\e[91m${appnamelist[$opn209]} [${executionlist[$opn209]}] not installed\e[0m"
+		  	   fi
+		   fi;;
+		*)case "$opn209" in
+		  h|H)opnr="e"
+	    	      homekey="y";;
+		  p|P)opnr="y";;
+		  esac;;
+		esac
+	  done;;
+	2)opnr="e"
+	  config_applist;;
+	h|H)opnr="e"
+	    homekey="y";;
+	*)opnr="e"
+	  echo -e "\e[91mBad input\e[0m";;
 	esac
-  done;;
-2)config_applist;;
-h|H)opnr="e"
-    homekey="y";;
-*)opnr="e"
-  echo -e "\e[91mBad input\e[0m";;
-esac
+done
 }
 
 
