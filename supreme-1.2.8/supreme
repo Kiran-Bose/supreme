@@ -695,7 +695,7 @@ genlist=()
 templist=()
 displaylist=()
 banner
-instfmt "Select an option | p [Previous Menu] | h [Home]"
+instfmt "Select an option | p [Previous menu] | h [Home]"
 echo -e "(1)Add app(s) to list\n(2)Remove app(s) from list"
 read cal1
 	case $cal1 in
@@ -814,7 +814,7 @@ read appvar
 	  while [ "$opnr" == "z" ]
 	  do
 	  banner
-	  instfmt "Select an option | p [Previous Menu] | h [Home]"
+	  instfmt "Select an option | p [Previous menu] | h [Home]"
 	  genfmt "${appnamelist[@]}"
 	  read opn209
 	  v808=$( echo $(numval "$opn209") )
@@ -1168,9 +1168,6 @@ echo -e "(1)\e[36m🔡\e[0m Manage Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)�
 			then
 			opnr="e"
 			operations
-			elif [ "$opnr" == "y" ]
-			then
-			echo -e "\e[91mBad input\e[0m"
 			fi
 		  done
 		  load_delay;;
