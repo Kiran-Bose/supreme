@@ -139,7 +139,7 @@ opnr="e"
 				if [ "$v11" == "p" ]
 				then
 				opnr="x"
-				actionitems
+				actionitems;
 				fi;;
 			esac
 		else
