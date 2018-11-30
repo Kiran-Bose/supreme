@@ -839,8 +839,6 @@ read appvar
 	  config_applist;;
 	h|H)opnr="e"
 	    homekey="y";;
-	*)opnr="e"
-	  echo -e "\e[91mBad input\e[0m";;
 	esac
 done
 }
