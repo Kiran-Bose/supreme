@@ -16,74 +16,112 @@ fi
 #------------------------------------------------------------------------------------------------
 function usbcop ()
 {
+opnr="g"
+while [[ "$opnr" == "g" ]]
+do
 qbar=1
 mularr=()
 arraymock=()
 usb_check
-if [[ "${#usbarr[@]}" != 0 ]]
-then
-colorfmt "${usbarr[@]}"
-instfmt "Select USB device"
-read uc55
-v1=$( echo $(numval "$uc55") )
-	if [[ "$v1" == "p" ]]
+	if [[ "${#usbarr[@]}" != 0 ]]
 	then
-		if (($uc55<$j)) > /dev/null 2>&1
+	colorfmt "${usbarr[@]}"
+	instfmt "Select USB device | h [Home]"
+	read uc55
+	v1=$( echo $(numval "$uc55") )
+		if [[ "$v1" == "p" ]]
 		then
-		instfmt "Select an option"
-		echo -e "(1)USB File Explorer\n(2)Format"
-		read opt1
-			case "$opt1" in
-			1)instfmt "s [Search] | n [Navigate] | b [Back] | h [Home]"
-			  read uc11
-			  case "$uc11" in
-			  s)srch11="${usbarr[$uc55]}"
-			    door UD
-			    unset srch11;;
-			  n)navig "${usbarr[$uc55]}";;
-			  b)usbcop
-			    unset arraymock;;
-			  h)homekey="y";;
-			  *)return;;
-			  esac
-			  if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
-			  then
-			  opnr="e"
-			  operations
-			  else
-			  return
-			  fi;;
-			2)fsys=$(df -h "${usbarr[$uc55]}" | awk '{print $1}' | sed 1d)
-			  instfmt "Are you sure you want to format ${usbarr[$uc55]}?(y/n)"
-			  echo -e "\e[91mWarning: This is irreversible and will erase everything\e[0m"
-			  read uc88
-			  case "$uc88" in
-			  y|Y)sudo umount "$fsys"
-			      instfmt "Select a File System"
-			      echo -e "(1)FAT\n(2)vFat\n(3)NTFS\n(4)EXT4"
-			      read uc99
-			      case "$uc99" in
-			      1)sudo mkfs.fat -n "${vendorname[$uc55]}" -I "$fsys";;
-			      2)sudo mkfs.vfat -n "${vendorname[$uc55]}" -I "$fsys";;
-			      3)sudo mkfs.ntfs -n "${vendorname[$uc55]}" -I "$fsys";;
-			      4)sudo mkfs.ext4 -n "${vendorname[$uc55]}" -I "$fsys";;
-			      *)echo -e "\e[91Bad Input\e[0m";;
-			      esac;;
-			  *)return;;
-			  esac;;
-			*)echo -e "\e[91mBad input\e[0m"
-			  return;;
-			esac
+			if (($uc55<$j)) > /dev/null 2>&1
+			then
+			opnr="y"
+				while [[ "$opnr" == "y" ]]
+				do 
+				banner
+				instfmt "Select an option | p [Previous menu] | h [Home]"
+				echo -e "(1)USB File Explorer\n(2)Format"
+				read opt1
+					case "$opt1" in
+					1)opnr="f"
+					  while [[ "$opnr" == "f" ]]
+					  do
+					  banner
+					  instfmt "s [Search] | n [Navigate] | p [Previous menu] | h [Home]"
+					  read uc11
+						  case "$uc11" in
+						  s|S)opnr="x"
+						      srch11="${usbarr[$uc55]}"
+						      door UD
+						      unset srch11
+						      case "$srch1" in
+						      p|P)opnr="f"
+						      esac;;
+						  n|N)opnr="x"
+						      navig "${usbarr[$uc55]}"
+						      case "$navig1" in
+						      p|P)opnr="f"
+						      esac;;
+						  p|P)opnr="y"
+						      unset arraymock;;
+						  h|H)opnr="x"
+						      homekey="y";;
+						  esac
+					  done
+					  if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
+					  then
+					  opnr="e"
+					  operations
+					  fi;;
+					2)fsys=$(df -h "${usbarr[$uc55]}" | awk '{print $1}' | sed 1d)
+					  instfmt "Are you sure you want to format ${usbarr[$uc55]}?(y/n)"
+					  echo -e "\e[91mWarning: This is irreversible and will erase everything\e[0m"
+					  read uc88
+					  case "$uc88" in
+					  y|Y)opnr="f"
+					      while [[ "$opnr" == "f" ]]
+					      do
+					      banner
+					      instfmt "Select a File System | p [Previous menu] | h [Home]"
+					      echo -e "(1)FAT\n(2)vFat\n(3)NTFS\n(4)EXT4"
+					      read uc99
+						      case "$uc99" in
+						      1)opnr="x"
+							sudo umount "$fsys"
+							sudo mkfs.fat -n "${vendorname[$uc55]}" -I "$fsys";;
+						      2)opnr="x"
+							sudo umount "$fsys"
+							sudo mkfs.vfat -n "${vendorname[$uc55]}" -I "$fsys";;
+						      3)opnr="x"
+							sudo umount "$fsys"
+							sudo mkfs.ntfs -n "${vendorname[$uc55]}" -I "$fsys";;
+						      4)opnr="x"
+							sudo umount "$fsys"
+							sudo mkfs.ext4 -n "${vendorname[$uc55]}" -I "$fsys";;
+						      p|P)opnr="y";;
+						      h|H)opnr="x"
+							  homekey="y";;
+						      esac
+					      done;;
+					  *)opnr="x"
+					    return;;
+					  esac;;
+					p|P)opnr="g";;
+					h|H)opnr="x"
+					    homekey="y";;
+					esac
+				done
+			fi
 		else
-		echo -e "\e[91mBad input\e[0m"
+			case "$uc55" in
+			h|H)opnr="x"
+			    homekey="y";;
+			*)opnr="g";;
+			esac
 		fi
 	else
-	echo -e "\e[91mBad input\e[0m"
+	echo -e "\e[91mNo USB Device Found\e[0m"
+	return
 	fi
-else
-echo -e "\e[91mNo USB Device Found\e[0m"
-return
-fi
+done
 }
 
 #------------------------------------------------------------------------------------------------
