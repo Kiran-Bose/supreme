@@ -212,21 +212,11 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	    v11="p";;
 	m|M)instfmt "Enter name for new directory"
 	    read navignd
-		if [[ "$navpath" == *"/1000/gvfs/mtp"* ]]
-		then
-		mkdir "$navpath"/"$navignd"
-		else
-		sudo mkdir "$navpath"/"$navignd"
-		fi
+		mkdir "$navpath"/"$navignd" > /dev/null 2>&1 || sudo mkdir "$navpath"/"$navignd" > /dev/null 2>&1
 	    navig "$navpath";;
 	f|F)instfmt "Enter file name"
 	    read navignf
-		if [[ "$navpath" == *"/1000/gvfs/mtp"* ]]
-		then
-		touch "$navpath"/"$navignf"
-		else
-		sudo touch "$navpath"/"$navignf"
-		fi
+		touch "$navpath"/"$navignf" > /dev/null 2>&1 || sudo touch "$navpath"/"$navignf"  > /dev/null 2>&1
 	    navig "$navpath";;
 	h|H)opnr="x"
 	    homekey="y";;
