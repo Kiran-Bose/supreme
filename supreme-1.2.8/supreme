@@ -136,6 +136,7 @@ path=( "${access[0]}"/* )
 					  fi
 					  if [[ -d /home/"$user"/Phone\ Backup ]] && [[ "${#arropt4[@]}" != 0 ]]
 					  then
+					  instfmt "Files will be synched to /home/"$user"/Phone Backup"
 						for emt4 in "${arropt4[@]}"
 						do
 							case $emt4 in
@@ -638,14 +639,15 @@ read opn11
 	  mv "${arraymock[0]}" "$R"/"$newname"
 	  fi;;
 	6)opnr="f"
+	  while [ "$opnr" == "f" ]
+	  do
+	  banner
 	  quick f
-	  if [ "${#quickarray[@]}" != 0 ]
-	  then
-	  instfmt "Select Device | h [Home]"
-		while [ "$opnr" == "f" ]
-		do
-		read opn99
-		v111=$( echo $(numval "$opn99") )
+		  if [ "${#quickarray[@]}" != 0 ]
+		  then
+		  instfmt "Select Device | h [Home]"
+			read opn99
+			v111=$( echo $(numval "$opn99") )
 			if [[ ("$v111" == "p") ]]
 			then
 				if (($opn99<$j)) > /dev/null 2>&1
@@ -662,13 +664,11 @@ read opn11
 			then
 			opnr="x"
 			homekey="y"
-			else
-			echo -e "\e[91mBad input\e[0m"
 			fi
-		done
-	  else
-	  return
-	  fi;;
+		  else
+		  return
+		  fi
+	  done;;
 	7)opnr="f"
 	  rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
 	  if [[ "$rcver" != "v1.4"* ]]
