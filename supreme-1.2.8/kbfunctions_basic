@@ -319,14 +319,17 @@ read opn1
 	    navig /;;
 	h|H)opnr="x"
 	    homekey="y";;
-	q|Q)quick
+	q|Q)opnr="e"
+	    while [[ "$opnr" == "e" ]]
+	    do
+	    quick
 		if [ "${#quickarray[@]}" != 0 ]
 		then
 		instfmt "Select an option | p [Previous menu] | h [Home]"
 		read opn15
 		v101=$( echo $(numval "$opn15") )
 			case "$opn15" in
-			b|B)opnr="y";;
+			p|P)opnr="y";;
 			h|H)opnr="x"
 			    homekey="y";;
 			*)if [[ "$v101" == "p" ]]
@@ -335,13 +338,13 @@ read opn1
 				  then
 				  navig "${quickarray[$opn15]}"
 				  fi
-			  else
-			  return
 			  fi;;
 			esac
 		else
+		opnr="x"
 		return
-		fi;;
+		fi
+	    done;;
 	esac
 done
 }
