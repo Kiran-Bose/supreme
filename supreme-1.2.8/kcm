@@ -58,7 +58,7 @@ while getopts ":cmv" option; do
   	case "${option}" in
 	c)actn="cp -rv";;
 	m)actn="mv -v";;
-	v)echo -e "version 1.0.2" && exit 0;;
+	v)echo -e "version 1.0.3" && exit 0;;
 	\?)kcmusage && exit 0;;
 	esac
 done
@@ -72,8 +72,14 @@ echo -e "\e[91mSource path not found\e[0m"
 exit 0
 else
 feedemt=$(echo "$2" | rev | cut -d '/' -f 1 | rev)
-colorfmt "$2""-->""$3"
-$actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots" 
+colorfmt "$2 --> $3"
+$actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots"
+	if [[ ${PIPESTATUS[0]} == 1 ]]
+	then
+	banner
+	colorfmt "$2 --> $3"
+	sudo $actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots"
+	fi 
 fi
 
 

@@ -89,98 +89,119 @@ fi
 #------------------------------------------------------------------------------------------------
 function andcop ()
 {
+opnr="g"
+while [[ "$opnr" == "g" ]]
+do
 qbar=1
 arraymock=()
 device=/run/user/1000/gvfs/mtp
 access=( "$device"* )
 path=( "${access[0]}"/* )
-if [[ "${path[@]}" == *"*"* ]]
-then
-echo -e "\e[91mNo phone found\e[0m"
-else
-colorfmt "${path[@]}"
-instfmt "Select Storage"
-read ac32
-v7=$( echo $(numval "$ac32") )
-	if [[ "$v7" == "p" ]]
+	if [[ "${path[@]}" == *"*"* ]]
 	then
-		if(($ac32<$j)) > /dev/null 2>&1
-		then
-		storage="${path[$ac32]}"
-		else
-		echo -e "\e[91mBad Input\e[0m"
-		return
-		fi
+	opnr="x"
+	echo -e "\e[91mNo phone found\e[0m"
 	else
-	echo -e "\e[91mBad Input\e[0m"
-	return
-	fi
-instfmt "Select an option"
-echo -e "(1)Phone File Explorer\n(2)Sync Folders"
-read ac1
-	case "$ac1" in
-	1)navig "$storage"
-	  if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
-	  then
-	  opnr="e"
-	  operations
-	  else
-	  return
-	  fi;;
-	2)instfmt "Select rsync option(s)"
-	  echo -e "(1)Bulk rsync\n(2)DCIM\n(3)Videos"
-	  read ac6
-	  IFS=', ' read -r -a arropt4 <<< "$ac6"
-		for emt4 in "${arropt4[@]}"
-		do
-			case $emt4 in
-			1) if [[ -d "$storage"/DCIM/Camera ]]
-			   then
-	rsync --ignore-existing -rvv --progress "$storage"/DCIM/Camera/ /home/"$user"/Phone\ Backup/Camera
-			   fi
-			   if [[ -d "$storage"/WhatsApp ]]
-			   then
-			   rsync --ignore-existing -rvv --progress "$storage"/WhatsApp/ /home/"$user"/Phone\ Backup/WhatsApp
-			   fi
-			   if [[ -d "$storage"/SHAREit ]]
-			   then
-			   rsync --ignore-existing -rvv --progress "$storage"/SHAREit/ /home/"$user"/Phone\ Backup/SHAREit
-			   fi
-			   if [[ -d "$storage"/PicsArt ]]
-			   then
-			   rsync --ignore-existing -rvv --progress "$storage"/PicsArt/ /home/"$user"/Phone\ Backup/PicsArt
-			   fi
-			   if [[ -d "$storage"/Download ]]
-			   then
-			   rsync --ignore-existing -rvv --progress "$storage"/Download/ /home/"$user"/Phone\ Backup/Download
-			   fi
-			   if [[ -d "$storage"/Video ]]
-			   then
-			   rsync --ignore-existing -rvv --progress "$storage"/Video/ /home/"$user"/Phone\ Backup/Download/Video
-			   fi
-			   if [[ -d "$storage"/Pictures ]]
-			   then
-			   rsync --ignore-existing -rvv --progress "$storage"/Pictures/ /home/"$user"/Phone\ Backup/Pictures
-			   fi
-			   if [[ -d "$storage"/mp3 ]]
-			   then
-	rsync --ignore-existing -rvv --progress "$storage"/mp3/ /home/"$user"/Phone\ Backup/mp3
-			   fi
-			   return;;
-			2) if [[ -d "$storage"/DCIM/Camera ]]
-			   then
-	rsync --ignore-existing -rvv --progress "$storage"/DCIM/Camera/ /home/"$user"/Phone\ Backup/Camera
-			   fi;;
-			3) if [[ -d "$storage"/Video ]]
-			   then
-			   rsync --ignore-existing -rvv --progress "$storage"/Video/ /home/"$user"/Phone\ Backup/Download/Video
-			   fi;;
-			*) echo -e "\e[91mInvalid choice\e[0m";;
+	colorfmt "${path[@]}"
+	instfmt "Select Storage | h [Home]"
+	read ac32
+	v7=$( echo $(numval "$ac32") )
+		if [[ "$v7" == "p" ]]
+		then
+			if(($ac32<$j)) > /dev/null 2>&1
+			then
+			storage="${path[$ac32]}"
+			opnr="y"
+				while [[ "$opnr" == "y" ]]
+				do 
+				banner
+					instfmt "Select an option | p [Previous menu] | h [Home]"
+					echo -e "(1)Phone File Explorer\n(2)Sync Folders"
+					read ac1
+					case "$ac1" in
+					1)navig "$storage"
+					  if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
+					  then
+					  opnr="e"
+					  operations
+					  fi;;
+					2)opnr="x"
+					  instfmt "Select rsync option(s)"
+					  echo -e "(1)Bulk rsync\n(2)DCIM\n(3)Videos"
+					  read ac6
+					  IFS=', ' read -r -a arropt4 <<< "$ac6"
+					  if [[ ! -d /home/"$user"/Phone\ Backup ]]
+					  then
+					  mkdir /home/"$user"/Phone\ Backup
+					  fi
+					  if [[ -d /home/"$user"/Phone\ Backup ]] && [[ "${#arropt4[@]}" != 0 ]]
+					  then
+						for emt4 in "${arropt4[@]}"
+						do
+							case $emt4 in
+							1) if [[ -d "$storage"/DCIM/Camera ]]
+							   then
+					rsync --ignore-existing -rvv --progress "$storage"/DCIM/Camera/ /home/"$user"/Phone\ Backup/Camera
+							   fi
+							   if [[ -d "$storage"/WhatsApp ]]
+							   then
+							   rsync --ignore-existing -rvv --progress "$storage"/WhatsApp/ /home/"$user"/Phone\ Backup/WhatsApp
+							   fi
+							   if [[ -d "$storage"/SHAREit ]]
+							   then
+							   rsync --ignore-existing -rvv --progress "$storage"/SHAREit/ /home/"$user"/Phone\ Backup/SHAREit
+							   fi
+							   if [[ -d "$storage"/PicsArt ]]
+							   then
+							   rsync --ignore-existing -rvv --progress "$storage"/PicsArt/ /home/"$user"/Phone\ Backup/PicsArt
+							   fi
+							   if [[ -d "$storage"/Download ]]
+							   then
+							   rsync --ignore-existing -rvv --progress "$storage"/Download/ /home/"$user"/Phone\ Backup/Download
+							   fi
+							   if [[ -d "$storage"/Video ]]
+							   then
+							   rsync --ignore-existing -rvv --progress "$storage"/Video/ /home/"$user"/Phone\ Backup/Download/Video
+							   fi
+							   if [[ -d "$storage"/Pictures ]]
+							   then
+							   rsync --ignore-existing -rvv --progress "$storage"/Pictures/ /home/"$user"/Phone\ Backup/Pictures
+							   fi
+							   if [[ -d "$storage"/mp3 ]]
+							   then
+					rsync --ignore-existing -rvv --progress "$storage"/mp3/ /home/"$user"/Phone\ Backup/mp3
+							   fi
+							   return;;
+							2) if [[ -d "$storage"/DCIM/Camera ]]
+							   then
+					rsync --ignore-existing -rvv --progress "$storage"/DCIM/Camera/ /home/"$user"/Phone\ Backup/Camera
+							   fi;;
+							3) if [[ -d "$storage"/Video ]]
+							   then
+							   rsync --ignore-existing -rvv --progress "$storage"/Video/ /home/"$user"/Phone\ Backup/Download/Video
+							   fi;;
+							*) echo -e "\e[91mInvalid choice\e[0m";;
+							esac
+						done
+					    else
+					    echo -e "\e[91mBad input\e[0m"
+					    fi;;
+					p|P)opnr="g";;
+					h|H)opnr="x"
+				    	    homekey="y";;
+					*)echo -e "\e[91mInvalid option\e[0m";;
+					esac
+				done
+			fi
+		else
+			case "$ac32" in
+			h|H)opnr="x"
+			    homekey="y";;
+			*)opnr="g";;
 			esac
-		done;;
-	*)echo -e "\e[91mInvalid option\e[0m";;
-	esac
-fi
+		fi
+	fi
+done
 }
 #------------------------------------------------------------------------------------------------
 
@@ -555,7 +576,7 @@ read opn11
 	  feeder
 		  if [[ -d "${arraymock[0]}" ]]
 		  then
-		  opnr="g"
+		  opnr="x"
 			for opnemt in "${tempmock[@]}"
 			do
 			kcm -c "$opnemt" "${arraymock[0]}"
@@ -572,7 +593,7 @@ read opn11
 	  feeder
 		  if [[ -d "${arraymock[0]}" ]]
 		  then
-		  opnr="g"
+		  opnr="x"
 			for opnemt in "${tempmock[@]}"
 			do
 			qbar=0
@@ -629,7 +650,7 @@ read opn11
 			then
 				if (($opn99<$j)) > /dev/null 2>&1
 			  	then
-				opnr="g"
+				opnr="x"
 					for opnemt in "${arraymock[@]}"
 					do
 					kcm -c "$opnemt" "${quickarray[$opn99]}"
@@ -639,7 +660,7 @@ read opn11
 				fi
 			elif [ "$opn99" == "h" ]
 			then
-			opnr="g"
+			opnr="x"
 			homekey="y"
 			else
 			echo -e "\e[91mBad input\e[0m"
@@ -694,6 +715,7 @@ navdoor="GEN"
 genlist=()
 templist=()
 displaylist=()
+arraymock=()
 banner
 instfmt "Select an option | p [Previous menu] | h [Home]"
 echo -e "(1)Add app(s) to list\n(2)Remove app(s) from list"
@@ -750,27 +772,34 @@ read cal1
 		  instfmt "Select apps you want to remove"
 		  genfmt "${genlist[@]}"
 		  read cal4
-		  IFS=', ' read -r -a srchopt <<< "$cal4"
-		  actionitems
-		  instfmt "Are you sure you want to remove selected app(s) from list? (y/n)"
-		  read cal5
-		  	case "$cal5" in
-			y|Y)SAVEIFS=$IFS
-			    IFS=$(echo -en "\n\b")
-			    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
-			    for emt in "${srchopt[@]}"
-			    do
-			    remlist+=( "${templist[$emt]}" )
-			    done
-			    templist=( $(printf "%s\n" "${templist[@]}" "${remlist[@]}" | sort | uniq -u) )
-			    IFS=$SAVEIFS
-			    echo -n > /home/"$user"/.supreme_app_config
-			    for ((i=0; i<${#genlist[@]}; i++))
-			    do
-			    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
-			    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
-			    done;;
-			 esac
+		  v71=$( echo $(numval "$cal4") )
+			case "$v71" in
+			p|P)IFS=', ' read -r -a srchopt <<< "$cal4"
+		  	    actionitems;;
+			*)echo -e "\e[91mBad input\e[0m";;
+			esac
+			if [[ "${#arraymock[@]}" != 0 ]]
+			then
+		  	instfmt "Are you sure you want to remove selected app(s) from list? (y/n)"
+		        read cal5
+			  	case "$cal5" in
+				y|Y)SAVEIFS=$IFS
+				    IFS=$(echo -en "\n\b")
+				    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
+				    for emt in "${srchopt[@]}"
+				    do
+				    remlist+=( "${templist[$emt]}" )
+				    done
+				    templist=( $(printf "%s\n" "${templist[@]}" "${remlist[@]}" | sort | uniq -u) )
+				    IFS=$SAVEIFS
+				    echo -n > /home/"$user"/.supreme_app_config
+				    for ((i=0; i<${#genlist[@]}; i++))
+				    do
+				    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
+				    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
+				    done;;
+				 esac
+			fi
 		  else
 		  echo -e "\e[91mNo app added to list\e[0m"
 		  fi
@@ -1171,8 +1200,7 @@ echo -e "(1)\e[36m🔡\e[0m Manage Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)�
 			fi
 		  done
 		  load_delay;;
-		3)opnr="e"
-		  andcop
+		3)andcop
 		  load_delay;;
 		4)opnr="e"
 		  usbcop
