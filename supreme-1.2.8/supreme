@@ -276,31 +276,42 @@ fi
 #------------------------------------------------------------------------------------------------
 function selectcloud ()
 {
+opnr="e"
+while [[ "$opnr" == "e" ]]
+do
+banner
 cloudlist=()
-if [[ -f /home/"$user"/.supremecloud.txt ]]
-then
-instfmt "Select cloud storage"
-	while read line; do
-	cloudlist+=( "$line" )
-	done < /home/"$user"/.supremecloud.txt
-	for ((i=0; i<${#cloudlist[@]}; i++))
-	do
-	echo -e "($i) ${cloudlist[$i]}"
-	done
-	read gdit143
-	v55=$( echo $(numval "$gdit143") )
-	if [ "$v55" == "p" ]
+	if [[ -f /home/"$user"/.supremecloud.txt ]]
 	then
-		if [[ $gdit143 < ${#cloudlist[@]} ]]
+	instfmt "Select cloud storage | p [Previous menu] | h [Home]"
+		while read line; do
+		cloudlist+=( "$line" )
+		done < /home/"$user"/.supremecloud.txt
+		for ((i=0; i<${#cloudlist[@]}; i++))
+		do
+		echo -e "($i) ${cloudlist[$i]}"
+		done
+		read gdit143
+		v55=$( echo $(numval "$gdit143") )
+		if [ "$v55" == "p" ]
 		then
-		cldopt="${cloudlist[$gdit143]}:/"
+			if [[ $gdit143 < ${#cloudlist[@]} ]]
+			then
+			opnr="g"
+			cldopt="${cloudlist[$gdit143]}:/"
+			fi
+		else
+			case "$gdit143" in
+			p|P)opnr="g";;
+			h|H)opnr="x"
+			    homekey="y";;
+			esac
 		fi
 	else
-	echo -e "\e[91mBad Input\e[0m"
+	opnr="x"
+	echo -e "\e[91mCloud Storage not configured. Configure cloud from option Manage Cloud\e[0m"
 	fi
-else
-echo -e "\e[91mCloud Storage not configured. Configure cloud from option Manage Cloud\e[0m"
-fi
+done
 }
 
 #------------------------------------------------------------------------------------------------
@@ -394,192 +405,199 @@ esac
 #------------------------------------------------------------------------------------------------
 function cloudit ()
 {
-if [[ -f /home/"$user"/.supremecloud.txt ]]
-then
-checkInternet || return
-sudo rm -rf /home/"$user"/Supremetemp/*
-unset gdit1
-instfmt "Select an option"
-echo -e "(1)Cloud File Explorer\n(2)Configure Cloud"
-read cldit
-	case "$cldit" in
-	1)selectcloud
-	  if [[ -z "$cldopt" ]]
-	  then
-	  return
-	  fi
-	  oprpt="g"
-	  while [[ "$oprpt" == "g" ]]
-	  do
-	  cloudnavig
-		  if [ "${#arraymock[@]}" != 0 ]
-		  then
-		  instfmt "Select an option"
-		  echo -e "(1)\e[32m⏏\e[0m  Open\n(2)\e[92m⬇\e[0m  Download\n(3)\e[90m📖\e[0m Copy\n(4)\e[95m📑\e[0m Move\n(5)\e[91m🚮\e[0m Delete\n(h)\e[93m🏠\e[0m Go Home"
-		  read cldit1
-			oprpt="y"
-			while [[ "$oprpt" == "y" ]]
-			do
-				case "$cldit1" in
-				1)tempsortfile=( "${sortfile[@]}" )
-		  	 	  tempsortdir=( "${sortdir[@]}" )
+opnr="g"
+while [[ "$opnr" == "g" ]]
+do
+banner
+instfmt "Supreme uses package 'rclone' for cloud storage operations"
+	if [[ -f /home/"$user"/.supremecloud.txt ]]
+	then
+	checkInternet || return
+	sudo rm -rf /home/"$user"/Supremetemp/*
+	unset gdit1
+	instfmt "Select an option | h [Home]"
+	echo -e "(1)Cloud File Explorer\n(2)Configure Cloud"
+	read cldit
+		case "$cldit" in
+		1)selectcloud
+		  oprpt="g"
+		  while [[ "$oprpt" == "g" ]] && [[ ! -z "$cldopt" ]]
+		  do
+		  cloudnavig
+			  case "$gdn2" in
+			  p|P)selectcloud
+			      oprpt="g";;
+			  esac
+			  if [ "${#arraymock[@]}" != 0 ]
+			  then
+			  instfmt "Select an option"
+			  echo -e "(1)\e[32m⏏\e[0m  Open\n(2)\e[92m⬇\e[0m  Download\n(3)\e[90m📖\e[0m Copy\n(4)\e[95m📑\e[0m Move\n(5)\e[91m🚮\e[0m Delete\n(h)\e[93m🏠\e[0m Go Home"
+			  read cldit1
+				oprpt="y"
+				while [[ "$oprpt" == "y" ]]
+				do
+					case "$cldit1" in
+					1)tempsortfile=( "${sortfile[@]}" )
+			  	 	  tempsortdir=( "${sortdir[@]}" )
+						if [ "$gdn1" == "$cldopt" ]
+						then
+						rcfeed copy $cldopt "/home/$user/Supremetemp" "" 5
+						else
+						rcfeed copy "$gdn1" "/home/$user/Supremetemp" 4 5
+						fi
+					  decarray=( /home/"$user"/Supremetemp/* )
+					  for gdnavemt in "${decarray[@]}"
+					  do
+					  xdg-open "$gdnavemt" > /dev/null 2>&1
+					  done
+					  instfmt "Do you want to perform operations on the opened file(s)?(y/n)"
+					  read gdn22
+						case "$gdn22" in
+						y|Y)colorfmt "${arraymock[@]}"
+						    instfmt "Select an option"
+						    echo -e "(1)\e[92m⬇\e[0m  Download\n(2)\e[90m📖\e[0m Copy\n(3)\e[95m📑\e[0m Move\n(4)\e[91m🚮\e[0m Delete\n(h)\e[93m🏠\e[0m Go Home"
+						    read cldit2
+							case "$cldit2" in
+							1)cldit1=2;;
+							2)cldit1=3;;
+							3)cldit1=4;;
+							4)cldit1=5;;
+							h)cldit1="h";;
+							esac;;
+						*)oprpt="g"
+						  sudo rm -rf /home/"$user"/Supremetemp/*;;
+						esac;;
+					2)oprpt="n"
+					  gdit1="DOWNLOAD";;
+					3)oprpt="n"
+					  gdit1="COPY";;
+					4)oprpt="n"
+					  gdit1="MOVE";;
+					5)oprpt="n"
+					  gdit1="DELETE";;
+					h|H)oprpt="n"
+					    homekey="y";;
+					*)oprpt="n"
+					  echo -e "\e[91mBad input\e[0m";;
+					esac
+				done
+			  fi
+		  done;;
+		2)checkInternet || return
+		  rclone config;;
+		h|H)opnr="x"
+		    homekey="y";;	
+		esac 
+		case "$gdit1" in
+		DOWNLOAD)if [ "${#arraymock[@]}" != 0 ]
+			 then
+			 tempsortfile=( "${sortfile[@]}" )
+		  	 tempsortdir=( "${sortdir[@]}" )
+		  	 instfmt "Select destinatin folder"
+		  	 feeder
+				 if [ "${#arraymock[@]}" != 0 ]
+				 then
 					if [ "$gdn1" == "$cldopt" ]
 					then
-					rcfeed copy $cldopt "/home/$user/Supremetemp" "" 5
+					rcfeed copy $cldopt "${arraymock[0]}" "" 5
 					else
-					rcfeed copy "$gdn1" "/home/$user/Supremetemp" 4 5
+					rcfeed copy "$gdn1" "${arraymock[0]}" 4 5
 					fi
-				  decarray=( /home/"$user"/Supremetemp/* )
-				  for gdnavemt in "${decarray[@]}"
-				  do
-				  xdg-open "$gdnavemt" > /dev/null 2>&1
-				  done
-				  instfmt "Do you want to perform operations on the opened file(s)?(y/n)"
-				  read gdn22
-					case "$gdn22" in
-					y|Y)colorfmt "${arraymock[@]}"
-					    instfmt "Select an option"
-					    echo -e "(1)\e[92m⬇\e[0m  Download\n(2)\e[90m📖\e[0m Copy\n(3)\e[95m📑\e[0m Move\n(4)\e[91m🚮\e[0m Delete\n(h)\e[93m🏠\e[0m Go Home"
-					    read cldit2
-						case "$cldit2" in
-						1)cldit1=2;;
-						2)cldit1=3;;
-						3)cldit1=4;;
-						4)cldit1=5;;
-						h)cldit1="h";;
-						esac;;
-					*)oprpt="g"
-					  sudo rm -rf /home/"$user"/Supremetemp/*;;
-					esac;;
-				2)oprpt="n"
-				  gdit1="DOWNLOAD";;
-				3)oprpt="n"
-				  gdit1="COPY";;
-				4)oprpt="n"
-				  gdit1="MOVE";;
-				5)oprpt="n"
-				  gdit1="DELETE";;
-				h|H)oprpt="n"
-				    homekey="y";;
-				*)oprpt="n"
-				  echo -e "\e[91mBad input\e[0m";;
+				 fi
+		  	 fi;;
+		DELETE)if [ "${#arraymock[@]}" != 0 ]
+		       then
+		       instfmt "Are you sure you want to delete the selected files from $gdn1?(y/n)"
+		       read gdit63
+				case "$gdit63" in
+				y|Y)if [ "$gdn1" == "$cldopt" ]
+				    then
+				    rcfeed delete $cldopt
+				    else
+				    rcfeed delete "$gdn1" "" 4
+				    fi;;
 				esac
-			done
-		  fi
-	  done;;
-	2)checkInternet || return
-	  rclone config;;
-	*)echo -e "\e[91mBad input\e[0m";;	
-	esac 
-	case "$gdit1" in
-	DOWNLOAD)if [ "${#arraymock[@]}" != 0 ]
-	         then
-		 tempsortfile=( "${sortfile[@]}" )
-	  	 tempsortdir=( "${sortdir[@]}" )
-	  	 instfmt "Select destinatin folder"
-	  	 feeder
-			 if [ "${#arraymock[@]}" != 0 ]
-			 then
-				if [ "$gdn1" == "$cldopt" ]
-				then
-				rcfeed copy $cldopt "${arraymock[0]}" "" 5
-				else
-				rcfeed copy "$gdn1" "${arraymock[0]}" 4 5
-				fi
-			 fi
-	  	 fi;;
-	DELETE)if [ "${#arraymock[@]}" != 0 ]
-	       then
-	       instfmt "Are you sure you want to delete the selected files from $gdn1?(y/n)"
-	       read gdit63
-			case "$gdit63" in
-			y|Y)if [ "$gdn1" == "$cldopt" ]
-			    then
-			    rcfeed delete $cldopt
-			    else
-			    rcfeed delete "$gdn1" "" 4
-			    fi;;
-			esac
-	  	fi;;
-	COPY|MOVE)tempsortdir=( "${sortdir[@]}" )
-		  tempsortfile=( "${sortfile[@]}" )
-		  gdntemp="$gdn1"
-		  cldtemp="$cldopt"
-		  if [[ ("${#tempsortdir[@]}" == 0) && ("${#tempsortfile[@]}" == 0) ]]
-		  then
-		  return
-		  else
-		  instfmt "Select Destination"
-		  echo -e "(1)cloud storage\n(2)local"
-		  read gdit55
-			case $gdit55 in
-			1)selectcloud
-			cloudnavig;;
-			2)feeder;;
-			*)return;;
-			esac
-			if [[ "$homekey" == "y" ]] || [[ -z "$cldopt" ]]
-			then
-			return
-			else
-				case $gdit1 in
-				MOVE)cldactn="move";;
-				COPY)cldactn="copy";;
+		  	fi;;
+		COPY|MOVE)tempsortdir=( "${sortdir[@]}" )
+			  tempsortfile=( "${sortfile[@]}" )
+			  gdntemp="$gdn1"
+			  cldtemp="$cldopt"
+			  if [[ ("${#tempsortdir[@]}" == 0) && ("${#tempsortfile[@]}" == 0) ]]
+			  then
+			  return
+			  else
+			  instfmt "Select Destination"
+			  echo -e "(1)cloud storage\n(2)local"
+			  read gdit55
+				case $gdit55 in
+				1)selectcloud
+				cloudnavig;;
+				2)feeder;;
 				*)return;;
 				esac
-				case "$gdit55" in
-				2)if [ "$gdn1" == "$cldopt" ]
-				  then
-					if [ "${#arraymock[@]}" == 0 ]
-					then
-					echo -e "\e[91mNo destination directory selected\e[0m"
-					else
-					rcfeed $cldactn "$gdn1" "${arraymock[0]}" "" 5
-					fi
-				  else
-					if [ "${#arraymock[@]}" == 0 ]
-					then
-					echo -e "\e[91mNo destination directory selected\e[0m"
-					else
-					rcfeed $cldactn "$gdn1" "${arraymock[0]}" 4 5
-					fi
-				  fi;;
-				1)if [[ ("$gdn1" == "$cldopt") && ("$gdntemp" == "$cldtemp") ]]
-				  then
-				  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
-					if [ "${#arraymock[@]}" == 0 ]
-					then
-					rcfeed $cldactn "$gdntemp" "$gdn1"
-					else
-					rcfeed $cldactn "$gdntemp" "$gdn1""${arraymock[0]}" "" 5
-					fi
-				  elif [[ ("$gdn1" != "$cldopt") && ("$gdntemp" == "$cldtemp") ]]
-				  then
-				  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
-				  rcfeed $cldactn "$gdntemp" "$gdn1"/"${arraymock[0]}" "" 5
-				  elif [[ ("$gdn1" == "$cldopt") && ("$gdntemp" != "$cldtemp") ]]
-				  then
-				  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
-					if [ "${#arraymock[@]}" == 0 ]
-					then
-					rcfeed $cldactn "$gdntemp" "$gdn1" 4
-					else
-					rcfeed $cldactn "$gdntemp" "$gdn1""${arraymock[0]}" 4 5 
-					fi
-				  elif [[ ("$gdn1" != "$cldopt") && ("$gdntemp" != "$cldtemp") ]]
-				  then
-				  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
-				  rcfeed $cldactn "$gdntemp" "$gdn1"/"${arraymock[0]}" 4 5
-				  fi;;
-				esac
-			fi
-		  fi;;	
-	esac
-sudo rm -rf /home/"$user"/Supremetemp/*
-unset gdit1
-else
-echo -e "\e[91mCloud Storage not configured\e[0m"
-fi
+				if [[ "$homekey" == "y" ]] || [[ -z "$cldopt" ]]
+				then
+				return
+				else
+					case $gdit1 in
+					MOVE)cldactn="move";;
+					COPY)cldactn="copy";;
+					*)return;;
+					esac
+					case "$gdit55" in
+					2)if [ "$gdn1" == "$cldopt" ]
+					  then
+						if [ "${#arraymock[@]}" == 0 ]
+						then
+						echo -e "\e[91mNo destination directory selected\e[0m"
+						else
+						rcfeed $cldactn "$gdn1" "${arraymock[0]}" "" 5
+						fi
+					  else
+						if [ "${#arraymock[@]}" == 0 ]
+						then
+						echo -e "\e[91mNo destination directory selected\e[0m"
+						else
+						rcfeed $cldactn "$gdn1" "${arraymock[0]}" 4 5
+						fi
+					  fi;;
+					1)if [[ ("$gdn1" == "$cldopt") && ("$gdntemp" == "$cldtemp") ]]
+					  then
+					  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
+						if [ "${#arraymock[@]}" == 0 ]
+						then
+						rcfeed $cldactn "$gdntemp" "$gdn1"
+						else
+						rcfeed $cldactn "$gdntemp" "$gdn1""${arraymock[0]}" "" 5
+						fi
+					  elif [[ ("$gdn1" != "$cldopt") && ("$gdntemp" == "$cldtemp") ]]
+					  then
+					  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
+					  rcfeed $cldactn "$gdntemp" "$gdn1"/"${arraymock[0]}" "" 5
+					  elif [[ ("$gdn1" == "$cldopt") && ("$gdntemp" != "$cldtemp") ]]
+					  then
+					  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
+						if [ "${#arraymock[@]}" == 0 ]
+						then
+						rcfeed $cldactn "$gdntemp" "$gdn1" 4
+						else
+						rcfeed $cldactn "$gdntemp" "$gdn1""${arraymock[0]}" 4 5 
+						fi
+					  elif [[ ("$gdn1" != "$cldopt") && ("$gdntemp" != "$cldtemp") ]]
+					  then
+					  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
+					  rcfeed $cldactn "$gdntemp" "$gdn1"/"${arraymock[0]}" 4 5
+					  fi;;
+					esac
+				fi
+			  fi;;	
+		esac
+	sudo rm -rf /home/"$user"/Supremetemp/*
+	unset gdit1
+	else
+	echo -e "\e[91mCloud Storage not configured\e[0m"
+	fi
+done
 }
 
 #------------------------------------------------------------------------------------------------
@@ -1240,12 +1258,9 @@ echo -e "(1)\e[36m🔡\e[0m Manage Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)�
 		  load_delay;;
 		3)andcop
 		  load_delay;;
-		4)opnr="e"
-		  usbcop
+		4)usbcop
 		  load_delay;;
 		5)opnr="e"
-		  banner
-		  instfmt "Supreme uses package 'rclone' for cloud storage operations"
 		  cloudconfig
 		  rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
 			if [[ "$rcver" != "v1.4"* ]]
