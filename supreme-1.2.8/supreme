@@ -252,26 +252,42 @@ checkInternet()
 #------------------------------------------------------------------------------------------------
 function cloudconfig ()
 {
-if [[ -f /home/"$user"/.config/rclone/rclone.conf ]]
-then
-linecount=$( wc -l /home/"$user"/.config/rclone/rclone.conf | cut -d ' ' -f1 )
-	if [[ $linecount == 0 ]]
+opnr="y"
+while [[ "$opnr" == "y" ]]
+do
+	if [[ -f /home/"$user"/.config/rclone/rclone.conf ]]
 	then
-	rclone config
-	fi
-	if [[ -f /home/"$user"/.supremecloud.txt ]]
-	then
-	sudo rm -f /home/"$user"/.supremecloud.txt
-	fi
-	while read line; do
-		if [[ "$line" == "["*"]" ]]
+	linecount=$( wc -l /home/"$user"/.config/rclone/rclone.conf | cut -d ' ' -f1 )
+		if [[ $linecount == 0 ]]
 		then
-		echo $line | cut -d "[" -f2 | cut -d "]" -f1 >> /home/"$user"/.supremecloud.txt
+		instfmt "Cloud storage not configured. Do you wish to configure?(y/n)"
+		read cldcfg1
+			case "$cldcfg1" in
+			y|Y)rclone config;;
+			*)opnr="x";;
+			esac
+		else
+		opnr="x"
+			if [[ -f /home/"$user"/.supremecloud.txt ]]
+			then
+			sudo rm -f /home/"$user"/.supremecloud.txt
+			fi
+			while read line; do
+				if [[ "$line" == "["*"]" ]]
+				then
+				echo $line | cut -d "[" -f2 | cut -d "]" -f1 >> /home/"$user"/.supremecloud.txt
+				fi
+			done < /home/"$user"/.config/rclone/rclone.conf
 		fi
-	done < /home/"$user"/.config/rclone/rclone.conf
-else
-rclone config
-fi
+	else
+	instfmt "Cloud storage not configured. Do you wish to configure?(y/n)"
+	read cldcfg1
+		case "$cldcfg1" in
+		y|Y)rclone config;;
+		*)opnr="x";;
+		esac
+	fi
+done
 }
 #------------------------------------------------------------------------------------------------
 function selectcloud ()
@@ -295,7 +311,7 @@ cloudlist=()
 		v55=$( echo $(numval "$gdit143") )
 		if [ "$v55" == "p" ]
 		then
-			if [[ $gdit143 < ${#cloudlist[@]} ]]
+			if(($gdit143<${#cloudlist[@]})) > /dev/null 2>&1
 			then
 			opnr="g"
 			cldopt="${cloudlist[$gdit143]}:/"
@@ -485,7 +501,8 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 				done
 			  fi
 		  done;;
-		2)checkInternet || return
+		2)opnr="x"
+		  checkInternet || return
 		  rclone config;;
 		h|H)opnr="x"
 		    homekey="y";;	
@@ -1346,7 +1363,8 @@ user=$(whoami)
 		  load_delay;;
 		4)usbcop
 		  load_delay;;
-		5)cloudconfig
+		5)banner
+		  cloudconfig
 		  rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
 			if [[ "$rcver" != "v1.4"* ]]
 			then
