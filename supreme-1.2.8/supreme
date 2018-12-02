@@ -170,7 +170,7 @@ path=( "${access[0]}"/* )
 					  IFS=', ' read -r -a arropt4 <<< "$ac6"
 					  if [[ ! -d /home/"$user"/Phone\ Backup ]]
 					  then
-					  mkdir /home/"$user"/Phone\ Backup
+					  mkdir /home/"$user"/Phone\ Backup || sudo /home/"$user"/Phone\ Backup
 					  fi
 					  if [[ -d /home/"$user"/Phone\ Backup ]] && [[ "${#arropt4[@]}" != 0 ]]
 					  then
@@ -302,7 +302,10 @@ cloudlist=()
 			fi
 		else
 			case "$gdit143" in
-			p|P)opnr="g";;
+			p|P)opnr="g"
+			    case "$gdn2" in
+			    p|P)oprpt="x";;
+			    esac;;
 			h|H)opnr="x"
 			    homekey="y";;
 			esac
@@ -425,8 +428,7 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 		  do
 		  cloudnavig
 			  case "$gdn2" in
-			  p|P)selectcloud
-			      oprpt="g";;
+			  p|P)selectcloud;;
 			  esac
 			  if [ "${#arraymock[@]}" != 0 ]
 			  then
@@ -943,7 +945,7 @@ then
 	done
 	if [[ "${#genlist[@]}" != 0 ]] && [[ "${genlist[@]}" != "/home/$user/.supreme_cs/*" ]]
 	then
-	instfmt "Select script"
+	instfmt "Select script | p [Previous menu] | h [Home]"
 		for ((i=0; i<${#genlist[@]}; i++))
 		do
 		echo -e "($i) ${genlist[$i]}"
@@ -960,88 +962,131 @@ fi
 #------------------------------------------------------------------------------------------------
 function custom_scripts ()
 {
+opnr="g"
+while [[ "$opnr" == "g" ]]
+do
+banner
 instfmt "Select an option | h [Home]"
 echo -e "(1)Add script\n(2)Remove script(s)\n(3)Modify script\n(4)Execute script\n(5)Run Commands"
 read cs1
-case "$cs1" in
-1)if [[ -d /home/"$user"/.supreme_cs ]]
-  then
-  instfmt "Enter file name"
-  read csfn
-  sudo touch /home/"$user"/.supreme_cs/"$csfn"
-  sudo xdg-open /home/"$user"/.supreme_cs/"$csfn"
-  else
-  sudo mkdir /home/"$user"/.supreme_cs
-  instfmt "Enter file name"
-  read csfn
-  sudo touch /home/"$user"/.supreme_cs/"$csfn"
-  sudo xdg-open /home/"$user"/.supreme_cs/"$csfn"
-  fi;;
-2)select_cs
-  v180=$(echo $(numval "$csopt"))
-  IFS=', ' read -r -a srchopt <<< "$csopt"
-  if [[ "$v180" == "p" ]]
-  then
-  actionitems
-	  if [[ "${#arraymock[@]}" != 0 ]]
+	case "$cs1" in
+	1)opnr="x"
+	  if [[ -d /home/"$user"/.supreme_cs ]]
 	  then
-	  instfmt "Are you sure you want to remove selected items?(y/n)"
-	  read cs2
-		  case "$cs2" in
-		  y|Y)for csemt in "${arraymock[@]}"
-		      do
-		      sudo rm -vrf "$csemt"
-		      done;;
-		  *)return;;
-		  esac
+	  instfmt "Enter file name"
+	  read csfn
+	  sudo touch /home/"$user"/.supreme_cs/"$csfn"
+	  sudo xdg-open /home/"$user"/.supreme_cs/"$csfn"
+	  else
+	  sudo mkdir /home/"$user"/.supreme_cs
+	  instfmt "Enter file name"
+	  read csfn
+	  sudo touch /home/"$user"/.supreme_cs/"$csfn"
+	  sudo xdg-open /home/"$user"/.supreme_cs/"$csfn"
+	  fi;;
+	2)opnr="f"
+	  while [[ "$opnr" == "f" ]]
+	  do
+	  banner
+	  select_cs
+	  v180=$(echo $(numval "$csopt"))
+	  IFS=', ' read -r -a srchopt <<< "$csopt"
+	  if [[ "$v180" == "p" ]]
+	  then
+	  opnr="x"
+	  actionitems
+		  if [[ "${#arraymock[@]}" != 0 ]]
+		  then
+		  instfmt "Are you sure you want to remove selected items?(y/n)"
+		  read cs2
+			  case "$cs2" in
+			  y|Y)for csemt in "${arraymock[@]}"
+			      do
+			      sudo rm -vrf "$csemt"
+			      done;;
+			  *)return;;
+			  esac
+		   fi
+	   else
+	   	case "$csopt" in
+		p|P)opnr="g";;
+		h|H)opnr="x"
+		    homekey="y";;
+		esac
 	   fi
-   fi;;
-3)select_cs
-  v184=$(echo $(numval "$csopt"))
-  if [[ "$v184" == "p" ]]
-  then
-  	if (("$csopt"<$i)) > /dev/null 2>&1 || echo -e "\e[91mBad Input\e[0m"
-	then
-  	sudo xdg-open "${genlist[$csopt]}"
-	fi
-  fi;;
-4)select_cs
-  v185=$(echo $(numval "$csopt"))
-  if [[ "$v185" == "p" ]]
-  then
-	csrpt="y"
-	while [ "$csrpt" = "y" ]
-	do
-	  	if (("$csopt"<$i)) > /dev/null 2>&1 || echo -e "\e[91mBad Input\e[0m" 
+	   done;;
+	3)opnr="f"
+	  while [[ "$opnr" == "f" ]]
+	  do
+	  banner
+	  select_cs
+	  v184=$(echo $(numval "$csopt"))
+	  if [[ "$v184" == "p" ]]
+	  then
+	  	if (("$csopt"<$i)) > /dev/null 2>&1
 		then
-	  	. "${genlist[$csopt]}"
-		instfmt "Enter commands(to call custom functions in your script)  | h [Home]"
-		read cscmd
-			case "$cscmd" in
-			h|H)csrpt="n"
-			    homekey="y"
-			    return;;
-			*)homekey="y"
-			  $cscmd
-			  instfmt "Do you want to continue executing your script?(y/n)"
-			  read csrpt;;
-			esac
+	  	sudo xdg-open "${genlist[$csopt]}"
 		fi
-	done
-  fi;;
-5)csrpt="y"
-  homekey="y"
-  while [ "$csrpt" == "y" ]
-  do
-  instfmt "Enter command"
-  read cs11
-  $cs11
-  instfmt "Do you want to continue with other commands?(y/n)"
-  read csrpt
-  done;;
-h|H)homekey="y";;
-*)echo -e "\e[91mBad input\e[0m";;
-esac
+	  else
+	   	case "$csopt" in
+		p|P)opnr="g";;
+		h|H)opnr="x"
+		    homekey="y";;
+		esac
+	  fi
+	  done;;
+	4)opnr="f"
+	  while [[ "$opnr" == "f" ]]
+	  do
+	  banner
+	  select_cs
+	  v185=$(echo $(numval "$csopt"))
+	  if [[ "$v185" == "p" ]]
+	  then
+		csrpt="y"
+		while [[ "$csrpt" = "y" ]]
+		do
+		  	if (("$csopt"<$i)) > /dev/null 2>&1 
+			then
+		  	. "${genlist[$csopt]}"
+			instfmt "Enter commands(to call custom functions in your script)  | h [Home]"
+			read cscmd
+				case "$cscmd" in
+				h|H)csrpt="n"
+				    opnr="x"
+				    homekey="y";;
+				*)opnr="x"
+				  $cscmd
+				  instfmt "Do you want to continue executing your script?(y/n)"
+				  read csrpt;;
+				esac
+			else
+			csrpt="n"
+			fi
+		done
+	  else
+	   	case "$csopt" in
+		p|P)opnr="g";;
+		h|H)opnr="x"
+		    homekey="y";;
+		esac
+	  fi
+	  done;;
+	5)csrpt="y"
+	  homekey="y"
+	  while [ "$csrpt" == "y" ]
+	  do
+	  instfmt "Enter command"
+	  read cs11
+	  $cs11
+	  instfmt "Do you want to continue with other commands?(y/n)"
+	  read csrpt
+	  done;;
+	h|H)opnr="x"
+	    homekey="y";;
+	*)echo -e "\e[91mBad input\e[0m";;
+	esac
+done
 }
 
 #------------------------------------------------------------------------------------------------
@@ -1260,8 +1305,7 @@ echo -e "(1)\e[36m🔡\e[0m Manage Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)�
 		  load_delay;;
 		4)usbcop
 		  load_delay;;
-		5)opnr="e"
-		  cloudconfig
+		5)cloudconfig
 		  rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
 			if [[ "$rcver" != "v1.4"* ]]
 			then
@@ -1269,9 +1313,7 @@ echo -e "(1)\e[36m🔡\e[0m Manage Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)�
 			fi
 		   cloudit
 		   load_delay;;
-		6)opnr="e"
-		  banner
-		  custom_scripts
+		6)custom_scripts
 		  load_delay;;
 		p|P)opnr="e"
 		  preferences
