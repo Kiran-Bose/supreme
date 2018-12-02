@@ -790,8 +790,8 @@ do
 navdoor="GEN"
 genlist=()
 templist=()
-displaylist=()
 arraymock=()
+remlist=()
 banner
 instfmt "Select an option | p [Previous menu] | h [Home]"
 echo -e "(1)Add app(s) to list\n(2)Remove app(s) from list"
@@ -819,10 +819,26 @@ read cal1
 				"-#"*)templist+=( "$line" );;
 				esac
 			done < /home/"$user"/.supreme_app_config
-		  echo -n > /home/"$user"/.supreme_app_config
 		  fi
-	  genlist+=( "#+-""$cal3" )
-	  templist+=( "-#""$cal2" )
+		  for emt in "${genlist[@]}"
+		  do
+			if [[ "$emt" == "#+-$cal3" ]]
+			then
+			echo -e "\e[91mApp with display name $cal3 already exists. Try a different name\e[0m"
+			return
+			fi
+		  done
+		  for emt in "${templist[@]}"
+		  do
+		  	if [[ "$emt" == "-#$cal2" ]]
+			then
+			echo -e "\e[91mApp with Command $cal3 already exists\e[0m"
+			return
+			fi
+		  done	
+		  genlist+=( "#+-""$cal3" )
+		  templist+=( "-#""$cal2" )
+		  echo -n > /home/"$user"/.supreme_app_config
 		  for ((i=0; i<${#genlist[@]}; i++))
 		  do
 		  echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
@@ -837,6 +853,7 @@ read cal1
 	  genlist=()
 	  templist=()
 	  arraymock=()
+	  remlist=()
 		  if [[ -f /home/"$user"/.supreme_app_config ]]
 		  then
 		  wc -l /home/"$user"/.supreme_app_config > /dev/null 2>&1 || { echo -e "\e[91mNo app added to list\e[0m"; return; }
@@ -868,13 +885,14 @@ read cal1
 			  	instfmt "Are you sure you want to remove selected app(s) from list?(y/n)"
 				read cal5
 				  	case "$cal5" in
-					y|Y)SAVEIFS=$IFS
-					    IFS=$(echo -en "\n\b")
-					    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
+					y|Y)opnr="x"
 					    for emt in "${srchopt[@]}"
 					    do
 					    remlist+=( "${templist[$emt]}" )
 					    done
+					    SAVEIFS=$IFS
+					    IFS=$(echo -en "\n\b")
+					    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
 					    templist=( $(printf "%s\n" "${templist[@]}" "${remlist[@]}" | sort | uniq -u) )
 					    IFS=$SAVEIFS
 					    echo -n > /home/"$user"/.supreme_app_config
@@ -886,9 +904,11 @@ read cal1
 					 esac
 				fi
 			  else
+			  opnr="x"
 			  echo -e "\e[91mNo app added to list\e[0m"
 			  fi
 		  else
+		  opnr="x"
 		  echo -e "\e[91mNo app added to list\e[0m"
 		  fi
 	  done;;
