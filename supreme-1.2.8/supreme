@@ -784,6 +784,7 @@ done
 #------------------------------------------------------------------------------------------------
 function config_applist ()
 {
+opnr="e"
 while [[ "$opnr" == "e" ]]
 do
 navdoor="GEN"
@@ -830,57 +831,67 @@ read cal1
 	  instfmt "Do you want to add more apps to list? (y/n)"
 	  read addnew
 	  done;;
-	2)opnr="x"
-	  if [[ -f /home/"$user"/.supreme_app_config ]]
-	  then
-	  wc -l /home/"$user"/.supreme_app_config > /dev/null 2>&1 || { echo -e "\e[91mNo app added to list\e[0m"; return; }
-	  linecount=$( wc -l /home/"$user"/.supreme_app_config | cut -d ' ' -f1 )
-		  if [[ "$linecount" != 0 ]]
+	2)opnr="f"
+	  while [[ "$opnr" == "f" ]]
+	  do
+	  genlist=()
+	  templist=()
+	  arraymock=()
+		  if [[ -f /home/"$user"/.supreme_app_config ]]
 		  then
-			while read line; do
-				case "$line" in
-				"#+-"*)genlist+=( "$line" );;
-				"-#"*)templist+=( "$line" );;
+		  wc -l /home/"$user"/.supreme_app_config > /dev/null 2>&1 || { echo -e "\e[91mNo app added to list\e[0m"; return; }
+		  linecount=$( wc -l /home/"$user"/.supreme_app_config | cut -d ' ' -f1 )
+			  if [[ "$linecount" != 0 ]]
+			  then
+				while read line; do
+					case "$line" in
+					"#+-"*)genlist+=( "$line" );;
+					"-#"*)templist+=( "$line" );;
+					esac
+				done < /home/"$user"/.supreme_app_config
+			  banner
+			  instfmt "Select apps you want to remove | p [Previous menu] | h [Home]"
+			  genfmt "${genlist[@]}"
+			  read cal4
+			  v71=$( echo $(numval "$cal4") )
+				case "$v71" in
+				p|P)IFS=', ' read -r -a srchopt <<< "$cal4"
+			  	    actionitems;;
+				*)case "$cal4" in
+				  p|P)opnr="e";;
+				  h|H)opnr="x"
+				      homekey="y";;
+				  esac;;
 				esac
-			done < /home/"$user"/.supreme_app_config
-		  banner
-		  instfmt "Select apps you want to remove"
-		  genfmt "${genlist[@]}"
-		  read cal4
-		  v71=$( echo $(numval "$cal4") )
-			case "$v71" in
-			p|P)IFS=', ' read -r -a srchopt <<< "$cal4"
-		  	    actionitems;;
-			*)echo -e "\e[91mBad input\e[0m";;
-			esac
-			if [[ "${#arraymock[@]}" != 0 ]]
-			then
-		  	instfmt "Are you sure you want to remove selected app(s) from list? (y/n)"
-		        read cal5
-			  	case "$cal5" in
-				y|Y)SAVEIFS=$IFS
-				    IFS=$(echo -en "\n\b")
-				    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
-				    for emt in "${srchopt[@]}"
-				    do
-				    remlist+=( "${templist[$emt]}" )
-				    done
-				    templist=( $(printf "%s\n" "${templist[@]}" "${remlist[@]}" | sort | uniq -u) )
-				    IFS=$SAVEIFS
-				    echo -n > /home/"$user"/.supreme_app_config
-				    for ((i=0; i<${#genlist[@]}; i++))
-				    do
-				    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
-				    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
-				    done;;
-				 esac
-			fi
+				if [[ "${#arraymock[@]}" != 0 ]]
+				then
+			  	instfmt "Are you sure you want to remove selected app(s) from list?(y/n)"
+				read cal5
+				  	case "$cal5" in
+					y|Y)SAVEIFS=$IFS
+					    IFS=$(echo -en "\n\b")
+					    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
+					    for emt in "${srchopt[@]}"
+					    do
+					    remlist+=( "${templist[$emt]}" )
+					    done
+					    templist=( $(printf "%s\n" "${templist[@]}" "${remlist[@]}" | sort | uniq -u) )
+					    IFS=$SAVEIFS
+					    echo -n > /home/"$user"/.supreme_app_config
+					    for ((i=0; i<${#genlist[@]}; i++))
+					    do
+					    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
+					    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
+					    done;;
+					 esac
+				fi
+			  else
+			  echo -e "\e[91mNo app added to list\e[0m"
+			  fi
 		  else
 		  echo -e "\e[91mNo app added to list\e[0m"
 		  fi
-	  else
-	  echo -e "\e[91mNo app added to list\e[0m"
-	  fi;;
+	  done;;
 	h|H)opnr="x"
 	    homekey="y";;
 	p|P)opnr="y";;
@@ -940,8 +951,7 @@ read appvar
 		  esac;;
 		esac
 	  done;;
-	2)opnr="e"
-	  config_applist;;
+	2)config_applist;;
 	h|H)opnr="e"
 	    homekey="y";;
 	esac
