@@ -322,7 +322,8 @@ cloudlist=()
 			    case "$gdn2" in
 			    p|P)oprpt="x";;
 			    esac;;
-			h|H)opnr="x"
+			h|H)oprpt="x"
+			    opnr="x"
 			    homekey="y";;
 			esac
 		fi
