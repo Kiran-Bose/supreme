@@ -44,7 +44,6 @@ done
 arraysrch=( $(remove_array_dups "${arraysrch[@]}") )
 IFS=$SAVEIFS
 colorfmt "${arraysrch[@]}"
-unset srch11
 if [ "${#arraysrch[@]}" == 0 ]
 then
 flag=0
@@ -85,11 +84,33 @@ IFS=$SAVEIFS
 }
 
 #------------------------------------------------------------------------------------------------
+function reconfirm ()
+{
+tempopnr="${1:-e}"
+if [[ "${#arraymock[@]}" != 0 ]]
+then
+instfmt "Do you want to perform operations on the selected items?(y/n)"
+read recfm1
+	case "$recfm1" in
+	y|Y)opnr="x";;
+	*)opnr="$tempopnr";;
+	esac
+else
+instfmt "Do you want to continue?(y/n)"
+read recfm2
+	case "$recfm2" in
+	y|Y)opnr="$tempopnr";;
+	*)opnr="x"
+	  homekey="y";;
+esac
+fi
+}
+
+#------------------------------------------------------------------------------------------------
 function door ()
 {
 flag=0
 navdoor="DOOR"
-arraymock=()
 optdir1="${1:-D}"
 instfmt "enter wildcard(s)"
 read mockwc
@@ -98,6 +119,7 @@ fso="y"
 opnr="e"
 while [[ "$opnr" == "e" ]]
 do
+arraymock=()
 	case "$fso" in
 	y|Y)qksrch "${mockopt[@]}"
 	    if [ $flag == 0 ]
@@ -112,15 +134,15 @@ do
 	instfmt "Select file(s) | a [Select all] | z [Inverse selection] | s [Normal search] | p [Previous menu] | h [Home]"
 	read srch1
 		case "$srch1" in
-		a|A)opnr="x"
-		    srchopt=()
+		a|A)srchopt=()
 		    for ((i=0; i<${#arraysrch[@]}; i++)); do
 		    srchopt+=( "$i" )
 		    done
 		    actionitems
+		    reconfirm
 		    v11="p";;
-		z|Z)opnr="x"
-		    invslct "${arraysrch[@]}"
+		z|Z)invslct "${arraysrch[@]}"
+		    reconfirm
 		    v11="p";;
 		h|H)opnr="x"
 		    homekey="y";;
@@ -131,23 +153,7 @@ do
 			if [ "$v11" == "p" ]
 			then
 			actionitems
-				if [[ "${#arraymock[@]}" != 0 ]]
-				  then
-				  instfmt "Do you want to perform operations on the selected items?(y/n)"
-				  read navigop
-				  	case "$navigop" in
-					y|Y)opnr="x";;
-					*)opnr="e";;
-					esac
-				  else
-				  instfmt "Do you want to continue?(y/n)"
-				  read navig7
-					case "$navig7" in
-					y|Y)opnr="e";;
-					*)opnr="x"
-					  homekey="y";;
-					esac
-				  fi
+			reconfirm	
 			fi;;
 		esac
 	else
@@ -207,15 +213,15 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 		fi;;
 	b|B)backpath="`echo "$navpath" | rev | cut -d/ -f2- | rev`"
 	    navig "$backpath";;
-	a|A)opnr="x"
-	    srchopt=()
+	a|A)srchopt=()
 	    for ((i=0; i<${#temppath[@]}; i++)); do
 	    srchopt+=( "$i" )
 	    done
 	    actionitems
+	    reconfirm
 	    v11="p";;
-	z|Z)opnr="x"
-	    invslct "${temppath[@]}"
+	z|Z)invslct "${temppath[@]}"
+	    reconfirm
 	    v11="p";;
 	m|M)instfmt "Enter name for new directory"
 	    read navignd
@@ -233,23 +239,7 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	  then
 	  IFS=', ' read -r -a srchopt <<< "$navig1"
 	  actionitems
-		  if [[ "${#arraymock[@]}" != 0 ]]
-		  then
-		  instfmt "Do you want to perform operations on the selected items?(y/n)"
-		  read navigop
-		  	case "$navigop" in
-			y|Y)opnr="x";;
-			*)opnr="e";;
-			esac
-		  else
-		  instfmt "Do you want to continue?(y/n)"
-		  read navig7
-			case "$navig7" in
-			y|Y)opnr="e";;
-			*)opnr="x"
-			  homekey="y";;
-			esac
-		  fi
+	  reconfirm
 	  fi;;
 	esac
 done
@@ -784,15 +774,15 @@ isdir=()
 		    read gdnnd
 		    rclone mkdir $gdn1/"$gdnnd"
 		    cloudnavig $gdn1;;
-		z|Z)opnr="x"
-		    invslct "${newitem[@]}";;
-		a|A)opnr="x"
-		    srchopt=()
+		z|Z)invslct "${newitem[@]}"
+		    reconfirm "h";;
+		a|A)srchopt=()
 		    for ((i=0; i<${#newitem[@]}; i++)); do
 		    srchopt+=( "$i" )
 		    done
 		    actionitems
-		    dfsort;;
+		    dfsort
+		    reconfirm "h";;
 		r|R)opnr="x"
 		    colorfmt "$cldopt"
 		    echo -e "\e[91mRoot folder selected(Should only be selected as destination. No other operations are permitted)\e[0m";;
@@ -804,23 +794,7 @@ isdir=()
 		  IFS=', ' read -r -a srchopt <<< "$gdn2"
 		  actionitems
 		  dfsort
-			  if [[ "${#arraymock[@]}" != 0 ]]
-			  then
-			  instfmt "Do you want to perform operations on the selected items?(y/n)"
-			  read navigop
-			  	case "$navigop" in
-				y|Y)opnr="x";;
-				*)opnr="h";;
-				esac
-			  else
-			  instfmt "Do you want to continue?(y/n)"
-			  read navig7
-				case "$navig7" in
-				y|Y)opnr="h";;
-				*)opnr="x"
-				  homekey="y";;
-				esac
-			  fi
+		  reconfirm "h"
 		  fi;;
 		esac
 	fi
