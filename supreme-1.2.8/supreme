@@ -1010,9 +1010,11 @@ then
 		done
         	read csopt
 	else
+	opnr="x"
 	echo -e "\e[91mNo script added\e[0m"
 	fi
 else
+opnr="x"
 echo -e "\e[91mNo script added\e[0m"
 fi
 }
