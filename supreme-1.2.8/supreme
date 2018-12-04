@@ -592,7 +592,7 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 					  fi;;
 					1)if [[ ("$gdn1" == "$cldopt") && ("$gdntemp" == "$cldtemp") ]]
 					  then
-					  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
+					  instfmt "Source:$gdntemp --> Destination:$gdn1"
 						if [ "${#arraymock[@]}" == 0 ]
 						then
 						rcfeed $cldactn "$gdntemp" "$gdn1"
@@ -601,11 +601,11 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 						fi
 					  elif [[ ("$gdn1" != "$cldopt") && ("$gdntemp" == "$cldtemp") ]]
 					  then
-					  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
+					  instfmt "Source:$gdntemp --> Destination:$gdn1"
 					  rcfeed $cldactn "$gdntemp" "$gdn1"/"${arraymock[0]}" "" 5
 					  elif [[ ("$gdn1" == "$cldopt") && ("$gdntemp" != "$cldtemp") ]]
 					  then
-					  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
+					  instfmt "Source:$gdntemp --> Destination:$gdn1"
 						if [ "${#arraymock[@]}" == 0 ]
 						then
 						rcfeed $cldactn "$gdntemp" "$gdn1" 4
@@ -614,7 +614,7 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 						fi
 					  elif [[ ("$gdn1" != "$cldopt") && ("$gdntemp" != "$cldtemp") ]]
 					  then
-					  echo -e "\e[91msource:$gdntemp destination:$gdn1\e[0m"
+					  instfmt "Source:$gdntemp --> Destination:$gdn1"
 					  rcfeed $cldactn "$gdntemp" "$gdn1"/"${arraymock[0]}" 4 5
 					  fi;;
 					esac
