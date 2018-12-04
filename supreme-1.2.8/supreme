@@ -163,68 +163,77 @@ path=( "${access[0]}"/* )
 					  opnr="e"
 					  operations
 					  fi;;
-					2)opnr="x"
-					  instfmt "Select rsync option(s)"
+					2)opnr="h"
+					  while [[ "$opnr" == "h" ]]
+					  do
+					  banner
+					  instfmt "Select rsync option(s) | p [Previous menu] | h [Home]"
 					  echo -e "(1)Bulk rsync\n(2)DCIM\n(3)Videos"
 					  read ac6
 					  IFS=', ' read -r -a arropt4 <<< "$ac6"
-					  if [[ ! -d /home/"$user"/Phone\ Backup ]]
-					  then
-					  mkdir /home/"$user"/Phone\ Backup || sudo /home/"$user"/Phone\ Backup
-					  fi
-					  if [[ -d /home/"$user"/Phone\ Backup ]] && [[ "${#arropt4[@]}" != 0 ]]
-					  then
-					  instfmt "Files will be synched to /home/"$user"/Phone Backup"
-						for emt4 in "${arropt4[@]}"
-						do
-							case $emt4 in
-							1) if [[ -d "$storage"/DCIM/Camera ]]
-							   then
-					rsync --ignore-existing -rvv --progress "$storage"/DCIM/Camera/ /home/"$user"/Phone\ Backup/Camera
-							   fi
-							   if [[ -d "$storage"/WhatsApp ]]
-							   then
-							   rsync --ignore-existing -rvv --progress "$storage"/WhatsApp/ /home/"$user"/Phone\ Backup/WhatsApp
-							   fi
-							   if [[ -d "$storage"/SHAREit ]]
-							   then
-							   rsync --ignore-existing -rvv --progress "$storage"/SHAREit/ /home/"$user"/Phone\ Backup/SHAREit
-							   fi
-							   if [[ -d "$storage"/PicsArt ]]
-							   then
-							   rsync --ignore-existing -rvv --progress "$storage"/PicsArt/ /home/"$user"/Phone\ Backup/PicsArt
-							   fi
-							   if [[ -d "$storage"/Download ]]
-							   then
-							   rsync --ignore-existing -rvv --progress "$storage"/Download/ /home/"$user"/Phone\ Backup/Download
-							   fi
-							   if [[ -d "$storage"/Video ]]
-							   then
-							   rsync --ignore-existing -rvv --progress "$storage"/Video/ /home/"$user"/Phone\ Backup/Download/Video
-							   fi
-							   if [[ -d "$storage"/Pictures ]]
-							   then
-							   rsync --ignore-existing -rvv --progress "$storage"/Pictures/ /home/"$user"/Phone\ Backup/Pictures
-							   fi
-							   if [[ -d "$storage"/mp3 ]]
-							   then
-					rsync --ignore-existing -rvv --progress "$storage"/mp3/ /home/"$user"/Phone\ Backup/mp3
-							   fi
-							   return;;
-							2) if [[ -d "$storage"/DCIM/Camera ]]
-							   then
-					rsync --ignore-existing -rvv --progress "$storage"/DCIM/Camera/ /home/"$user"/Phone\ Backup/Camera
-							   fi;;
-							3) if [[ -d "$storage"/Video ]]
-							   then
-							   rsync --ignore-existing -rvv --progress "$storage"/Video/ /home/"$user"/Phone\ Backup/Download/Video
-							   fi;;
-							*) echo -e "\e[91mInvalid choice\e[0m";;
-							esac
-						done
-					    else
-					    echo -e "\e[91mBad input\e[0m"
-					    fi;;
+						  if [[ ! -d /home/"$user"/Phone\ Backup ]]
+						  then
+						  mkdir /home/"$user"/Phone\ Backup || sudo /home/"$user"/Phone\ Backup
+						  fi
+						  if [[ -d /home/"$user"/Phone\ Backup ]] && [[ "${#arropt4[@]}" != 0 ]]
+						  then
+							for emt4 in "${arropt4[@]}"
+							do
+								case $emt4 in
+								1)instfmt "Files will be synched to /home/"$user"/Phone Backup"
+								   opnr="x"
+								   if [[ -d "$storage"/DCIM/Camera ]]
+								   then
+						rsync --ignore-existing -rvv --progress "$storage"/DCIM/Camera/ /home/"$user"/Phone\ Backup/Camera
+								   fi
+								   if [[ -d "$storage"/WhatsApp ]]
+								   then
+								   rsync --ignore-existing -rvv --progress "$storage"/WhatsApp/ /home/"$user"/Phone\ Backup/WhatsApp
+								   fi
+								   if [[ -d "$storage"/SHAREit ]]
+								   then
+								   rsync --ignore-existing -rvv --progress "$storage"/SHAREit/ /home/"$user"/Phone\ Backup/SHAREit
+								   fi
+								   if [[ -d "$storage"/PicsArt ]]
+								   then
+								   rsync --ignore-existing -rvv --progress "$storage"/PicsArt/ /home/"$user"/Phone\ Backup/PicsArt
+								   fi
+								   if [[ -d "$storage"/Download ]]
+								   then
+								   rsync --ignore-existing -rvv --progress "$storage"/Download/ /home/"$user"/Phone\ Backup/Download
+								   fi
+								   if [[ -d "$storage"/Video ]]
+								   then
+								   rsync --ignore-existing -rvv --progress "$storage"/Video/ /home/"$user"/Phone\ Backup/Download/Video
+								   fi
+								   if [[ -d "$storage"/Pictures ]]
+								   then
+								   rsync --ignore-existing -rvv --progress "$storage"/Pictures/ /home/"$user"/Phone\ Backup/Pictures
+								   fi
+								   if [[ -d "$storage"/mp3 ]]
+								   then
+						rsync --ignore-existing -rvv --progress "$storage"/mp3/ /home/"$user"/Phone\ Backup/mp3
+								   fi
+								   return;;
+								2)instfmt "Files will be synched to /home/"$user"/Phone Backup"
+								   opnr="x" 
+								   if [[ -d "$storage"/DCIM/Camera ]]
+								   then
+						rsync --ignore-existing -rvv --progress "$storage"/DCIM/Camera/ /home/"$user"/Phone\ Backup/Camera
+								   fi;;
+								3)instfmt "Files will be synched to /home/"$user"/Phone Backup"
+								   opnr="x" 
+								   if [[ -d "$storage"/Video ]]
+								   then
+								   rsync --ignore-existing -rvv --progress "$storage"/Video/ /home/"$user"/Phone\ Backup/Download/Video
+								   fi;;
+								p|P)opnr="y";;
+								h|H)opnr="x"
+								    homekey="y";;
+								esac
+							done
+						    fi
+					    done;;
 					p|P)opnr="g";;
 					h|H)opnr="x"
 				    	    homekey="y";;
