@@ -75,11 +75,11 @@ instdirchk=("$instsrch"/*)
 			case "$item" in
 			"${instlist[0]}"/kbfunctions_basic) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/kbfunctions_basic &&
 			i=$(($i+1));;
-			"${instlist[0]}"/supreme) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/supreme &&
-			i=$(($i+1));;
-			"${instlist[0]}"/kcm) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/kcm &&
+			"${instlist[0]}"/kbcm) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/kbcm &&
 			i=$(($i+1));;
 			"${instlist[0]}"/progress_bar) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/progress_bar &&
+			i=$(($i+1));;
+			"${instlist[0]}"/supreme) sudo cp -f "$item" /usr/local/bin && sudo chmod +x /usr/local/bin/supreme &&
 			i=$(($i+1));;
 			esac
 		done

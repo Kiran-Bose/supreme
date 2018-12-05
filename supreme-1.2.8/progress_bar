@@ -16,7 +16,10 @@ if [ "$1" == "$2" ] || [ "$tots" == 0 ]
 then
 return
 fi
+if [[ ! -d "$2" ]] || [[ ! -f "$2" ]]
+then
 sleep 1
+fi
 if [[ (-d "$2") || (-f "$2") ]] && [ $tots != 0 ]
 then
 	if [[ ("$1" == "/media/$user"*) && ("$2" == "/media/$user"*) ]]

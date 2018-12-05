@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.2.7"
+currentversion="1.2.8"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -44,7 +44,6 @@ done
 arraysrch=( $(remove_array_dups "${arraysrch[@]}") )
 IFS=$SAVEIFS
 colorfmt "${arraysrch[@]}"
-unset srch11
 if [ "${#arraysrch[@]}" == 0 ]
 then
 flag=0
@@ -85,19 +84,42 @@ IFS=$SAVEIFS
 }
 
 #------------------------------------------------------------------------------------------------
+function reconfirm ()
+{
+tempopnr="${1:-e}"
+if [[ "${#arraymock[@]}" != 0 ]]
+then
+instfmt "Do you want to perform operations on the selected items?(y/n)"
+read recfm1
+	case "$recfm1" in
+	y|Y)opnr="x";;
+	*)opnr="$tempopnr";;
+	esac
+else
+instfmt "Do you want to continue?(y/n)"
+read recfm2
+	case "$recfm2" in
+	y|Y)opnr="$tempopnr";;
+	*)opnr="x"
+	  homekey="y";;
+esac
+fi
+}
+
+#------------------------------------------------------------------------------------------------
 function door ()
 {
 flag=0
 navdoor="DOOR"
-arraymock=( )
 optdir1="${1:-D}"
 instfmt "enter wildcard(s)"
 read mockwc
 IFS=', ' read -a mockopt <<< "$mockwc"
 fso="y"
-rpt="y"
-while [ "$rpt" == "y" ]
+opnr="e"
+while [[ "$opnr" == "e" ]]
 do
+arraymock=()
 	case "$fso" in
 	y|Y)qksrch "${mockopt[@]}"
 	    if [ $flag == 0 ]
@@ -109,32 +131,29 @@ do
 	esac
 	if [ $flag == 1 ]
 	then
-	instfmt "Select file(s) | a [Select all] | z [Inverse selection] | s [Normal search] | h [Home]"
+	instfmt "Select file(s) | a [Select all] | z [Inverse selection] | s [Normal search] | p [Previous menu] | h [Home]"
 	read srch1
 		case "$srch1" in
-		a|A)rpt="n"
-		    srchopt=()
+		a|A)srchopt=()
 		    for ((i=0; i<${#arraysrch[@]}; i++)); do
 		    srchopt+=( "$i" )
 		    done
 		    actionitems
+		    reconfirm
 		    v11="p";;
-		z|Z)rpt="n"
-		    invslct "${arraysrch[@]}"
+		z|Z)invslct "${arraysrch[@]}"
+		    reconfirm
 		    v11="p";;
-		h|H)rpt="n"
-		    opnr="x"
+		h|H)opnr="x"
 		    homekey="y";;
 		s|S)fso="n";;
-		*)rpt="n"
-		  v11=$( echo $(numval "$srch1") )
+		p|P)opnr="y";;
+		*)v11=$( echo $(numval "$srch1") )
 		  IFS=', ' read -r -a srchopt <<< "$srch1"
 			if [ "$v11" == "p" ]
 			then
 			actionitems
-			else
-			echo -e "\e[91mBad Input\e[0m"
-			return
+			reconfirm	
 			fi;;
 		esac
 	else
@@ -157,77 +176,76 @@ echo -e "\e[91mSelected ${#arraymock[@]} item(s)\e[0m"
 #------------------------------------------------------------------------------------------------
 function navig ()
 {
+opnr="e"
+while [[ "$opnr" == "e" ]]
+do
 dividerarray=()
 arraymock=()
 flag=1
 navdoor="NAV"
 navpath="${1:-/}"
 check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
-if [ "$check" == "*" ]
-then
-echo -e "\e[91mFolder empty\e[0m"
-temppath=()
-instfmt "b [Back] | m [Make directory] | f [Make file] | h [home]"
-else
-temppath=("$navpath"/*)
-for ((i=0; i<${#temppath[@]}; i++)); do
-Q=$( echo "(${i}) ${temppath[$i]}" | rev | cut -d '/' -f 1 | rev )
-dividerarray+=( "$Q" )	
+	if [ "$check" == "*" ]
+	then
+	echo -e "\e[91mFolder empty\e[0m"
+	temppath=()
+	instfmt "b [Back] | m [Make directory] | f [Make file] | h [home]"
+	else
+	temppath=("$navpath"/*)
+	for ((i=0; i<${#temppath[@]}; i++)); do
+	Q=$( echo "(${i}) ${temppath[$i]}" | rev | cut -d '/' -f 1 | rev )
+	dividerarray+=( "$Q" )	
+	done
+	colorfmt "${dividerarray[@]}"
+	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | n [Navigate] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]" 
+	fi
+	read navig1
+	v11=$( echo $(numval "$navig1") )
+	case "$navig1" in
+	n|N)instfmt "Select folder to navigate"
+	    read navig2
+	    v1000=$( echo $(numval "$navig2") )
+		if [ "$v1000" == "p" ]
+		then
+		navig "${temppath[$navig2]}"
+		else
+		return
+		fi;;
+	b|B)backpath="`echo "$navpath" | rev | cut -d/ -f2- | rev`"
+	    navig "$backpath";;
+	a|A)srchopt=()
+	    for ((i=0; i<${#temppath[@]}; i++)); do
+	    srchopt+=( "$i" )
+	    done
+	    actionitems
+	    reconfirm
+	    v11="p";;
+	z|Z)invslct "${temppath[@]}"
+	    reconfirm
+	    v11="p";;
+	m|M)instfmt "Enter name for new directory"
+	    read navignd
+		mkdir "$navpath"/"$navignd" > /dev/null 2>&1 || sudo mkdir "$navpath"/"$navignd" > /dev/null 2>&1
+	    navig "$navpath";;
+	f|F)instfmt "Enter file name"
+	    read navignf
+		touch "$navpath"/"$navignf" > /dev/null 2>&1 || sudo touch "$navpath"/"$navignf"  > /dev/null 2>&1
+	    navig "$navpath";;
+	h|H)opnr="x"
+	    homekey="y";;
+	p|P)case $opn1 in
+	    q|Q)opnr="e";;
+	    *)opnr="y"
+	    esac
+	    return;;
+	*)if [ "$v11" == "p" ]
+	  then
+	  IFS=', ' read -r -a srchopt <<< "$navig1"
+	  actionitems
+	  reconfirm
+	  fi;;
+	esac
 done
-colorfmt "${dividerarray[@]}"
-instfmt "Select item(s) | a [Select all] | z [Inverse selection] | n [Navigate] | b [Back] | m [Make directory] | f [Make file] | h [Home]" 
-fi
-read navig1
-v11=$( echo $(numval "$navig1") )
-case "$navig1" in
-n|N)instfmt "Select folder to navigate"
-    read navig2
-    v1000=$( echo $(numval "$navig2") )
-	if [ "$v1000" == "p" ]
-	then
-	navig "${temppath[$navig2]}"
-	else
-	return
-	fi;;
-b|B)backpath="`echo "$navpath" | rev | cut -d/ -f2- | rev`"
-    navig "$backpath";;
-a|A)srchopt=()
-    for ((i=0; i<${#temppath[@]}; i++)); do
-    srchopt+=( "$i" )
-    done
-    actionitems
-    v11="p";;
-z|Z)invslct "${temppath[@]}"
-    v11="p";;
-m|M)instfmt "Enter name for new directory"
-    read navignd
-	if [[ "$navpath" == *"/1000/gvfs/mtp"* ]]
-	then
-	mkdir "$navpath"/"$navignd"
-	else
-	sudo mkdir "$navpath"/"$navignd"
-	fi
-    navig "$navpath";;
-f|F)instfmt "Enter file name"
-    read navignf
-	if [[ "$navpath" == *"/1000/gvfs/mtp"* ]]
-	then
-	touch "$navpath"/"$navignf"
-	else
-	sudo touch "$navpath"/"$navignf"
-	fi
-    navig "$navpath";;
-h|H)opnr="x"
-    homekey="y";;
-*)if [ "$v11" == "p" ]
-  then
-  IFS=', ' read -r -a srchopt <<< "$navig1"
-  actionitems
-  else
-  echo -e "\e[91mBad Input\e[0m"
-  return
-  fi;;
-esac
 }
 
 #------------------------------------------------------------------------------------------------
@@ -257,7 +275,7 @@ access=( "$device"* )
 path=( "${access[0]}"/* )
 if [[ ("${path[@]}" == *"*"*) && ("${#usbarr[@]}" == 0) ]]
 then
-echo -e "\e[91mNo external quick access folder available\e[0m"
+echo -e "\e[91mNo device found\e[0m"
 elif [[ ("${path[@]}" != *"*"*) && ("${#usbarr[@]}" == 0) ]]
 then
 quickarray+=( "${path[@]}" )
@@ -282,47 +300,59 @@ fi
 function feeder ()
 {
 unset homekey
+opnr="y"
+while [[ "$opnr" == "y" ]]
+do
+banner
 arraymock=()
 instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]"
 read opn1
-case "$opn1" in
-s|S)instfmt "Select an option"
-    echo -e "(1)Default (limited number of folders)\n(2)Path specific (Opt for 2 and enter '/' to search entire system)"
-    read opn4
-    case "$opn4" in
-    1)door;;
-    2)door UD;;
-    *)return;;
-    esac;;
-n|N)opnr="x"
-    navig /;;
-h|H)opnr="x"
-    homekey="y";;
-q|Q)quick
-	if [ "${#quickarray[@]}" != 0 ]
-	then
-	instfmt "Select an option | b [Back] | h [Home]"
-	read opn15
-	v101=$( echo $(numval "$opn15") )
-		case "$opn15" in
-		b|B)feeder;;
-		h|H)opnr="x"
-		    homekey="y";;
-		*)if [[ "$v101" == "p" ]]
-		  then
-			  if (($opn15<$j)) > /dev/null 2>&1
+	case "$opn1" in
+	s|S)banner
+	    instfmt "Select an option | p [Previous menu] | h [Home]"
+	    echo -e "(1)Default (limited number of folders)\n(2)Path specific (Opt for 2 and enter '/' to search entire system)"
+	    read opn4
+	    case "$opn4" in
+	    1)opnr="x"
+	      door;;
+	    2)opnr="x"
+	      door UD;;
+	    p|P)opnr="y";;
+	    h|H)opnr="x"
+		homekey="y";;
+	    esac;;
+	n|N)opnr="x"
+	    navig /;;
+	h|H)opnr="x"
+	    homekey="y";;
+	q|Q)opnr="e"
+	    while [[ "$opnr" == "e" ]]
+	    do
+	    quick
+		if [ "${#quickarray[@]}" != 0 ]
+		then
+		instfmt "Select an option | p [Previous menu] | h [Home]"
+		read opn15
+		v101=$( echo $(numval "$opn15") )
+			case "$opn15" in
+			p|P)opnr="y";;
+			h|H)opnr="x"
+			    homekey="y";;
+			*)if [[ "$v101" == "p" ]]
 			  then
-			  navig "${quickarray[$opn15]}"
-			  fi
-		  else
-		  return
-		  fi;;
-		esac
-	else
-	return
-	fi;;
-*)return;;
-esac
+				  if (($opn15<$j)) > /dev/null 2>&1
+				  then
+				  navig "${quickarray[$opn15]}"
+				  fi
+			  fi;;
+			esac
+		else
+		opnr="x"
+		return
+		fi
+	    done;;
+	esac
+done
 }
 
 #------------------------------------------------------------------------------------------------
@@ -660,6 +690,9 @@ echo
 #------------------------------------------------------------------------------------------------
 function cloudnavig ()
 {
+opnr="h"
+while [[ "$opnr" == "h" ]]
+do
 unset homekey
 SAVEIFS=$IFS
 arraymock=()
@@ -667,103 +700,109 @@ sortindex=()
 sortfile=()
 sortdir=()
 isdir=()
-if [[ (-z "$cldopt") && ($# -eq 0) ]]
-then
-return
-else
-navdoor="GDNAV"
-newitem=()
-gdn1="${1:-$cldopt}"
-gditems=( "$(rclone lsjson "$gdn1")" )
-	for row in $(echo "${gditems}" | jq -r '.[] | @base64'); do
-	    _jq() {
-	     echo ${row} | base64 --decode | jq -r ${1}
-	    }
+	if [[ (-z "$cldopt") && ($# -eq 0) ]]
+	then
+	opnr="x"
+	return
+	else
+	navdoor="GDNAV"
+	newitem=()
+	gdn1="${1:-$cldopt}"
+	gditems=( "$(rclone lsjson "$gdn1")" )
+		for row in $(echo "${gditems}" | jq -r '.[] | @base64'); do
+		    _jq() {
+		     echo ${row} | base64 --decode | jq -r ${1}
+		    }
 
-	    newitem+=( "$(_jq '.Path')" )
-	    isdir+=( "$(_jq '.Size')" )
+		    newitem+=( "$(_jq '.Path')" )
+		    isdir+=( "$(_jq '.Size')" )
 
-	done
-colorfmt "${newitem[@]}"
-instfmt "Select item(s) | a [Select all] | z [Inverse selection] | r [Select root folder] | n [Navigate] | b [Back] | u [Upload] | f [View folder structure and navigate] | m [Make directory] | e [Empty Trash] | h [Home]" 
-read gdn2
-v122=$( echo $(numval "$gdn2") )
-	case "$gdn2" in
-	n|N)gdopn="y"
-	    instfmt "Select folder to navigate | b [Back] | h [Home]"
-	    while [ "$gdopn" == "y" ]
-	    do
-	    read gdn3
-	    v1010=$( echo $(numval "$gdn3") )
-		  case "$gdn3" in
-		  b|B)gdopn="f"
-		      backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
-		      cloudnavig "$backpath";;
-		  h|H)gdopn="f"
-		      unset cldopt
-		      unset tempsortdir
-		      unset tempsortfile
-		      unset tempmock
-		      oprpt="n"
-		      homekey="y";;
-		  *)if [[ ("$v1010" == "p") && ("${isdir[$gdn3]}" == -1) ]]
+		done
+	colorfmt "${newitem[@]}"
+	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | r [Select root folder] | n [Navigate] | b [Back] | u [Upload] | f [View folder structure and navigate] | m [Make directory] | e [Empty Trash] | p [Previous menu] | h [Home]" 
+	read gdn2
+	v122=$( echo $(numval "$gdn2") )
+		case "$gdn2" in
+		n|N)gdopn="y"
+		    instfmt "Select folder to navigate | b [Back] | h [Home]"
+		    while [ "$gdopn" == "y" ]
+		    do
+		    read gdn3
+		    v1010=$( echo $(numval "$gdn3") )
+			  case "$gdn3" in
+			  b|B)gdopn="f"
+			      backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
+			      cloudnavig "$backpath";;
+			  h|H)gdopn="f"
+			      unset cldopt
+			      unset tempsortdir
+			      unset tempsortfile
+			      unset tempmock
+			      oprpt="n"
+			      opnr="x"
+			      homekey="y";;
+			  *)if [[ ("$v1010" == "p") && ("${isdir[$gdn3]}" == -1) ]]
+			    then
+			    gdopn="f"
+				if [ "$gdn1" == "$cldopt" ]
+				then
+				cloudnavig "$gdn1""${newitem[$gdn3]}"
+				else
+				cloudnavig "$gdn1"/"${newitem[$gdn3]}"
+				fi
+			   else
+			   echo -e "\e[91mNot a directory/Bad Input\e[0m"
+			   fi;;
+			   esac
+		    done;;
+		h|H)unset cldopt
+		    unset tempsortdir
+		    unset tempsortfile
+		    unset tempmock
+		    oprpt="n"
+		    opnr="x"
+		    homekey="y";;
+		u|U)feeder
+		    if [[ "$homekey" != "y" ]]
 		    then
-		    gdopn="f"
-			if [ "$gdn1" == "$cldopt" ]
-			then
-			cloudnavig "$gdn1""${newitem[$gdn3]}"
-			else
-			cloudnavig "$gdn1"/"${newitem[$gdn3]}"
-			fi
-		   else
-		   echo -e "\e[91mNot a directory/Bad Input\e[0m"
-		   fi;;
-		   esac
-	    done;;
-	h|H)unset cldopt
-	    unset tempsortdir
-            unset tempsortfile
-            unset tempmock
-	    oprpt="n"
-	    homekey="y";;
-	u|U)feeder
-	    if [[ "$homekey" != "y" ]]
-	    then
-	    cloudupload
-	    fi;;
-	b|B)backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
-	    cloudnavig "$backpath";;
-	f|F)rclone tree $gdn1 -d --full-path
-	    instfmt "Enter path"
-	    read gdn18
-	    cloudnavig $gdn1"$gdn18";;
-	m|M)instfmt "Enter name for new directory"
-	    read gdnnd
-	    rclone mkdir $gdn1/"$gdnnd"
-	    cloudnavig $gdn1;;
-	z|Z)invslct "${newitem[@]}";;
-	a|A)srchopt=()
-	    for ((i=0; i<${#newitem[@]}; i++)); do
-	    srchopt+=( "$i" )
-	    done
-	    actionitems
-	    dfsort;;
-	r|R)colorfmt "$cldopt"
-	    echo -e "\e[91mRoot folder selected(Should only be selected as destination. No other operations are permitted)\e[0m";;
-	e|E)rclone cleanup $cldopt --drive-trashed-only -v;;
-	*)if [ "$v122" == "p" ]
-	  then
-	  IFS=', ' read -r -a srchopt <<< "$gdn2"
-	  actionitems
-	  dfsort
-	  else
-	  echo -e "\e[91mBad Input\e[0m"
-	  unset cldopt
-	  return
-	  fi;;
-	esac
-fi
+		    cloudupload
+		    fi;;
+		b|B)backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
+		    cloudnavig "$backpath";;
+		f|F)rclone tree $gdn1 -d --full-path
+		    instfmt "Enter path"
+		    read gdn18
+		    cloudnavig $gdn1"$gdn18";;
+		m|M)instfmt "Enter name for new directory"
+		    read gdnnd
+		    rclone mkdir $gdn1/"$gdnnd"
+		    cloudnavig $gdn1;;
+		z|Z)invslct "${newitem[@]}"
+		    reconfirm "h";;
+		a|A)srchopt=()
+		    for ((i=0; i<${#newitem[@]}; i++)); do
+		    srchopt+=( "$i" )
+		    done
+		    actionitems
+		    dfsort
+		    reconfirm "h";;
+		r|R)opnr="x"
+		    colorfmt "$cldopt"
+		    echo -e "\e[91mRoot folder selected(Should only be selected as destination. No other operations are permitted)\e[0m";;
+		e|E)rclone cleanup $cldopt --drive-trashed-only -v;;
+		p|P)opnr="e";;
+		*)if [ "$v122" == "p" ]
+		  then
+		  opnr="x"
+		  IFS=', ' read -r -a srchopt <<< "$gdn2"
+		  actionitems
+		  dfsort
+		  reconfirm "h"
+		  fi;;
+		esac
+	fi
 IFS=$SAVEIFS
+done
 }
 
 #------------------------------------------------------------------------------------------------
