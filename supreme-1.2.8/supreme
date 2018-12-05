@@ -712,16 +712,41 @@ read opn11
 		done
 	  fi;;
 	5)opnr="f"
-	  Q=$( echo "${arraymock[0]}" | rev | cut -d '/' -f 1 | rev )
-	  R=$( echo "${arraymock[0]}" | rev | cut -d '/' -f2- | rev )
-	  instfmt "Current Name: $Q"
-	  instfmt "Enter New Name"
-	  read newname
-	  instfmt "Are you sure you want to rename $Q to $newname?(y/n)"
-	  read opn88
-	  if [ "$opn88" == "y" ]
-	  then
-	  mv "${arraymock[0]}" "$R"/"$newname"
+	  if [[ "${#arraymock[@]}" != 0 ]]
+          then
+	  instfmt "Select an option | h [Home]"
+      	  echo -e "(1)Auto rename\n(2)Normal rename"
+	  read ren
+		case "$ren" in
+		1)instfmt "Are you sure you want to auto rename ${#arraymock[@]} files?(y/n)"
+		  read renres
+		  case "$renres" in 
+		  y|Y)instfmt "Enter Common name"
+		      read rencom
+		      for ((t=0; t<${#arraymock[@]}; t++))
+		      do
+		      R=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f2- | rev )
+		      number=$(($t+1))
+		      mv "${arraymock[$t]}" "$R"/"$rencom-$number"
+		      done;;
+		   esac;;
+		 2)for ((t=0; t<${#arraymock[@]}; t++))
+		   do
+		   Q=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f 1 | rev )
+		   R=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f2- | rev )
+		   instfmt "Current Name: $Q"
+		   instfmt "Enter New Name"
+		   read newname
+		   instfmt "Are you sure you want to rename $Q to $newname?(y/n)"
+		   read opn88
+			if [ "$opn88" == "y" ]
+			then
+			mv "${arraymock[$t]}" "$R"/"$newname"
+			fi
+		   done;;
+		  h|H)opnr="x"
+		      homekey="y";;
+		esac
 	  fi;;
 	6)opnr="f"
 	  while [ "$opnr" == "f" ]

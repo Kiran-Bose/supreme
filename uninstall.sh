@@ -14,9 +14,9 @@ else
 		    then
 		    sudo rm -vf /usr/local/bin/supreme  
 		    fi
-		    if [[ -f /usr/local/bin/kcm ]]
+		    if [[ -f /usr/local/bin/kbcm ]]
 		    then
-		    sudo rm -vf /usr/local/bin/kcm  
+		    sudo rm -vf /usr/local/bin/kbcm  
 		    fi
 		    if [[ -f /usr/local/bin/kbfunctions_basic ]]
 		    then
