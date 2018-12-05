@@ -233,7 +233,10 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	    navig "$navpath";;
 	h|H)opnr="x"
 	    homekey="y";;
-	p|P)opnr="y"
+	p|P)case $opn1 in
+	    q|Q)opnr="e";;
+	    *)opnr="y"
+	    esac
 	    return;;
 	*)if [ "$v11" == "p" ]
 	  then
@@ -272,7 +275,7 @@ access=( "$device"* )
 path=( "${access[0]}"/* )
 if [[ ("${path[@]}" == *"*"*) && ("${#usbarr[@]}" == 0) ]]
 then
-echo -e "\e[91mNo external quick access folder available\e[0m"
+echo -e "\e[91mNo device found\e[0m"
 elif [[ ("${path[@]}" != *"*"*) && ("${#usbarr[@]}" == 0) ]]
 then
 quickarray+=( "${path[@]}" )
