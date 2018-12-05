@@ -665,7 +665,7 @@ read opn11
 		  opnr="x"
 			for opnemt in "${tempmock[@]}"
 			do
-			kcm -c "$opnemt" "${arraymock[0]}"
+			kbcm -c "$opnemt" "${arraymock[0]}"
 			done
 		  else
 		  echo -e "\e[91mNot a directory\e[0m"
@@ -683,7 +683,7 @@ read opn11
 			for opnemt in "${tempmock[@]}"
 			do
 			qbar=0
-			kcm -m "$opnemt" "${arraymock[0]}"
+			kbcm -m "$opnemt" "${arraymock[0]}"
 			done
 		  else
 		  echo -e "\e[91mNot a directory\e[0m"
@@ -700,10 +700,10 @@ read opn11
 			then
 				if [[ -d /home/"$user"/Supremetemp ]]
 				then
-				kcm -m "$opnemt" /home/"$user"/Supremetemp/
+				kbcm -m "$opnemt" /home/"$user"/Supremetemp/
 				else
 				mkdir /home/"$user"/Supremetemp
-				kcm -m "$opnemt" /home/"$user"/Supremetemp/
+				kbcm -m "$opnemt" /home/"$user"/Supremetemp/
 				fi 
 			sudo rm -vrf /home/"$user"/Supremetemp/*
 			else
@@ -740,7 +740,7 @@ read opn11
 				opnr="x"
 					for opnemt in "${arraymock[@]}"
 					do
-					kcm -c "$opnemt" "${quickarray[$opn99]}"
+					kbcm -c "$opnemt" "${quickarray[$opn99]}"
 					done
 				else
 				echo -e "\e[91mBad input\e[0m"
@@ -1384,7 +1384,7 @@ user=$(whoami)
 	banner
 
 	instfmt "Select an option"
-	echo -e "(1)\e[36m🔡\e[0m Manage Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)📱 Manage Phone\n(4)\e[91m🎞\e[0m  Manage USB\n(5)\e[94m🌩 \e[0m Manage Cloud\n(6)🔗 Manage Custom Scripts\n(p)⚙  Preferences\n(x)\e[91m✖\e[0m  Exit"
+	echo -e "(1)\e[36m🔡\e[0m Manage Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)📱 Manage Phone\n(4)\e[91m🎞\e[0m  Manage USB Device\n(5)\e[94m🌩 \e[0m Manage Cloud\n(6)🔗 Manage Custom Scripts\n(p)⚙  Preferences\n(x)\e[91m✖\e[0m  Exit"
 	read opn2
 		case "$opn2" in
 		1)banner
