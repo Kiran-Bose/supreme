@@ -531,6 +531,142 @@ fi
 }
 
 #------------------------------------------------------------------------------------------------
+function cloudnavig ()
+{
+opnr="h"
+while [[ "$opnr" == "h" ]]
+do
+unset homekey
+SAVEIFS=$IFS
+arraymock=()
+sortindex=()
+sortfile=()
+sortdir=()
+isdir=()
+	if [[ (-z "$cldopt") && ($# -eq 0) ]]
+	then
+	opnr="x"
+	return
+	else
+	navdoor="GDNAV"
+	newitem=()
+	gdn1="${1:-$cldopt}"
+	gditems=( "$(rclone lsjson "$gdn1")" )
+		for row in $(echo "${gditems}" | jq -r '.[] | @base64'); do
+		    _jq() {
+		     echo ${row} | base64 --decode | jq -r ${1}
+		    }
+
+		    newitem+=( "$(_jq '.Path')" )
+		    isdir+=( "$(_jq '.Size')" )
+
+		done
+	colorfmt "${newitem[@]}"
+	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | r [Select root folder] | n [Navigate] | b [Back] | u [Upload] | f [View folder structure and navigate] | m [Make directory] | e [Empty Trash] | p [Previous menu] | h [Home]" 
+	read gdn2
+	v122=$( echo $(numval "$gdn2") )
+		case "$gdn2" in
+		n|N)gdopn="y"
+		    instfmt "Select folder to navigate | b [Back] | h [Home]"
+		    while [ "$gdopn" == "y" ]
+		    do
+		    read gdn3
+		    v1010=$( echo $(numval "$gdn3") )
+			  case "$gdn3" in
+			  b|B)gdopn="f"
+			      backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
+			      cloudnavig "$backpath";;
+			  h|H)gdopn="f"
+			      unset cldopt
+			      unset tempsortdir
+			      unset tempsortfile
+			      unset tempmock
+			      oprpt="n"
+			      opnr="x"
+			      homekey="y";;
+			  *)if [[ ("$v1010" == "p") && ("${isdir[$gdn3]}" == -1) ]]
+			    then
+			    gdopn="f"
+				if [ "$gdn1" == "$cldopt" ]
+				then
+				cloudnavig "$gdn1""${newitem[$gdn3]}"
+				else
+				cloudnavig "$gdn1"/"${newitem[$gdn3]}"
+				fi
+			   else
+			   echo -e "\e[91mNot a directory/Bad Input\e[0m"
+			   fi;;
+			   esac
+		    done;;
+		h|H)unset cldopt
+		    unset tempsortdir
+		    unset tempsortfile
+		    unset tempmock
+		    oprpt="n"
+		    opnr="x"
+		    homekey="y";;
+		u|U)feeder
+		    if [[ "$homekey" != "y" ]]
+		    then
+		    cloudupload
+		    fi;;
+		b|B)backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
+		    cloudnavig "$backpath";;
+		f|F)rclone tree $gdn1 -d --full-path
+		    instfmt "Enter path"
+		    read gdn18
+		    cloudnavig $gdn1"$gdn18";;
+		m|M)instfmt "Enter name for new directory"
+		    read gdnnd
+		    rclone mkdir $gdn1/"$gdnnd"
+		    cloudnavig $gdn1;;
+		z|Z)invslct "${newitem[@]}"
+		    reconfirm "h";;
+		a|A)srchopt=()
+		    for ((i=0; i<${#newitem[@]}; i++)); do
+		    srchopt+=( "$i" )
+		    done
+		    actionitems
+		    dfsort
+		    reconfirm "h";;
+		r|R)opnr="x"
+		    colorfmt "$cldopt"
+		    echo -e "\e[91mRoot folder selected(Should only be selected as destination. No other operations are permitted)\e[0m";;
+		e|E)rclone cleanup $cldopt --drive-trashed-only -v;;
+		p|P)opnr="e";;
+		*)if [ "$v122" == "p" ]
+		  then
+		  opnr="x"
+		  IFS=', ' read -r -a srchopt <<< "$gdn2"
+		  actionitems
+		  dfsort
+		  reconfirm "h"
+		  fi;;
+		esac
+	fi
+IFS=$SAVEIFS
+done
+}
+
+#------------------------------------------------------------------------------------------------
+function dfsort ()
+{
+for sortemt in "${srchopt[@]}"
+do
+	if [ "${isdir[$sortemt]}" == -1 ]	
+	then
+	sortdir+=( "${newitem[$sortemt]}" )
+	sortindex+=( "$sortemt" )
+	fi
+done
+sortfileinp=( $(printf "%s\n" "${srchopt[@]}" "${sortindex[@]}" | sort | uniq -u) )
+for sortemt1 in "${sortfileinp[@]}"
+do
+sortfile+=( "${newitem[$sortemt1]}" )
+done		
+}
+
+#------------------------------------------------------------------------------------------------
 function genfmt ()
 {
 genarray=( "$@" )
@@ -684,143 +820,6 @@ echo -en "\0015"
 echo -en "$userpri$user\e[0m"
 echo
 echo
-}
-
-
-#------------------------------------------------------------------------------------------------
-function cloudnavig ()
-{
-opnr="h"
-while [[ "$opnr" == "h" ]]
-do
-unset homekey
-SAVEIFS=$IFS
-arraymock=()
-sortindex=()
-sortfile=()
-sortdir=()
-isdir=()
-	if [[ (-z "$cldopt") && ($# -eq 0) ]]
-	then
-	opnr="x"
-	return
-	else
-	navdoor="GDNAV"
-	newitem=()
-	gdn1="${1:-$cldopt}"
-	gditems=( "$(rclone lsjson "$gdn1")" )
-		for row in $(echo "${gditems}" | jq -r '.[] | @base64'); do
-		    _jq() {
-		     echo ${row} | base64 --decode | jq -r ${1}
-		    }
-
-		    newitem+=( "$(_jq '.Path')" )
-		    isdir+=( "$(_jq '.Size')" )
-
-		done
-	colorfmt "${newitem[@]}"
-	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | r [Select root folder] | n [Navigate] | b [Back] | u [Upload] | f [View folder structure and navigate] | m [Make directory] | e [Empty Trash] | p [Previous menu] | h [Home]" 
-	read gdn2
-	v122=$( echo $(numval "$gdn2") )
-		case "$gdn2" in
-		n|N)gdopn="y"
-		    instfmt "Select folder to navigate | b [Back] | h [Home]"
-		    while [ "$gdopn" == "y" ]
-		    do
-		    read gdn3
-		    v1010=$( echo $(numval "$gdn3") )
-			  case "$gdn3" in
-			  b|B)gdopn="f"
-			      backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
-			      cloudnavig "$backpath";;
-			  h|H)gdopn="f"
-			      unset cldopt
-			      unset tempsortdir
-			      unset tempsortfile
-			      unset tempmock
-			      oprpt="n"
-			      opnr="x"
-			      homekey="y";;
-			  *)if [[ ("$v1010" == "p") && ("${isdir[$gdn3]}" == -1) ]]
-			    then
-			    gdopn="f"
-				if [ "$gdn1" == "$cldopt" ]
-				then
-				cloudnavig "$gdn1""${newitem[$gdn3]}"
-				else
-				cloudnavig "$gdn1"/"${newitem[$gdn3]}"
-				fi
-			   else
-			   echo -e "\e[91mNot a directory/Bad Input\e[0m"
-			   fi;;
-			   esac
-		    done;;
-		h|H)unset cldopt
-		    unset tempsortdir
-		    unset tempsortfile
-		    unset tempmock
-		    oprpt="n"
-		    opnr="x"
-		    homekey="y";;
-		u|U)feeder
-		    if [[ "$homekey" != "y" ]]
-		    then
-		    cloudupload
-		    fi;;
-		b|B)backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
-		    cloudnavig "$backpath";;
-		f|F)rclone tree $gdn1 -d --full-path
-		    instfmt "Enter path"
-		    read gdn18
-		    cloudnavig $gdn1"$gdn18";;
-		m|M)instfmt "Enter name for new directory"
-		    read gdnnd
-		    rclone mkdir $gdn1/"$gdnnd"
-		    cloudnavig $gdn1;;
-		z|Z)invslct "${newitem[@]}"
-		    reconfirm "h";;
-		a|A)srchopt=()
-		    for ((i=0; i<${#newitem[@]}; i++)); do
-		    srchopt+=( "$i" )
-		    done
-		    actionitems
-		    dfsort
-		    reconfirm "h";;
-		r|R)opnr="x"
-		    colorfmt "$cldopt"
-		    echo -e "\e[91mRoot folder selected(Should only be selected as destination. No other operations are permitted)\e[0m";;
-		e|E)rclone cleanup $cldopt --drive-trashed-only -v;;
-		p|P)opnr="e";;
-		*)if [ "$v122" == "p" ]
-		  then
-		  opnr="x"
-		  IFS=', ' read -r -a srchopt <<< "$gdn2"
-		  actionitems
-		  dfsort
-		  reconfirm "h"
-		  fi;;
-		esac
-	fi
-IFS=$SAVEIFS
-done
-}
-
-#------------------------------------------------------------------------------------------------
-function dfsort ()
-{
-for sortemt in "${srchopt[@]}"
-do
-	if [ "${isdir[$sortemt]}" == -1 ]	
-	then
-	sortdir+=( "${newitem[$sortemt]}" )
-	sortindex+=( "$sortemt" )
-	fi
-done
-sortfileinp=( $(printf "%s\n" "${srchopt[@]}" "${sortindex[@]}" | sort | uniq -u) )
-for sortemt1 in "${sortfileinp[@]}"
-do
-sortfile+=( "${newitem[$sortemt1]}" )
-done		
 }
 
 
