@@ -73,13 +73,21 @@ exit 0
 else
 feedemt=$(echo "$2" | rev | cut -d '/' -f 1 | rev)
 colorfmt "$2 --> $3"
-$actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots"
+$actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots" || exit 1
 	if [[ ${PIPESTATUS[0]} == 1 ]]
 	then
-	banner
-	colorfmt "$2 --> $3"
-	sudo $actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots"
-	fi 
+		tots=$(szcum "$2")
+		if [ "$tots" == "f" ]
+		then
+		echo -e "\e[91mSource path not found\e[0m"
+		exit 1
+		else
+		feedemt=$(echo "$2" | rev | cut -d '/' -f 1 | rev)
+		banner
+		colorfmt "$2 --> $3"
+		sudo $actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots"
+		fi
+	fi
 fi
 
 
