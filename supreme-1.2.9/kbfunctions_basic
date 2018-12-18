@@ -15,6 +15,28 @@ fi
 }
 
 #------------------------------------------------------------------------------------------------
+function isdirectory ()
+{
+if [[ -d "$1" ]]
+then
+dcheck=1
+else
+dcheck=0
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function isfile ()
+{
+if [[ -f "$1" ]]
+then
+fcheck=1
+else
+fcheck=0
+fi
+}
+
+#------------------------------------------------------------------------------------------------
 function srch ()
 {
 arraysrch=()
@@ -305,7 +327,10 @@ while [[ "$opnr" == "y" ]]
 do
 banner
 arraymock=()
-instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]"
+case "$1" in
+local)instfmt "s [Search] | n [Navigate] | q [Quick access] | p [Previous menu] | h [Home]";;
+*)instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]";;
+esac
 read opn1
 	case "$opn1" in
 	s|S)banner
@@ -325,6 +350,9 @@ read opn1
 	    navig /;;
 	h|H)opnr="x"
 	    homekey="y";;
+	p|P)case "$1" in
+	    local)opnr="g";;
+	    esac;;
 	q|Q)opnr="e"
 	    while [[ "$opnr" == "e" ]]
 	    do
@@ -536,6 +564,7 @@ function cloudnavig ()
 opnr="h"
 while [[ "$opnr" == "h" ]]
 do
+unset syncflag
 unset homekey
 SAVEIFS=$IFS
 arraymock=()
@@ -605,7 +634,7 @@ isdir=()
 		    oprpt="n"
 		    opnr="x"
 		    homekey="y";;
-		u|U)feeder
+		u|U)feeder "local"
 		    if [[ "$homekey" != "y" ]]
 		    then
 		    cloudupload
@@ -630,6 +659,7 @@ isdir=()
 		    dfsort
 		    reconfirm "h";;
 		r|R)opnr="x"
+		    syncflag=1
 		    colorfmt "$cldopt"
 		    echo -e "\e[91mRoot folder selected(Should only be selected as destination. No other operations are permitted)\e[0m";;
 		e|E)rclone cleanup $cldopt --drive-trashed-only -v;;

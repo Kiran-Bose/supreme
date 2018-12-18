@@ -83,7 +83,6 @@ $actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots" || exit 1
 		exit 1
 		else
 		feedemt=$(echo "$2" | rev | cut -d '/' -f 1 | rev)
-		banner
 		colorfmt "$2 --> $3"
 		sudo $actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots"
 		fi

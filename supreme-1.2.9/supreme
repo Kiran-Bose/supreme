@@ -38,7 +38,7 @@ usb_check
 				do 
 				banner
 				instfmt "Select an option | p [Previous menu] | h [Home]"
-				echo -e "(1)USB File Explorer\n(2)Format"
+				echo -e "(1)USB File Explorer\n(2)Format\n(3)Sync\n(4)Configure Sync"
 				read opt1
 					case "$opt1" in
 					1)opnr="f"
@@ -104,6 +104,74 @@ usb_check
 					  *)opnr="x"
 					    return;;
 					  esac;;
+					3)opnr="h"
+					  while [[ "$opnr" == "h" ]]
+					  do
+						if [[ -f /home/"$user"/.supremeusync_config ]]
+						then
+						wc -l /home/"$user"/.supremeusync_config > /dev/null 2>&1 || { echo -e "\e[91mNo folder added to list\e[0m"; return; }
+						linecount=$( wc -l /home/"$user"/.supremeusync_config | cut -d ' ' -f1 )
+							if [[ "$linecount" != 0 ]]
+							then
+							genlist=()
+							templist=()
+							displaylist=()
+								while read line; do
+								case "$line" in
+								"#-#"*)genlist+=( "$( echo "$line" | awk -F '#-#' '{print $2}' )" );;
+								*"%-#"*)templist+=( "$( echo "$line" | awk -F '%-#' '{print $2}' )" );;
+								esac
+								done < /home/"$user"/.supremeusync_config
+								for ((i=0; i<${#genlist[@]}; i++))
+								do
+								displaylist+=("${genlist[$i]} --> ${templist[$i]}")
+								done
+							banner
+							colorfmt "${displaylist[@]}"
+							instfmt "Select sync option(s) | a [Sync all] | p [Previous menu] | h [Home]"
+							read ac6
+							IFS=', ' read -r -a arropt4 <<< "$ac6"
+							v408=$( echo $(numval "$ac6") )
+							  if [[ "${#arropt4[@]}" != 0 ]]
+							  then
+								case "$v408" in
+								p|P)for emt11 in "${arropt4[@]}"
+								    do
+								    	if(($emt11<${#genlist[@]})) > /dev/null 2>&1
+									then
+									opnr="x"
+										if [[ -d "${genlist[$emt11]}" ]] || [[ -f "${genlist[$emt11]}" ]] && [[ -d "${templist[$emt11]}" ]]
+										then
+										rsync --ignore-existing -rvv --progress "${genlist[$emt11]}" "${templist[$emt11]}" 
+										fi
+									fi
+								    done;;
+								*)case $ac6 in
+								  a|A)opnr="x"
+									  for ((i=0; i<${#genlist[@]}; i++))
+									  do
+										if [[ -d "${genlist[$i]}" ]] || [[ -f "${genlist[$i]}" ]] && [[ -d "${templist[$i]}" ]]
+										then
+										rsync --ignore-existing -rvv --progress "${genlist[$i]}" "${templist[$i]}" 
+										fi
+									   done
+								      return;;
+								  p|P)opnr="y";;
+								  h|H)opnr="x"
+								      homekey="y";;
+								  esac;;
+								esac
+							    fi
+							else
+							opnr="x"
+							echo -e "\e[91mSync folder(s) not configured\e[0m"
+							fi
+						else
+						opnr="x"
+						echo -e "\e[91mSync folder(s) not configured\e[0m"
+						fi
+					    done;;
+					4)config_sync "usb";;
 					p|P)opnr="g";;
 					h|H)opnr="x"
 					    homekey="y";;
@@ -121,6 +189,380 @@ usb_check
 	echo -e "\e[91mNo USB Device Found\e[0m"
 	return
 	fi
+done
+}
+
+#------------------------------------------------------------------------------------------------
+function sync_feed ()
+{
+if [[ -f /home/"$user"/"$1" ]]
+then
+	while read line; do
+		case "$line" in
+		"#-#"*)genlist+=( "$line" );;
+		*"%-#"*)templist+=( "$line" )
+		       tracker=$( echo "$line" | awk -F '%-#' '{print $1}' );;
+		esac
+	done < /home/"$user"/"$1"
+fi
+for emt in "${genlist[@]}"
+do
+	for item in "${tempmock[@]}"
+	do
+		if [[ "$emt" == "#-#$item" ]]
+		then
+		echo -e "\e[91m$item already exist in sync configuration. Ignoring..\e[0m"
+		sleep 2
+		SAVEIFS=$IFS
+	    	IFS=$(echo -en "\n\b")
+	    	tempmock=( $(printf "%s\n" "${tempmock[@]}" "$item" | sort | uniq -u) )
+	    	IFS=$SAVEIFS
+		fi
+	done
+done
+if [[ "${#tempmock[@]}" != 0 ]]
+then
+	for item1 in "${tempmock[@]}"
+	do	
+	genlist+=( "#-#""$item1" )
+	tracker=$((tracker+1))
+	templist+=( "$tracker%-#""${arraymock[0]}" )
+	done
+echo -n > /home/"$user"/"$1"
+	for ((i=0; i<${#genlist[@]}; i++))
+	do
+	echo "${genlist[$i]}" >> /home/"$user"/"$1"
+	echo "${templist[$i]}" >> /home/"$user"/"$1"
+	done
+echo -e "\e[91m${#tempmock[@]} item(s) added to sync configuration\e[0m"
+else
+echo -e "\e[91mNo item added to sync configuration\e[0m"
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function sync_rem ()
+{
+if [[ -f /home/"$user"/"$1" ]]
+then
+wc -l /home/"$user"/"$1" > /dev/null 2>&1 || { echo -e "\e[91mNo sync configuration found\e[0m"; return; }
+linecount=$( wc -l /home/"$user"/"$1" | cut -d ' ' -f1 )
+	if [[ "$linecount" != 0 ]]
+	then
+		while read line; do
+			case "$line" in
+			"#-#"*)genlist+=( "$line" )
+			       displaylist+=( "$( echo "$line" | awk -F '#-#' '{print $2}' )" );;
+			*"%-#"*)templist+=( "$line" )
+				displaylist1+=( "$( echo "$line" | awk -F '%-#' '{print $2}' )" );;
+			esac
+		done < /home/"$user"/"$1"
+		for ((i=0; i<${#genlist[@]}; i++))
+		do
+		showlist+=("${displaylist[$i]} --> ${displaylist1[$i]}")
+		done
+	banner
+	colorfmt "${showlist[@]}"
+	instfmt "Select item(s) you want to remove | p [Previous menu] | h [Home]"
+	read cps4
+	v91=$( echo $(numval "$cps4") )
+		case "$v91" in
+		p|P)IFS=', ' read -r -a srchopt <<< "$cps4"
+		    actionitems;;
+		*)case "$cps4" in
+		  p|P)opnr="e";;
+		  h|H)opnr="x"
+		      homekey="y";;
+		  esac;;
+		esac
+	if [[ "${#arraymock[@]}" != 0 ]]
+	then
+	instfmt "Are you sure you want to remove selected item(s) from list?(y/n)"
+	read cps5
+	  	case "$cps5" in
+		y|Y)opnr="x"
+		    for emt in "${srchopt[@]}"
+		    do
+		    remlist+=( "${templist[$emt]}" )
+		    done
+		    SAVEIFS=$IFS
+		    IFS=$(echo -en "\n\b")
+		    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
+		    templist=( $(printf "%s\n" "${templist[@]}" "${remlist[@]}" | sort | uniq -u) )
+		    IFS=$SAVEIFS
+		    echo -n > /home/"$user"/"$1"
+		    for ((i=0; i<${#genlist[@]}; i++))
+		    do
+		    echo "${genlist[$i]}" >> /home/"$user"/"$1"
+		    echo "${templist[$i]}" >> /home/"$user"/"$1"
+		    done;;
+		 esac
+	fi
+	else
+	opnr="x"
+	echo -e "\e[91mNo sync configuration found\e[0m"
+	fi
+else
+opnr="x"
+echo -e "\e[91mNo sync configuration found\e[0m"
+fi
+}
+
+#------------------------------------------------------------------------------------------------
+function config_sync ()
+{
+opnr="e"
+while [[ "$opnr" == "e" ]]
+do
+unset dcheck
+navdoor="GEN"
+genlist=()
+templist=()
+arraymock=()
+displaylist=()
+displaylist1=()
+showlist=()
+remlist=()
+tracker=0
+banner
+instfmt "Select an option | p [Previous menu] | h [Home]"
+echo -e "(1)Add sync folder(s)/file(s) to list\n(2)Remove sync folder(s)/file(s) from list"
+read cps1
+	case $cps1 in
+	1)opnr="y"
+	  while [[ "$opnr" == "y" ]]
+	  do
+	  banner
+	  genlist=()
+	  templist=()
+		case "$1" in
+		phone)opnr="f"
+		      while [[ "$opnr" == "f" ]]
+		      do
+		      banner
+		      instfmt "Select Source | p [Previous menu] | h [Home]"
+		      echo -e "(1)Phone\n(2)Local"
+		      read cfgsync11
+			case "$cfgsync11" in
+			1)navig "$storage";;
+			2)feeder "local"
+			  case "$opn1" in
+			  p|P)opnr="f";;
+			  h|H)unset navig1;;
+			  esac;;
+			p|P)opnr="e";;
+			h|H)opnr="x"
+			    homekey="y"
+			    unset navig1;;
+			esac
+		      done;;
+		usb)opnr="f"
+		      while [[ "$opnr" == "f" ]]
+		      do
+		      banner
+		      instfmt "Select Source | p [Previous menu] | h [Home]"
+		      echo -e "(1)USB Device\n(2)Local"
+		      read cfgsync21
+			case "$cfgsync21" in
+			1)navig "${usbarr[$uc55]}";;
+			2)feeder "local"
+			  case "$opn1" in
+			  p|P)opnr="f";;
+			  h|H)unset navig1;;
+			  esac;;
+			p|P)opnr="e";;
+			h|H)opnr="x"
+			    homekey="y"
+			    unset navig1;;
+			esac
+		      done;;
+		cloud)opnr="f"
+		      while [[ "$opnr" == "f" ]]
+		      do
+		      banner
+		      instfmt "Select Source | p [Previous menu] | h [Home]"
+		      echo -e "(1)Cloud\n(2)Local"
+		      read cfgsync1
+			      	case "$cfgsync1" in
+				1)opnr="h"
+				  while [[ "$opnr" == "h" ]]
+				  do
+				  selectcloud
+					  if [[ ! -z "$cldopt" ]]
+					  then
+					  cloudnavig
+					  fi
+					  case "$gdit143" in
+					  p|P)opnr="f"
+					      unset cldopt gdn2;;
+					  esac
+					  case "$gdn2" in
+					  p|P)opnr="h"
+					      unset cldopt;;
+					  esac
+				  done;;
+				2)feeder "local"
+				  case "$opn1" in
+				  p|P)opnr="f";;
+				  h|H)unset navig1;;
+				  esac;;
+				p|P)opnr="e";;
+				h|H)opnr="x"
+				    homekey="y"
+				    unset navig1;;
+				esac
+		      done;;
+		esac 
+	  	if [[ "${#arraymock[@]}" != 0 ]]
+		then
+		tempmock=()
+			for object in "${arraymock[@]}"
+			do
+				if [[ ! -z "${access[0]}" ]] && [[ "$object" == "${access[0]}"* ]]
+				then
+				object=${object#"${access[0]}"}
+	  			tempmock+=("$object")
+				elif [[ ! -z "$cldopt" ]] && [[ "$1" == "cloud" ]]
+				then
+				tempmock+=("$gdn1/$object")
+				else
+				tempmock+=("$object")
+				fi
+			done
+			case "$1" in
+			phone)opnr="f"
+		              while [[ "$opnr" == "f" ]]
+		              do
+		      	      banner
+		      	      instfmt "Select Destination | p [Previous menu] | h [Home]"
+		      	      echo -e "(1)Phone\n(2)Local"
+		      	      read cfgsync12
+				case "$cfgsync12" in
+				1)navig "$storage"
+				  isdirectory "${arraymock[0]}"
+				  	if [[ "${#arraymock[@]}" != 0 ]]
+					then
+					tempswap=("${arraymock[0]}")
+						if [[ ! -z "${access[0]}" ]] && [[ "${arraymock[0]}" == "${access[0]}"* ]]
+						then
+						tempswap[0]=${tempswap#"${access[0]}"}
+			  			fi
+					arraymock=("${tempswap[@]}")
+					fi;;
+				2)feeder "local"
+				  case "$opn1" in
+				  p|P)opnr="f";;
+				  h|H)unset navig1;;
+				  esac
+				  isdirectory "${arraymock[0]}";;
+				p|P)opnr="e";;
+				h|H)opnr="x"
+				    homekey="y"
+				    unset navig1;;
+				esac
+		            done;;
+			usb)opnr="f"
+		     	    while [[ "$opnr" == "f" ]]
+		      	    do
+		      	    banner
+		      	    instfmt "Select Destination | p [Previous menu] | h [Home]"
+		      	    echo -e "(1)USB Device\n(2)Local"
+		      	    read cfgsync22
+				case "$cfgsync22" in
+				1)navig "${usbarr[$uc55]}"
+				  isdirectory "${arraymock[0]}";;
+				2)feeder "local"
+				  case "$opn1" in
+				  p|P)opnr="f";;
+				  h|H)unset navig1;;
+				  esac
+				  isdirectory "${arraymock[0]}";;
+				p|P)opnr="e";;
+				h|H)opnr="x"
+				    homekey="y"
+				    unset navig1;;
+				esac
+		      	    done;;
+			cloud)opnr="f"
+			      while [[ "$opnr" == "f" ]]
+			      do
+			      banner
+			      instfmt "Select Destination | p [Previous menu] | h [Home]"
+			      echo -e "(1)Cloud\n(2)Local"
+			      read cfgsync2
+				      case "$cfgsync2" in
+				      1)opnr="h"
+					while [[ "$opnr" == "h" ]]
+					do
+					selectcloud
+						if [[ ! -z "$cldopt" ]]
+						then
+						cloudnavig
+							if [[ "${#sortdir[@]}" != 0 ]]
+							then
+							arraymock=("$gdn1/${sortdir[0]}")
+							dcheck=1
+							v11="p"
+							elif [[ "${#arraymock[@]}" == 0 ]] && [[ "$syncflag" == 1 ]]
+							then
+							arraymock=("$gdn1")
+							dcheck=1
+							v11="p"
+							fi
+						fi
+						case "$gdit143" in
+						p|P)opnr="f"
+						    unset cldopt gdn2;;
+						esac
+						case "$gdn2" in
+						p|P)opnr="h"
+						    unset cldopt;;
+					 	esac
+					done;;
+				      2)feeder "local"
+					isdirectory "${arraymock[0]}"
+					case "$opn1" in
+					p|P)opnr="e";;
+					esac;;
+				      p|P)opnr="e";;
+				      h|H)opnr="x"
+					  homekey="y";;
+				      esac
+			      done;;
+			esac
+			case "$navig1" in
+			p|P)opnr="e";;
+			esac
+			if [[ ("$v11" == "p") && ("$dcheck" == 1) ]]
+			then
+				case "$1" in
+				phone)sync_feed ".supremepsync_config";;
+				usb)sync_feed ".supremeusync_config";;
+				cloud)sync_feed ".supremecsync_config";;
+				esac 	
+			else
+			echo -e "\e[91mNo item added to sync configuration\e[0m"
+			fi
+		fi	
+	  done;;
+	2)opnr="f"
+	  while [[ "$opnr" == "f" ]]
+	  do
+	  genlist=()
+	  templist=()
+	  displaylist=()
+	  arraymock=()
+	  remlist=()
+		case "$1" in
+		phone)sync_rem ".supremepsync_config";;
+		usb)sync_rem ".supremeusync_config";;
+		cloud)sync_rem ".supremecsync_config";;
+		esac 		  
+	  done;;
+	h|H)opnr="x"
+	    homekey="y";;
+	p|P)opnr="y";;
+	esac
 done
 }
 
@@ -154,7 +596,7 @@ path=( "${access[0]}"/* )
 				do 
 				banner
 					instfmt "Select an option | p [Previous menu] | h [Home]"
-					echo -e "(1)Phone File Explorer\n(2)Sync Folders"
+					echo -e "(1)Phone File Explorer\n(2)Sync\n(3)Configure Sync"
 					read ac1
 					case "$ac1" in
 					1)navig "$storage"
@@ -166,74 +608,81 @@ path=( "${access[0]}"/* )
 					2)opnr="h"
 					  while [[ "$opnr" == "h" ]]
 					  do
-					  banner
-					  instfmt "Select rsync option(s) | p [Previous menu] | h [Home]"
-					  echo -e "(1)Bulk rsync\n(2)DCIM\n(3)Videos"
-					  read ac6
-					  IFS=', ' read -r -a arropt4 <<< "$ac6"
-						  if [[ ! -d /home/"$user"/Phone\ Backup ]]
-						  then
-						  mkdir /home/"$user"/Phone\ Backup || sudo /home/"$user"/Phone\ Backup
-						  fi
-						  if [[ -d /home/"$user"/Phone\ Backup ]] && [[ "${#arropt4[@]}" != 0 ]]
-						  then
-							for emt4 in "${arropt4[@]}"
-							do
-								case $emt4 in
-								1)instfmt "Files will be synched to /home/"$user"/Phone Backup"
-								   opnr="x"
-								   if [[ -d "$storage"/DCIM/Camera ]]
-								   then
-						rsync --ignore-existing -rvv --progress "$storage"/DCIM/Camera/ /home/"$user"/Phone\ Backup/Camera
-								   fi
-								   if [[ -d "$storage"/WhatsApp ]]
-								   then
-								   rsync --ignore-existing -rvv --progress "$storage"/WhatsApp/ /home/"$user"/Phone\ Backup/WhatsApp
-								   fi
-								   if [[ -d "$storage"/SHAREit ]]
-								   then
-								   rsync --ignore-existing -rvv --progress "$storage"/SHAREit/ /home/"$user"/Phone\ Backup/SHAREit
-								   fi
-								   if [[ -d "$storage"/PicsArt ]]
-								   then
-								   rsync --ignore-existing -rvv --progress "$storage"/PicsArt/ /home/"$user"/Phone\ Backup/PicsArt
-								   fi
-								   if [[ -d "$storage"/Download ]]
-								   then
-								   rsync --ignore-existing -rvv --progress "$storage"/Download/ /home/"$user"/Phone\ Backup/Download
-								   fi
-								   if [[ -d "$storage"/Video ]]
-								   then
-								   rsync --ignore-existing -rvv --progress "$storage"/Video/ /home/"$user"/Phone\ Backup/Download/Video
-								   fi
-								   if [[ -d "$storage"/Pictures ]]
-								   then
-								   rsync --ignore-existing -rvv --progress "$storage"/Pictures/ /home/"$user"/Phone\ Backup/Pictures
-								   fi
-								   if [[ -d "$storage"/mp3 ]]
-								   then
-						rsync --ignore-existing -rvv --progress "$storage"/mp3/ /home/"$user"/Phone\ Backup/mp3
-								   fi
-								   return;;
-								2)instfmt "Files will be synched to /home/"$user"/Phone Backup"
-								   opnr="x" 
-								   if [[ -d "$storage"/DCIM/Camera ]]
-								   then
-						rsync --ignore-existing -rvv --progress "$storage"/DCIM/Camera/ /home/"$user"/Phone\ Backup/Camera
-								   fi;;
-								3)instfmt "Files will be synched to /home/"$user"/Phone Backup"
-								   opnr="x" 
-								   if [[ -d "$storage"/Video ]]
-								   then
-								   rsync --ignore-existing -rvv --progress "$storage"/Video/ /home/"$user"/Phone\ Backup/Download/Video
-								   fi;;
-								p|P)opnr="y";;
-								h|H)opnr="x"
-								    homekey="y";;
+						if [[ -f /home/"$user"/.supremepsync_config ]]
+						then
+						wc -l /home/"$user"/.supremepsync_config > /dev/null 2>&1 || { echo -e "\e[91mNo folder added to list\e[0m"; return; }
+						linecount=$( wc -l /home/"$user"/.supremepsync_config | cut -d ' ' -f1 )
+							if [[ "$linecount" != 0 ]]
+							then
+							genlist=()
+							templist=()
+							displaylist=()
+								while read line; do
+								case "$line" in
+								"#-#"*)genlist+=( "$( echo "$line" | awk -F '#-#' '{print $2}' )" );;
+								*"%-#"*)templist+=( "$( echo "$line" | awk -F '%-#' '{print $2}' )" );;
 								esac
-							done
-						    fi
+								done < /home/"$user"/.supremepsync_config
+								for ((i=0; i<${#genlist[@]}; i++))
+								do
+								displaylist+=("${genlist[$i]} --> ${templist[$i]}")
+								done
+							banner
+							colorfmt "${displaylist[@]}"
+							instfmt "Select sync option(s) | a [Sync all] | p [Previous menu] | h [Home]"
+							read ac6
+							IFS=', ' read -r -a arropt4 <<< "$ac6"
+							v408=$( echo $(numval "$ac6") )
+							  if [[ "${#arropt4[@]}" != 0 ]]
+							  then
+								case "$v408" in
+								p|P)for emt11 in "${arropt4[@]}"
+								    do
+								    	if(($emt11<${#genlist[@]})) > /dev/null 2>&1
+									then
+									opnr="x"
+										if [[ -d "${access[0]}${genlist[$emt11]}" ]] || [[ -f "${access[0]}${genlist[$emt11]}" ]] && [[ -d "${templist[$emt11]}" ]]
+										then
+										rsync --ignore-existing -rvv --progress "${access[0]}${genlist[$emt11]}" "${templist[$emt11]}"
+										elif [[ -d "${genlist[$emt11]}" ]] || [[ -f "${genlist[$emt11]}" ]] && [[ -d "${access[0]}${templist[$emt11]}" ]]
+										then
+										rsync --ignore-existing -rvv --progress "${genlist[$emt11]}" "${access[0]}${templist[$emt11]}"
+										else
+										echo -e "\e[91mBad sync configuration\e[0m"
+										fi
+									fi
+								    done;;
+								*)case $ac6 in
+								  a|A)opnr="x"
+									  for ((i=0; i<${#genlist[@]}; i++))
+									  do
+										if [[ -d "${access[0]}${genlist[$i]}" ]] || [[ -f "${access[0]}${genlist[$i]}" ]] && [[ -d "${templist[$i]}" ]]
+										then
+										rsync --ignore-existing -rvv --progress "${access[0]}${genlist[$i]}" "${templist[$i]}"
+										elif [[ -d "${genlist[$i]}" ]] || [[ -f "${genlist[$i]}" ]] && [[ -d "${access[0]}${templist[$i]}" ]]
+										then
+										rsync --ignore-existing -rvv --progress "${genlist[$i]}" "${access[0]}${templist[$i]}"
+										else
+										echo -e "\e[91mBad sync configuration\e[0m"
+										fi
+									   done
+								      return;;
+								  p|P)opnr="y";;
+								  h|H)opnr="x"
+								      homekey="y";;
+								  esac;;
+								esac
+							    fi
+							else
+							opnr="x"
+							echo -e "\e[91mSync folder(s) not configured\e[0m"
+							fi
+						else
+						opnr="x"
+						echo -e "\e[91mSync folder(s) not configured\e[0m"
+						fi
 					    done;;
+					3)config_sync "phone";;
 					p|P)opnr="g";;
 					h|H)opnr="x"
 				    	    homekey="y";;
@@ -445,7 +894,7 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 	sudo rm -rf /home/"$user"/Supremetemp/*
 	unset gdit1
 	instfmt "Select an option | h [Home]"
-	echo -e "(1)Cloud File Explorer\n(2)Configure Cloud"
+	echo -e "(1)Cloud File Explorer\n(2)Sync\n(3)Configure Sync\n(4)Configure Cloud"
 	read cldit
 		case "$cldit" in
 		1)selectcloud
@@ -453,6 +902,16 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 		  while [[ "$oprpt" == "g" ]] && [[ ! -z "$cldopt" ]]
 		  do
 		  cloudnavig
+			  case "$srch1" in
+			  h|H)oprpt="x";;
+			  esac
+			  case "$navig1" in
+			  h|H)oprpt="x";;
+			  esac
+			  case "$opn1" in
+			  h|H)oprpt="x";;
+			  p|P)oprpt="g";;
+			  esac
 			  case "$gdn2" in
 			  p|P)selectcloud;;
 			  esac
@@ -511,7 +970,87 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 				done
 			  fi
 		  done;;
-		2)opnr="x"
+		2)opnr="h"
+		  while [[ "$opnr" == "h" ]]
+		  do
+		  unset fcheck
+		  if [[ -f /home/"$user"/.supremecsync_config ]]
+		  then
+		  wc -l /home/"$user"/.supremecsync_config > /dev/null 2>&1 || { echo -e "\e[91mNo folder added to list\e[0m"; return; }
+		  linecount=$( wc -l /home/"$user"/.supremecsync_config | cut -d ' ' -f1 )
+			if [[ "$linecount" != 0 ]]
+			then
+			genlist=()
+			templist=()
+			displaylist=()
+				while read line; do
+				case "$line" in
+				"#-#"*)genlist+=( "$( echo "$line" | awk -F '#-#' '{print $2}' )" );;
+				*"%-#"*)templist+=( "$( echo "$line" | awk -F '%-#' '{print $2}' )" );;
+				esac
+				done < /home/"$user"/.supremecsync_config
+				for ((i=0; i<${#genlist[@]}; i++))
+				do
+				displaylist+=("${genlist[$i]} --> ${templist[$i]}")
+				done
+			banner
+			colorfmt "${displaylist[@]}"
+			instfmt "Select sync option(s) | a [Sync all] | p [Previous menu] | h [Home]"
+			read ac6
+			IFS=', ' read -r -a arropt4 <<< "$ac6"
+			v408=$( echo $(numval "$ac6") )
+			  if [[ "${#arropt4[@]}" != 0 ]]
+			  then
+				case "$v408" in
+				p|P)for emt11 in "${arropt4[@]}"
+				    do
+				    	if(($emt11<${#genlist[@]})) > /dev/null 2>&1
+					then
+					opnr="x"
+					tempdir=$( echo "${genlist[$emt11]}" | rev | cut -d '/' -f 1 | rev )
+					testdf=($(rclone ls "${genlist[$emt11]}" | awk '{print $2}'))
+						if [[ "${testdf[0]}" == "$tempdir" ]] || [[ -f "${genlist[$emt11]}" ]]
+						then
+						rclone copy "${genlist[$emt11]}" "${templist[$emt11]}" -Pv
+						else
+						rclone copy "${genlist[$emt11]}" "${templist[$emt11]}/$tempdir" -Pv
+						fi 
+					fi
+				    done;;
+				*)case $ac6 in
+				  a|A)opnr="x"
+					  for ((i=0; i<${#genlist[@]}; i++))
+					  do
+					  tempdir=$( echo "${genlist[$i]}" | rev | cut -d '/' -f 1 | rev )
+					  testdf=($(rclone ls "${genlist[$i]}" | awk '{print $2}'))
+						  if [[ "${testdf[0]}" == "$tempdir" ]] || [[ -f "${genlist[$i]}" ]]
+						  then
+						  rclone copy "${genlist[$i]}" "${templist[$i]}" -Pv
+						  else
+						  rclone copy "${genlist[$i]}" "${templist[$i]}/$tempdir" -Pv
+						  fi 
+					  done
+				      return;;
+				  p|P)opnr="g";;
+				  h|H)opnr="x"
+				      homekey="y";;
+				  esac;;
+				esac
+			    fi
+			else
+			opnr="x"
+			echo -e "\e[91mSync folder(s) not configured\e[0m"
+			fi
+		  else
+		  opnr="x"
+		  echo -e "\e[91mSync folder(s) not configured\e[0m"
+		  fi
+		  done;;
+		3)config_sync "cloud"
+		  case "$cps1" in
+		  p|P)opnr="g";;
+		  esac;;
+		4)opnr="x"
 		  checkInternet || return
 		  rclone config;;
 		h|H)opnr="x"
@@ -556,7 +1095,7 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 			  return
 			  else
 			  instfmt "Select Destination"
-			  echo -e "(1)cloud storage\n(2)local"
+			  echo -e "(1)cloud\n(2)local"
 			  read gdit55
 				case $gdit55 in
 				1)selectcloud
@@ -640,6 +1179,7 @@ echo -e "\e[41;97;10;85mEnter any key\e[0m"
 read delay
 fi
 }
+
 #------------------------------------------------------------------------------------------------
 function operations ()
 {
