@@ -1752,10 +1752,10 @@ read cqa
 	    echo -n > /home/"$user"/.supreme_qaconfig.txt 
 	    fi
 	    case "${#genlist[@]}" in
-	    0)echo -e "\e[91mNo directories selected\e[0m";;
+	    0)echo -e "\e[91mNo folder selected\e[0m";;
 	    *)IFS=$SAVEIFS
 	      colorfmt "${templist[@]}"
-	      echo -e "\e[91mAdded $lc directorie(s) to list\e[0m"
+	      echo -e "\e[91mAdded $lc folder(s) to list\e[0m"
 	      for emt in "${genlist[@]}"
 	      do
 	      echo "$emt" >> /home/"$user"/.supreme_qaconfig.txt
