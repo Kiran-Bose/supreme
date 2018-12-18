@@ -70,7 +70,6 @@ if [ "${#arraysrch[@]}" == 0 ]
 then
 flag=0
 echo -e "\e[91mNo match found\e[0m"
-return
 else
 flag=1
 fi
@@ -341,7 +340,8 @@ read opn1
 	    1)opnr="x"
 	      door;;
 	    2)opnr="x"
-	      door UD;;
+	      door UD
+	      unset srch11;;
 	    p|P)opnr="y";;
 	    h|H)opnr="x"
 		homekey="y";;
@@ -442,7 +442,6 @@ if [ "${#arraysrch[@]}" == 0 ]
 then
 flag=0
 echo -e "\e[91mNo match found\e[0m"
-return
 else
 flag=1
 fi
