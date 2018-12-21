@@ -81,7 +81,8 @@ Type 'supreme' and hit enter in the bash terminal. Follow the instructions
 <summary>(3)Manage Phone</summary>
 
     ----Phone File Explorer           
-    ----Sync folders                          
+    ----Sync
+    ----Configure sync                          
 
 </details>
 
@@ -91,6 +92,8 @@ Type 'supreme' and hit enter in the bash terminal. Follow the instructions
 
     ----USB File Explorer
     ----Format
+    ----Sync
+    ----Configure sync
 
 </details>
 
@@ -99,6 +102,8 @@ Type 'supreme' and hit enter in the bash terminal. Follow the instructions
 <summary>(5)Manage Cloud</summary>
 
     ----Cloud File Explorer
+    ----Sync
+    ----Configure sync
     ----Configure Cloud
 
 </details>
