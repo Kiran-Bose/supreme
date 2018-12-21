@@ -774,6 +774,7 @@ cloudlist=()
 			if(($gdit143<${#cloudlist[@]})) > /dev/null 2>&1
 			then
 			opnr="g"
+			oprpt="g"
 			cldopt="${cloudlist[$gdit143]}:/"
 			fi
 		else
