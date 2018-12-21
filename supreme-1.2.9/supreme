@@ -759,7 +759,10 @@ banner
 cloudlist=()
 	if [[ -f /home/"$user"/.supremecloud.txt ]]
 	then
-	instfmt "Select cloud storage | p [Previous menu] | h [Home]"
+		case "$1" in
+		local)instfmt "Select cloud storage | h [Home]";;
+		*)instfmt "Select cloud storage | p [Previous menu] | h [Home]";;
+		esac
 		while read line; do
 		cloudlist+=( "$line" )
 		done < /home/"$user"/.supremecloud.txt
@@ -779,9 +782,12 @@ cloudlist=()
 			fi
 		else
 			case "$gdit143" in
-			p|P)opnr="g"
-			    case "$gdn2" in
-			    p|P)oprpt="x";;
+			p|P)case "$1" in
+			    local)pass=donothing;;
+			    *)opnr="g"
+			      case "$gdn2" in
+			      p|P)oprpt="x";;
+			      esac;;
 			    esac;;
 			h|H)oprpt="x"
 			    opnr="x"
@@ -1329,10 +1335,10 @@ read opn11
 	  then
 	  curl https://rclone.org/install.sh | sudo bash
 	  fi
-	  selectcloud
+	  selectcloud "local"
 	  cloudupload;;
 	8)opnr="f"
-	  selectcloud
+	  selectcloud "local"
 	  if [[ -z "$cldopt" ]]
 	  then
 	  return
