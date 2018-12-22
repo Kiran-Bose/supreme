@@ -1,3 +1,7 @@
+#!/bin/bash
+#kiran.vkvr@gmail.com
+#https://github.com/Kiran-Bose/supreme
+
 #--------------------------------------------------------------------------------------------------
 function getos ()
 {
