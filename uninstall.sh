@@ -26,6 +26,10 @@ else
 		    then
 		    sudo rm -vf /usr/local/bin/progress_bar  
 		    fi
+		    if [[ -f /usr/local/bin/kcm ]]
+		    then
+		    sudo rm -vf /usr/local/bin/kcm  
+		    fi
 		    echo
 		    echo -e "Following dependencies have to be removed manually through package manager\n(1)rclone\n(2)jq\n(3)curl [Available by default in most of the linux distros]"
 		    echo;;
