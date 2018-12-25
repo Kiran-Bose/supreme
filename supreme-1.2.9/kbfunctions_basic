@@ -152,7 +152,7 @@ arraymock=()
 	esac
 	if [ $flag == 1 ]
 	then
-	instfmt "Select file(s) | a [Select all] | z [Inverse selection] | n [Navigate] | s [Normal search] | p [Previous menu] | h [Home]"
+	instfmt "Select file(s) | a [Select all] | z [Inverse selection] | s [Normal search] | p [Previous menu] | h [Home]"
 	read srch1
 		case "$srch1" in
 		a|A)srchopt=()
@@ -165,22 +165,6 @@ arraymock=()
 		z|Z)invslct "${arraysrch[@]}"
 		    reconfirm
 		    v11="p";;
-		n|N)instfmt "Select folder to navigate"
-	    	    read srch71
-	   	    v71=$( echo $(numval "$srch71") )
-			if [ "$v71" == "p" ]
-			then
-				if [[ -d "${arraysrch[$srch71]}" ]]
-				then
-				navig "${arraysrch[$srch71]}"
-				else
-				echo -e "\e[91mNot a directory\e[0m"
-				opnr="e"
-				fi
-				case "$navig1" in
-				p|P)opnr="e";;
-				esac
-			fi;;
 		h|H)opnr="x"
 		    homekey="y";;
 		s|S)fso="n";;
@@ -234,7 +218,7 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	dividerarray+=( "$Q" )	
 	done
 	colorfmt "${dividerarray[@]}"
-	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | n [Navigate] | s [Search] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]" 
+	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | n [Navigate] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]" 
 	fi
 	read navig1
 	v11=$( echo $(numval "$navig1") )
@@ -245,14 +229,9 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 		if [ "$v1000" == "p" ]
 		then
 		navig "${temppath[$navig2]}"
+		else
+		return
 		fi;;
-	s|S)srch11="$navpath"
-	    door UD
-	    sleep 1
-	    unset srch11
-		case "$srch1" in
-		p|P)opnr="e";;
-		esac;;
 	b|B)backpath="`echo "$navpath" | rev | cut -d/ -f2- | rev`"
 	    navig "$backpath";;
 	a|A)srchopt=()
