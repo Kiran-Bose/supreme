@@ -251,7 +251,8 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	    sleep 1
 	    unset srch11
 		case "$srch1" in
-		p|P)opnr="e";;
+		p|P)opnr="e"
+		    srch11="$navpath";;
 		esac;;
 	b|B)backpath="`echo "$navpath" | rev | cut -d/ -f2- | rev`"
 	    navig "$backpath";;
