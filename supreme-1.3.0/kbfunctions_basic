@@ -246,14 +246,20 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 		then
 		navig "${temppath[$navig2]}"
 		fi;;
-	s|S)srch11="$navpath"
+	s|S)if [[ "$navpath" = *"/1000/gvfs/mtp"* ]]
+	    then
+	    echo -e "\e[91mSearch not supported on current directory\e[0m"
+	    sleep 1
+	    else
+	    srch11="$navpath"
 	    door UD
 	    sleep 1
 	    unset srch11
 		case "$srch1" in
 		p|P)opnr="e"
 		    srch11="$navpath";;
-		esac;;
+		esac
+	    fi;;
 	b|B)backpath="`echo "$navpath" | rev | cut -d/ -f2- | rev`"
 	    navig "$backpath";;
 	a|A)srchopt=()
