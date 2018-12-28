@@ -1684,16 +1684,21 @@ read cs1
 		  	if (("$csopt"<$i)) > /dev/null 2>&1 
 			then
 		  	. "${genlist[$csopt]}"
-			instfmt "Enter commands(to call custom functions in your script)  | h [Home]"
-			read cscmd
-				case "$cscmd" in
-				h|H)csrpt="n"
-				    opnr="x"
-				    homekey="y";;
-				*)opnr="x"
-				  $cscmd
-				  instfmt "Do you want to continue executing your script?(y/n)"
-				  read csrpt;;
+			instfmt "Do you wish to run script specific commands?(y/n)"
+			read cs71
+				case "$cs71" in
+				y|Y)instfmt "Enter command | h [Home]"
+				    read cscmd
+				    case "$cscmd" in
+				    h|H)csrpt="n"
+				        opnr="x"
+				        homekey="y";;
+				    *)opnr="x"
+				      $cscmd
+				      instfmt "Do you want to continue executing your script?(y/n)"
+				      read csrpt;;
+				    esac;;
+				*)csrpt="n";;
 				esac
 			else
 			csrpt="n"

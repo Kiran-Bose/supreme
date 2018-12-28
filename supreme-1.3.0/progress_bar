@@ -8,7 +8,8 @@ function kbbar ()
 user=$(whoami)
 ptghistory=()
 local i
-local LENGTH=50
+local barcols=$(tput cols)
+local LENGTH=$(($barcols-8))
 local REMAINING="\e[107m \e[0m"
 local COMPLETED="\e[42m \e[0m"
 tots=$3
@@ -44,7 +45,9 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 		done
 	while echo "($ptg < 99)" | bc | grep -q 1
 	do
-	totd=0	
+	totd=0
+	local barcols=$(tput cols)
+	local LENGTH=$(($barcols-8))	
 		if [[ (-d "$1") || (-f "$1") ]]
 		then
 			if [[ (-d "$2") || (-f "$2") ]]
@@ -62,12 +65,12 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 			ds=$totd
 			ptg=$( echo "scale=6; $ds/$ss * 100" | bc )
 			sptg=${ptg%.*}
-			clb=$( echo "$ptg/2" | bc )
+			clb=$( echo "scale=6; $ptg/100 * $LENGTH" | bc )
 			ptghistory+=($sptg)
 				if(($sptg>100)) > /dev/null 2>&1
 				then
 				echo -en "\e[44;97;10;82m 100% \e[0m\e[89m \e[0m"
-					for i in `seq 1 50`
+					for i in `seq 1 $LENGTH`
 					do
 					echo -en "$COMPLETED"
 					done
@@ -86,11 +89,15 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 						fi
 					fi
 				fi
-				
+			local EMPTY=$( echo "scale=6; $LENGTH-$clb" | bc )	
 			echo -en "\e[44;97;10;82m  $sptg% \e[0m\e[89m \e[0m"
 				for i in `seq 1 $clb`
 				do
 				echo -en "$COMPLETED"
+				done
+				for i in `seq 1 $EMPTY`
+				do
+				echo -en "$REMAINING"
 				done
 			else
 			echo -e "\e[91mTransfer error/Device disconnected\e[0m"
@@ -106,7 +113,7 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 		then
 		echo -en "\0015"
 		echo -en "\e[44;97;10;82m 100% \e[0m\e[89m \e[0m"
-			for i in `seq 1 50`
+			for i in `seq 1 $LENGTH`
 			do
 			echo -en "$COMPLETED"
 			done
