@@ -109,7 +109,13 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 			return 1
 			fi
 		else
-		echo
+		echo -en "\0015"
+		echo -en "\e[44;97;10;82m 100% \e[0m\e[89m \e[0m"
+			for i in `seq 1 $LENGTH`
+			do
+			echo -en "$COMPLETED"
+			done
+			echo -e "\n"
 		break
 		fi
 	sleep 0.18
