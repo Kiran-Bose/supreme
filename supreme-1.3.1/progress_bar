@@ -84,7 +84,12 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 						then
 						pass=donothing
 						else
-						echo
+						echo -en "\e[44;97;10;82m 100% \e[0m\e[89m \e[0m"
+							for i in `seq 1 $LENGTH`
+							do
+							echo -en "$COMPLETED"
+							done
+							echo -e "\n"
 						return 1
 						fi
 					fi
@@ -100,11 +105,29 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 				echo -en "$REMAINING"
 				done
 			else
+			echo
 			echo -e "\e[91mTransfer error/Device disconnected\e[0m"
 			return 1
 			fi
 		else
-		echo
+		sleep 1
+			if [[ (-d "$2") || (-f "$2") ]]
+			then
+			totd=0
+			local barcols=$(tput cols)
+			local LENGTH=$(($barcols-8))
+				if [[ "$2" == *"/1000/gvfs/mtp"* ]]
+				then
+				IFS=$'\n' read -rd '' -a arraysz1 <<< `ls -Ral "$2" | awk '{print $5}' | sed 's/[^0-9]*//g'` 
+				else
+				IFS=$'\n' read -rd '' -a arraysz1 <<< `sudo ls -Ral "$2" | awk '{print $5}' | sed 's/[^0-9]*//g'` 
+				fi
+				for ((i=0; i<${#arraysz1[@]}; i++)); do
+				totd=$(($totd + "${arraysz1[$i]}"))	
+				done
+			ds=$totd
+			ptg=$( echo "scale=6; $ds/$ss * 100" | bc )
+			fi
 		break
 		fi
 	sleep 0.18
@@ -118,6 +141,8 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 			echo -en "$COMPLETED"
 			done
 			echo -e "\n"
+		else
+		echo -e "\n"
 		fi
 	fi
 fi
