@@ -217,7 +217,7 @@ sudo apt upgrade
 <details>
 <summary>Git Update</summary>
 
-#### If the package is installed running '. install' mentioned in Git install section, running it again will prompt for update if any.
+#### If the package is installed running '. install.sh' mentioned in Git install section, running it again will prompt for update if any.
 
 * cd into the cloned directory:
 ```bash
