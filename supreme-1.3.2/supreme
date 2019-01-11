@@ -1356,7 +1356,10 @@ read opn11
 	9)opnr="f"
 	  for opnemt in "${arraymock[@]}"
 	  do
-	  echo -e "________________________________________________________________________________"
+		for ((i=0; i<$col; i++))
+		do
+		echo -en "_"
+		done
 	  det "$opnemt"
 	  done;;
 	h|H)opnr="f"
