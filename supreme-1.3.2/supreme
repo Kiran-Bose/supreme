@@ -1731,11 +1731,18 @@ read cs1
 	  homekey="y"
 	  while [ "$csrpt" == "y" ]
 	  do
-	  instfmt "Enter command"
+	  instfmt "Enter command | p [Previous menu] | h [Home]"
 	  read cs11
-	  $cs11
-	  instfmt "Do you want to continue with other commands?(y/n)"
-	  read csrpt
+		  case "$cs11" in
+		  p|P)unset homekey
+		      csrpt="n"
+		      opnr="g";;
+		  h|H)opnr="x"
+		      csrpt="n";;
+		  *)$cs11
+		    instfmt "Do you want to continue with other commands?(y/n)"
+		    read csrpt;;
+		  esac
 	  done;;
 	h|H)opnr="x"
 	    homekey="y";;
