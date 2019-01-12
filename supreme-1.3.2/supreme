@@ -1392,48 +1392,60 @@ read cal1
 	  banner
 	  genlist=()
 	  templist=()
-	  instfmt "Enter command to open app"
+	  instfmt "Enter command to open app | p [Previous Menu] | h [Home]"
 	  read cal2
-	  instfmt "Enter display name for app"
-	  read cal3
-		  if [[ -z $cal3 ]] || [[ "$cal3" == "" ]]; then
-		  cal3=$cal2
-		  fi
-		  if [[ -f /home/"$user"/.supreme_app_config ]]
-		  then
+		case "$cal2" in
+		p|P)opnr="e"
+		    addnew="n";;
+		h|H)addnew="n"
+		    homekey="y";;
+		*)instfmt "Enter display name for app | p [Previous Menu] | h [Home]"
+	          read cal3
+		  case "$cal3" in
+		  p|P)opnr="e"
+		      addnew="n";;
+		  h|H)addnew="n"
+		      homekey="y";;
+		  *)if [[ -z $cal3 ]] || [[ "$cal3" == "" ]]; then
+		    cal3=$cal2
+		    fi
+		    if [[ -f /home/"$user"/.supreme_app_config ]]
+		    then
 		  	while read line; do
 				case "$line" in
 				"#+-"*)genlist+=( "$line" );;
 				"-#"*)templist+=( "$line" );;
 				esac
 			done < /home/"$user"/.supreme_app_config
-		  fi
-		  for emt in "${genlist[@]}"
-		  do
+		    fi
+		    for emt in "${genlist[@]}"
+		    do
 			if [[ "$emt" == "#+-$cal3" ]]
 			then
 			echo -e "\e[91mApp with display name $cal3 already exists. Try a different name\e[0m"
 			return
 			fi
-		  done
-		  for emt in "${templist[@]}"
-		  do
+		    done
+		    for emt in "${templist[@]}"
+		    do
 		  	if [[ "$emt" == "-#$cal2" ]]
 			then
 			echo -e "\e[91mApp with Command $cal3 already exists\e[0m"
 			return
 			fi
-		  done	
-		  genlist+=( "#+-""$cal3" )
-		  templist+=( "-#""$cal2" )
-		  echo -n > /home/"$user"/.supreme_app_config
-		  for ((i=0; i<${#genlist[@]}; i++))
-		  do
-		  echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
-		  echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
-		  done
-	  instfmt "Do you want to add more apps to list? (y/n)"
-	  read addnew
+		    done	
+		    genlist+=( "#+-""$cal3" )
+		    templist+=( "-#""$cal2" )
+		    echo -n > /home/"$user"/.supreme_app_config
+		    for ((i=0; i<${#genlist[@]}; i++))
+		    do
+		    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
+		    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
+		    done
+	  	    instfmt "Do you want to add more apps to list? (y/n)"
+	  	    read addnew;;
+		    esac;;
+		esac
 	  done;;
 	2)opnr="f"
 	  while [[ "$opnr" == "f" ]]
