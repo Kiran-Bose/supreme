@@ -1917,14 +1917,14 @@ read thm
 	  echo pri=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo sec=\""\e[102m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo logopri=\""\e[102;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo logosec=\""\e[44;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo logosec=\""\e[43;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
 	  echo userpri=\""\e[102;90;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo cfmtp1=\""\e[42;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo cfmtp1=\""\e[42;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
 	  echo cfmtp2=\""\e[107;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
 	  echo cfmtp1fill=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo cfmtp2fill=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmt=\""\e[103;90;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmtfill=\""\e[103m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
+	  echo ifmt=\""\e[42;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo ifmtfill=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
 	5)opnr="x"
 	  echo -n > /home/"$user"/.supremetheme.txt
 	  echo pri=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
