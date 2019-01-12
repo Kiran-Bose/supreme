@@ -1866,7 +1866,7 @@ while [[ "$opnr" == "h" ]]
 do
 banner
 instfmt "Select a theme | p [Previous menu] | h [Home]"
-echo -e "(1)Aqua\n \e[44m       \e[0m\n \e[46m       \e[0m\n(2)Polar\n \e[107m       \e[0m\n \e[47m       \e[0m\n(3)Classic\n \e[40m       \e[0m\n \e[100m       \e[0m\n(4)Solar\n \e[41m       \e[0m\n \e[103m       \e[0m\n(5)Carbon\n \e[100m       \e[0m\n \e[40m       \e[0m\n(6)Default\n \e[100m       \e[0m\n \e[101m       \e[0m"
+echo -e "(1)Aqua\n \e[44m       \e[0m\n \e[46m       \e[0m\n(2)Polar\n \e[107m       \e[0m\n \e[47m       \e[0m\n(3)Gold\n \e[103m       \e[0m\n \e[43m       \e[0m\n(4)Jungle\n \e[42m       \e[0m\n \e[102m       \e[0m\n(5)Carbon\n \e[100m       \e[0m\n \e[40m       \e[0m\n(6)Default\n \e[100m       \e[0m\n \e[101m       \e[0m"
 read thm
 	if [[ -f /home/"$user"/.supremetheme.txt ]]
 	then
@@ -1901,30 +1901,30 @@ read thm
 	  echo ifmtfill=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
 	3)opnr="x"
 	  echo -n > /home/"$user"/.supremetheme.txt
-	  echo pri=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt
-	  echo sec=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
-	  echo logopri=\""\e[100;31;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo logosec=\""\e[101;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo userpri=\""\e[100;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo cfmtp1=\""\e[40;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo cfmtp2=\""\e[107;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo cfmtp1fill=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt
-	  echo cfmtp2fill=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmt=\""\e[40;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmtfill=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
+	  echo pri=\""\e[103m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  echo sec=\""\e[43m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  echo logopri=\""\e[43;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo logosec=\""\e[44;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo userpri=\""\e[43;31;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo cfmtp1=\""\e[43;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo cfmtp2=\""\e[100;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo cfmtp1fill=\""\e[43m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  echo cfmtp2fill=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  echo ifmt=\""\e[103;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo ifmtfill=\""\e[103m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
 	4)opnr="x"
 	  echo -n > /home/"$user"/.supremetheme.txt
-	  echo pri=\""\e[41m \e[0m"\" >> /home/"$user"/.supremetheme.txt
-	  echo sec=\""\e[103m \e[0m"\" >> /home/"$user"/.supremetheme.txt
-	  echo logopri=\""\e[103;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo logosec=\""\e[40;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo userpri=\""\e[103;90;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo cfmtp1=\""\e[41;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo cfmtp2=\""\e[107;31;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo cfmtp1fill=\""\e[41m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  echo pri=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  echo sec=\""\e[102m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  echo logopri=\""\e[102;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo logosec=\""\e[44;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo userpri=\""\e[102;90;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo cfmtp1=\""\e[42;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo cfmtp2=\""\e[107;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo cfmtp1fill=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo cfmtp2fill=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmt=\""\e[41;93;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmtfill=\""\e[41m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
+	  echo ifmt=\""\e[103;90;1;82m"\" >> /home/"$user"/.supremetheme.txt
+	  echo ifmtfill=\""\e[103m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
 	5)opnr="x"
 	  echo -n > /home/"$user"/.supremetheme.txt
 	  echo pri=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
