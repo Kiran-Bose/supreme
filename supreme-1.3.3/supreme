@@ -706,7 +706,7 @@ done
 #------------------------------------------------------------------------------------------------
 checkInternet()
 {
-  ping -c2 github.com > /dev/null 2>&1 || { echo -e "\e[91mError: no active internet connection\e[0m" >&2; return 1; }
+  ping -c2 google.com > /dev/null 2>&1 || { echo -e "\e[91mError: no active internet connection\e[0m" >&2; return 1; }
 }
 
 #------------------------------------------------------------------------------------------------
