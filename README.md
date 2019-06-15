@@ -58,6 +58,7 @@ Type 'supreme' and hit enter in the bash terminal. Follow the instructions
                     |----Select File(s)
                     |----Select all
                     |----Inverse Selection
+		    |----Range Selection
                     |----Make directory
                     |----Make file
                     |----back
