@@ -116,7 +116,8 @@ read recfm1
 	y|Y)opnr="x";;
 	*)opnr="$tempopnr";;
 	esac
-else
+elif [[ "$homekey" != "y" ]]
+then
 instfmt "Do you want to continue?(y/n)"
 read recfm2
 	case "$recfm2" in
@@ -152,7 +153,7 @@ arraymock=()
 	esac
 	if [ $flag == 1 ]
 	then
-	instfmt "Select file(s) | a [Select all] | z [Inverse selection] | n [Navigate] | s [Normal search] | p [Previous menu] | h [Home]"
+	instfmt "Select file(s) | a [Select all] | z [Inverse selection] | w [Range selection] | n [Navigate] | s [Normal search] | p [Previous menu] | h [Home]"
 	read srch1
 		case "$srch1" in
 		a|A)srchopt=()
@@ -163,6 +164,9 @@ arraymock=()
 		    reconfirm
 		    v11="p";;
 		z|Z)invslct "${arraysrch[@]}"
+		    reconfirm
+		    v11="p";;
+		w|W)rangeslct "${arraysrch[@]}"
 		    reconfirm
 		    v11="p";;
 		n|N)instfmt "Select folder to navigate"
@@ -234,7 +238,7 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	dividerarray+=( "$Q" )	
 	done
 	colorfmt "${dividerarray[@]}"
-	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | n [Navigate] | s [Search] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]" 
+	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | n [Navigate] | s [Search] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]" 
 	fi
 	read navig1
 	v11=$( echo $(numval "$navig1") )
@@ -270,6 +274,9 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	    reconfirm
 	    v11="p";;
 	z|Z)invslct "${temppath[@]}"
+	    reconfirm
+	    v11="p";;
+	w|W)rangeslct "${temppath[@]}"
 	    reconfirm
 	    v11="p";;
 	m|M)instfmt "Enter name for new directory"
@@ -410,6 +417,60 @@ read opn1
 	esac
 done
 }
+#------------------------------------------------------------------------------------------------
+function rangeslct ()
+{
+if [[ $# -ne 0 ]]
+then
+rangevar=( "$@" )
+instfmt "Select range (eg:n1-n2,n3-n4.. or n1-n2 n3-n4..) | h [Home]"
+read range1
+	case "$range1" in
+	h|H)homekey="y"
+	    opnr="x";;
+	*)trarr=()
+	  trarr1=()
+	  srchopt=()
+	  rangearrfinal=()
+	  OLDIFS=$IFS
+	  IFS='-, ' read -r -a chknumarr <<< "$range1"
+	  IFS=$OLDIFS
+		for emt01 in "${chknumarr[@]}"
+		do
+			if [[ $(numval "$emt01") == "p" ]] && [[ $emt01 -le ${#rangevar[@]} ]]
+			then
+			trarr+=( "$emt01" )
+			else
+			trarr1+=( "$emt01" )
+			fi
+		done
+		if [[ "${#trarr1[@]}" == 0 ]]
+		then
+		IFS=IFS=', ' read -r -a rangearr1 <<< "$range1"
+			for emt02 in "${rangearr1[@]}"
+			do
+			rp1=$( echo "$emt02" | cut -d '-' -f 1 )
+			rp2=$( echo "$emt02" | cut -d '-' -f 2 )
+				for(( range=$rp1; range<=$rp2 ; range++))
+				do
+				rangearrfinal+=( $range )
+				done
+			done
+		srchopt=( $(remove_array_dups "${rangearrfinal[@]}") )
+			if [ "$navdoor" == "GDNAV" ]
+			then
+			actionitems
+			dfsort
+			else
+			actionitems
+			fi
+		else
+		echo -e "\e[91mBad Input\e[0m"
+		return
+		fi;;
+	esac
+fi
+}
 
 #------------------------------------------------------------------------------------------------
 function invslct ()
@@ -426,7 +487,8 @@ instfmt "Select file(s) that need to be excluded | h [Home]"
 read srch27
 v27=$( echo $(numval "$srch27") )
 	case "$srch27" in
-	h|H)homekey="y";;
+	h|H)homekey="y"
+	    opnr="x";;
 	*)if [ "$v27" == "p" ]
 	  then
 	  IFS=', ' read -r -a invopt <<< "$srch27"
@@ -618,7 +680,7 @@ isdir=()
 
 		done
 	colorfmt "${newitem[@]}"
-	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | r [Select root folder] | n [Navigate] | b [Back] | u [Upload] | f [View folder structure and navigate] | m [Make directory] | e [Empty Trash] | p [Previous menu] | h [Home]" 
+	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | r [Select root folder] | n [Navigate] | b [Back] | u [Upload] | f [View folder structure and navigate] | m [Make directory] | e [Empty Trash] | p [Previous menu] | h [Home]" 
 	read gdn2
 	v122=$( echo $(numval "$gdn2") )
 		case "$gdn2" in
@@ -687,6 +749,8 @@ isdir=()
 		    rclone mkdir $gdn1/"$gdnnd"
 		    cloudnavig $gdn1;;
 		z|Z)invslct "${newitem[@]}"
+		    reconfirm "h";;
+		w|W)rangeslct "${newitem[@]}"
 		    reconfirm "h";;
 		a|A)srchopt=()
 		    for ((i=0; i<${#newitem[@]}; i++)); do
