@@ -230,7 +230,7 @@ cd supreme
 ```
 </details>
 
-#### Incase update fail. Uninstall, Download the latest version and install.
+#### Incase update fail. Uninstall and then install latest version.
 
 
 
