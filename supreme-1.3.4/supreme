@@ -1078,8 +1078,7 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 			 then
 			 tempsortfile=( "${sortfile[@]}" )
 		  	 tempsortdir=( "${sortdir[@]}" )
-		  	 instfmt "Select destinatin folder"
-		  	 feeder
+		  	 feeder "dest"
 				 if [ "${#arraymock[@]}" != 0 ]
 				 then
 					if [ "$gdn1" == "$cldopt" ]
@@ -1116,7 +1115,7 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 			  read gdit55
 				case $gdit55 in
 				1)selectcloud
-				cloudnavig;;
+				  cloudnavig;;
 				2)feeder;;
 				*)return;;
 				esac
@@ -1215,8 +1214,7 @@ read opn11
 	  tempmock=( "${arraymock[@]}" )
 	  while [ "$opnr" == "f" ]
 	  do
-	  instfmt "Select destination folder"
-	  feeder
+	  feeder "dest"
 		  if [[ -d "${arraymock[0]}" ]]
 		  then
 		  opnr="x"
@@ -1232,8 +1230,7 @@ read opn11
 	  tempmock=( "${arraymock[@]}" )
 	  while [ "$opnr" == "f" ]
 	  do
-	  instfmt "Select destination folder"
-	  feeder
+	  feeder "dest"
 		  if [[ -d "${arraymock[0]}" ]]
 		  then
 		  opnr="x"
