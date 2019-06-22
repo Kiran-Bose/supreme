@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.3.3"
+currentversion="1.3.5"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -363,6 +363,8 @@ banner
 arraymock=()
 case "$1" in
 local)instfmt "s [Search] | n [Navigate] | q [Quick access] | p [Previous menu] | h [Home]";;
+dest)instfmt "Select Destination Folder"
+     instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]";;
 *)instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]";;
 esac
 read opn1
@@ -904,7 +906,6 @@ block=0
 tput reset
 user=$(whoami)
 col=$(tput cols)
-pos=$(($col/2-4))
 if [[ -f /home/"$user"/.supremetheme.txt ]]
 then
 chmod 444 /home/"$user"/.supremetheme.txt
@@ -931,24 +932,41 @@ do
 echo -en "$pri"
 done
 echo -en "\0015"
-for ((i=0; i<$pos; i++))
+echo -en "$logopri |''''  "
+echo -en "$logopri |   | \e[0m"
+for ((i=0; i<$col; i++))
 do
 echo -en "$pri"
 done
-echo -en "$logopri SUpreme \e[0m"
-echo
+echo -en "\0015"
+echo -en "$logopri ''''|  "
+
+echo -en "$logopri |   |"
+
+echo -en "$logopri p  "
+
+echo -en "$logopri r  "
+
+echo -en "$logopri e  "
+
+echo -en "$logopri m  "
+
+echo -en "$logopri e  \e[0m"
+echo -en "$logosec $currentversion \e[0m"
+echo -en "$pri"
+echo -en "$userpri $user "
 for ((i=0; i<$col; i++))
 do
-echo -en "$sec"
+echo -en "$pri"
 done
 echo -en "\0015"
-for ((i=0; i<$pos; i++))
+echo -en "$logopri '''''  "
+
+echo -en "$logopri ''''' "
+for ((i=0; i<$col-15; i++))
 do
-echo -en "$sec"
+echo -en "$pri"
 done
-echo -en "$logosec  $currentversion  \e[0m"
-echo -en "\0015"
-echo -en "$userpri$user\e[0m"
 echo
 echo
 }

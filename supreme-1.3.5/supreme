@@ -263,13 +263,20 @@ linecount=$( wc -l /home/"$user"/"$1" | cut -d ' ' -f1 )
 		done
 	banner
 	colorfmt "${showlist[@]}"
-	instfmt "Select item(s) you want to remove | p [Previous menu] | h [Home]"
+	instfmt "Select item(s) you want to remove | a [Select all] | z [Inverse selection] | w [Range selection] | p [Previous menu] | h [Home]"
 	read cps4
 	v91=$( echo $(numval "$cps4") )
 		case "$v91" in
 		p|P)IFS=', ' read -r -a srchopt <<< "$cps4"
-		    actionitems;;
+		      actionitems;;
 		*)case "$cps4" in
+		  a|A)srchopt=()
+	    	      for ((i=0; i<${#showlist[@]}; i++)); do
+	    	      srchopt+=( "$i" )
+	    	      done
+	    	      actionitems;;
+		  z|Z)invslct "${showlist[@]}";;
+		  w|W)rangeslct "${showlist[@]}";;
 		  p|P)opnr="e";;
 		  h|H)opnr="x"
 		      homekey="y";;
@@ -1071,8 +1078,7 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 			 then
 			 tempsortfile=( "${sortfile[@]}" )
 		  	 tempsortdir=( "${sortdir[@]}" )
-		  	 instfmt "Select destinatin folder"
-		  	 feeder
+		  	 feeder "dest"
 				 if [ "${#arraymock[@]}" != 0 ]
 				 then
 					if [ "$gdn1" == "$cldopt" ]
@@ -1109,7 +1115,7 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 			  read gdit55
 				case $gdit55 in
 				1)selectcloud
-				cloudnavig;;
+				  cloudnavig;;
 				2)feeder;;
 				*)return;;
 				esac
@@ -1208,8 +1214,7 @@ read opn11
 	  tempmock=( "${arraymock[@]}" )
 	  while [ "$opnr" == "f" ]
 	  do
-	  instfmt "Select destination folder"
-	  feeder
+	  feeder "dest"
 		  if [[ -d "${arraymock[0]}" ]]
 		  then
 		  opnr="x"
@@ -1225,8 +1230,7 @@ read opn11
 	  tempmock=( "${arraymock[@]}" )
 	  while [ "$opnr" == "f" ]
 	  do
-	  instfmt "Select destination folder"
-	  feeder
+	  feeder "dest"
 		  if [[ -d "${arraymock[0]}" ]]
 		  then
 		  opnr="x"
@@ -1467,7 +1471,7 @@ read cal1
 					esac
 				done < /home/"$user"/.supreme_app_config
 			  banner
-			  instfmt "Select apps you want to remove | p [Previous menu] | h [Home]"
+			  instfmt "Select apps you want to remove | a [Select all] | z [Inverse selection] | w [Range selection] | p [Previous menu] | h [Home]"
 			  genfmt "${genlist[@]}"
 			  read cal4
 			  v71=$( echo $(numval "$cal4") )
@@ -1475,6 +1479,13 @@ read cal1
 				p|P)IFS=', ' read -r -a srchopt <<< "$cal4"
 			  	    actionitems;;
 				*)case "$cal4" in
+				  a|A)srchopt=()
+	    	                      for ((i=0; i<${#genlist[@]}; i++)); do
+	    	      		      srchopt+=( "$i" )
+	    	     		      done
+	    	      		      actionitems;;
+		  		  z|Z)invslct "${genlist[@]}";;
+		  		  w|W)rangeslct "${genlist[@]}";;
 				  p|P)opnr="e";;
 				  h|H)opnr="x"
 				      homekey="y";;
@@ -1814,31 +1825,36 @@ read cqa
 			genlist+=( "$line" )
 			done < /home/"$user"/.supreme_qaconfig.txt
 		  colorfmt "${genlist[@]}"
-		  instfmt "Select folder(s) | p [Previous menu] | h [Home]"
+		  instfmt "Select folder(s) | a [Select all] | z [Inverse selection] | w [Range selection] | p [Previous menu] | h [Home]"
 		  read cqa1
 		  v028=$( echo $(numval "$cqa1") )
-			  if [ "$v028" == "p" ]
+			  case "$v028" in
+			  p|P)IFS=', ' read -r -a srchopt <<< "$cqa1"
+		  	      actionitems;;
+			  *)case "$cqa1" in
+			    a|A)srchopt=()
+    	                        for ((i=0; i<${#genlist[@]}; i++)); do
+    	      		        srchopt+=( "$i" )
+    	     		        done
+    	      		        actionitems;;
+	  		    z|Z)invslct "${genlist[@]}";;
+	  		    w|W)rangeslct "${genlist[@]}";;
+			    p|P)opnr="f";;
+			    h|H)opnr="x"
+			      homekey="y";;
+			    esac;;
+			  esac
+			  if [[ "${#arraymock[@]}" != 0 ]]
 			  then
-			  IFS=', ' read -r -a srchopt <<< "$cqa1"
-			  actionitems
-				  if [[ "${#arraymock[@]}" != 0 ]]
-				  then
-				  instfmt "Do you want to remove selected folder(s) from list?(y/n)"
-				  read cqa2
-			     	  	case "$cqa2" in
-					y|Y)opnr="x"
-			   		    SAVEIFS=$IFS
-					    IFS=$(echo -en "\n\b")
-					    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
-					    IFS=$SAVEIFS;;
-					*)return;;
-					esac
-				  fi
-			  else
-				case "$cqa1" in
-				p|P)opnr="f";;
-				h|H)opnr="x"
-				    homekey="y";;
+			  instfmt "Do you want to remove selected folder(s) from list?(y/n)"
+			  read cqa2
+		     	  	case "$cqa2" in
+				y|Y)opnr="x"
+		   		    SAVEIFS=$IFS
+				    IFS=$(echo -en "\n\b")
+				    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
+				    IFS=$SAVEIFS;;
+				*)return;;
 				esac
 			  fi
 		  echo -n > /home/"$user"/.supreme_qaconfig.txt
