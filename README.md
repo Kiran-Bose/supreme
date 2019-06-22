@@ -1,5 +1,5 @@
 # SUpreme <sup>TM</sup>
-![Logo](https://github.com/Kiran-Bose/supreme/blob/Supreme-1.3.4-UNSTABLE/SUpreme_Logo.jpg)
+![Logo](https://github.com/Kiran-Bose/supreme/blob/master/SUpreme_Logo.jpg)
 
 SUpreme is a command line file manager written in shell script.
 
