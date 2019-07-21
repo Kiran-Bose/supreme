@@ -941,17 +941,17 @@ done
 echo -en "\0015"
 echo -en "$logopri ''''|  "
 
-echo -en "$logopri |   |"
+echo -en "$logopri |   | "
 
-echo -en "$logopri p  "
+echo -en "$ifmt p  "
 
-echo -en "$logopri r  "
+echo -en "$ifmt r  "
 
-echo -en "$logopri e  "
+echo -en "$ifmt e  "
 
-echo -en "$logopri m  "
+echo -en "$ifmt m  "
 
-echo -en "$logopri e  \e[0m"
+echo -en "$ifmt e  \e[0m"
 echo -en "$logosec $currentversion \e[0m"
 echo -en "$pri"
 echo -en "$userpri $user "
