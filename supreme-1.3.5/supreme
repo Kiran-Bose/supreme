@@ -1389,7 +1389,7 @@ read opn11
 		     	if [[ -d "${arraymock[0]}" ]]
 		  	then
 		  	opnr="x"
-			tar -czvvf "${arraymock[0]}"/"$opn148".tar.gz "${tempmock[@]}"
+			sudo tar -czvvf "${arraymock[0]}"/"$opn148".tar.gz "${tempmock[@]}"
 			else
 			echo -e "\e[91mNot a directory\e[0m"
 			load_delay
@@ -1410,7 +1410,7 @@ read opn11
 		  	opnr="x"
 				for opnemt in "${tempmock[@]}"
 				do
-				tar -C "${arraymock[0]}" -xvvf "$opnemt"
+				sudo tar -C "${arraymock[0]}" -xvvf "$opnemt"
 				done
 			else
 			echo -e "\e[91mNot a directory\e[0m"
