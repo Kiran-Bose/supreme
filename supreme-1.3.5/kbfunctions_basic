@@ -123,7 +123,8 @@ read recfm2
 	case "$recfm2" in
 	y|Y)opnr="$tempopnr";;
 	*)opnr="x"
-	  homekey="y";;
+	  homekey="y"
+	  oprpt="x";;
 esac
 fi
 }
@@ -207,6 +208,7 @@ unset srch11
 #------------------------------------------------------------------------------------------------
 function actionitems ()
 {
+srchopt=( $(remove_array_dups "${srchopt[@]}") )
 slctin=$( echo "$(slct "${srchopt[@]}")" )
 mockres=$(echo "${slctin[@]}" | tr ';' '\n' | sort -nr)
 IFS=$'\n' read -rd '' -a arraymock <<< "$mockres"
@@ -422,14 +424,18 @@ done
 #------------------------------------------------------------------------------------------------
 function rangeslct ()
 {
+unset homekey
 if [[ $# -ne 0 ]]
 then
 rangevar=( "$@" )
-instfmt "Select range (eg:n1-n2,n3-n4.. or n1-n2 n3-n4..) | h [Home]"
+newopnr="$opnr"
+instfmt "Select range (eg:n1-n2,n3-n4.. or n1-n2 n3-n4..) | b [Back] | h [Home]"
 read range1
 	case "$range1" in
 	h|H)homekey="y"
 	    opnr="x";;
+	b|B)homekey="y"
+	    opnr="$newopnr";;
 	*)trarr=()
 	  trarr1=()
 	  srchopt=()
@@ -477,20 +483,24 @@ fi
 #------------------------------------------------------------------------------------------------
 function invslct ()
 {
+unset homekey
 if [[ $# -ne 0 ]]
 then
+newopnr="$opnr"
 invarr=( "$@" )
 srchopt=()
 srchopt1=()
 	for ((i=0; i<${#invarr[@]}; i++)); do
 	srchopt1+=( "$i" )
 	done
-instfmt "Select file(s) that need to be excluded | h [Home]"
+instfmt "Select file(s) that need to be excluded | b [Back] | h [Home]"
 read srch27
 v27=$( echo $(numval "$srch27") )
 	case "$srch27" in
 	h|H)homekey="y"
 	    opnr="x";;
+	b|B)homekey="y"
+	    opnr="$newopnr";;
 	*)if [ "$v27" == "p" ]
 	  then
 	  IFS=', ' read -r -a invopt <<< "$srch27"
@@ -784,6 +794,7 @@ done
 #------------------------------------------------------------------------------------------------
 function dfsort ()
 {
+srchopt=( $(remove_array_dups "${srchopt[@]}") )
 for sortemt in "${srchopt[@]}"
 do
 	if [ "${isdir[$sortemt]}" == -1 ]	

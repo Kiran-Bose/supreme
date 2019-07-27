@@ -929,6 +929,12 @@ instfmt "Rclone-SUpreme Bridge"
 			  h|H)oprpt="x";;
 			  p|P)oprpt="g";;
 			  esac
+			  case "$range1" in
+			  h|H)oprpt="x";;
+	    		  esac
+			  case "$srch27" in
+		          h|H)oprpt="x";;
+	    		  esac
 			  case "$gdn2" in
 			  p|P)selectcloud;;
 			  esac
