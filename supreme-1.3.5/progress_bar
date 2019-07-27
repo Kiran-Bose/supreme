@@ -52,7 +52,7 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 		then
 			if [[ (-d "$2") || (-f "$2") ]]
 			then
-				if [[ "$2" == *"/1000/gvfs/mtp"* ]]
+				if [[ "$2" == *"/$UID/gvfs/mtp"* ]]
 				then
 				IFS=$'\n' read -rd '' -a arraysz1 <<< `ls -Ral "$2" | awk '{print $5}' | sed 's/[^0-9]*//g'` 
 				else
@@ -116,7 +116,7 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 			totd=0
 			local barcols=$(tput cols)
 			local LENGTH=$(($barcols-8))
-				if [[ "$2" == *"/1000/gvfs/mtp"* ]]
+				if [[ "$2" == *"/$UID/gvfs/mtp"* ]]
 				then
 				IFS=$'\n' read -rd '' -a arraysz1 <<< `ls -Ral "$2" | awk '{print $5}' | sed 's/[^0-9]*//g'` 
 				else

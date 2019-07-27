@@ -250,7 +250,7 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 		then
 		navig "${temppath[$navig2]}"
 		fi;;
-	s|S)if [[ "$navpath" = *"/1000/gvfs/mtp"* ]]
+	s|S)if [[ "$navpath" = *"/$UID/gvfs/mtp"* ]]
 	    then
 	    echo -e "\e[91mSearch not supported on current directory\e[0m"
 	    sleep 1
@@ -326,7 +326,7 @@ else
 quickarray=()
 fi
 usb_check
-device=/run/user/1000/gvfs/mtp
+device=/run/user/$UID/gvfs/mtp
 access=( "$device"* )
 path=( "${access[0]}"/* )
 if [[ ("${path[@]}" == *"*"*) && ("${#usbarr[@]}" == 0) ]]
@@ -970,6 +970,8 @@ done
 echo
 echo
 }
+
+#------------------------------------------------------------------------------------------------
 
 
 
