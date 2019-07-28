@@ -1297,7 +1297,7 @@ read opn11
 		      do
 		      R=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f2- | rev )
 		      number=$(($t+1))
-		      mv "${arraymock[$t]}" "$R"/"$rencom-$number"
+		      mv "${arraymock[$t]}" "$R"/"$rencom$number"
 		      done;;
 		   esac;;
 		 2)for ((t=0; t<${#arraymock[@]}; t++))
