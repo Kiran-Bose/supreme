@@ -268,7 +268,7 @@ linecount=$( wc -l /home/"$user"/"$1" | cut -d ' ' -f1 )
 	v91=$( echo $(numval "$cps4") )
 		case "$v91" in
 		p|P)IFS=', ' read -r -a srchopt <<< "$cps4"
-		      actionitems;;
+		    actionitems;;
 		*)case "$cps4" in
 		  a|A)srchopt=()
 	    	      for ((i=0; i<${#showlist[@]}; i++)); do
@@ -583,7 +583,7 @@ while [[ "$opnr" == "g" ]]
 do
 qbar=1
 arraymock=()
-device=/run/user/1000/gvfs/mtp
+device=/run/user/$UID/gvfs/mtp
 access=( "$device"* )
 path=( "${access[0]}"/* )
 	if [[ "${path[@]}" == *"*"* ]]
@@ -904,7 +904,7 @@ while [[ "$opnr" == "g" ]]
 do
 unset cldopt
 banner
-instfmt "Supreme uses package 'rclone' for cloud storage operations"
+instfmt "Rclone-SUpreme Bridge"
 	if [[ -f /home/"$user"/.supremecloud.txt ]]
 	then
 	checkInternet || return
@@ -929,6 +929,12 @@ instfmt "Supreme uses package 'rclone' for cloud storage operations"
 			  h|H)oprpt="x";;
 			  p|P)oprpt="g";;
 			  esac
+			  case "$range1" in
+			  h|H)oprpt="x";;
+	    		  esac
+			  case "$srch27" in
+		          h|H)oprpt="x";;
+	    		  esac
 			  case "$gdn2" in
 			  p|P)selectcloud;;
 			  esac
@@ -1200,7 +1206,7 @@ fi
 function operations ()
 {
 instfmt "Select an option"
-echo -e "(1)\e[32m⏏\e[0m  Open\n(2)\e[90m📖\e[0m Copy\n(3)\e[95m📑\e[0m Move\n(4)\e[91m🚮\e[0m Delete\n(5)\e[36m📓\e[0m Rename\n(6)\e[94m➡\e[0m  Send to Device\n(7)\e[92m⬆\e[0m  Upload to Cloud\n(8)\e[92m⤴\e[0m  Move to cloud\n(9)\e[96mℹ\e[0m  Properties\e[0m\n(h)\e[93m🏠\e[0m Go Home"
+echo -e "(1) \e[32m⏏\e[0m  Open\n(2) \e[90m📖\e[0m Copy\n(3) \e[95m📑\e[0m Move\n(4) \e[91m🚮\e[0m Delete\n(5) \e[36m📓\e[0m Rename\n(6) \e[94m➡\e[0m  Send to Device\n(7) \e[92m⬆\e[0m  Upload to Cloud\n(8) \e[92m⤴\e[0m  Move to cloud\n(9) \e[96mℹ\e[0m  Properties\e[0m\n(10)\e[91m💼️\e[0m Compress\n(11)\e[36m🗳️\e[0m  Extract\n(h) \e[93m🏠\e[0m Go Home"
 while [ "$opnr" == "e" ]
 do
 read opn11
@@ -1224,6 +1230,11 @@ read opn11
 			done
 		  else
 		  echo -e "\e[91mNot a directory\e[0m"
+		  load_delay
+			case "$homekey" in
+			y|Y)opnr="x";;
+			*)opnr="f";;
+			esac
 		  fi
 	  done;;
 	3)opnr="f"
@@ -1241,6 +1252,11 @@ read opn11
 			done
 		  else
 		  echo -e "\e[91mNot a directory\e[0m"
+		  load_delay
+			case "$homekey" in
+			y|Y)opnr="x";;
+			*)opnr="f";;
+			esac
 		  fi
 	  done;;
 	4)opnr="f"
@@ -1250,7 +1266,7 @@ read opn11
 	  then 
 		for opnemt in "${arraymock[@]}"
 		do
-			if [[ "$opnemt" = *"/1000/gvfs/mtp"* ]]
+			if [[ "$opnemt" = *"/$UID/gvfs/mtp"* ]]
 			then
 				if [[ -d /home/"$user"/Supremetemp ]]
 				then
@@ -1281,7 +1297,7 @@ read opn11
 		      do
 		      R=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f2- | rev )
 		      number=$(($t+1))
-		      mv "${arraymock[$t]}" "$R"/"$rencom-$number"
+		      mv "${arraymock[$t]}" "$R"/"$rencom$number"
 		      done;;
 		   esac;;
 		 2)for ((t=0; t<${#arraymock[@]}; t++))
@@ -1366,6 +1382,52 @@ read opn11
 		done
 	  det "$opnemt"
 	  done;;
+	10)opnr="f"
+	   instfmt "Enter a name for compressed file | h [Home]"
+	   read opn148
+	   case $opn148 in
+	   h|H)opnr="x"
+	       homekey="y";;
+	   *)tempmock=( "${arraymock[@]}" )
+		     while [ "$opnr" == "f" ]
+	   	     do
+		     feeder "dest"
+		     	if [[ -d "${arraymock[0]}" ]]
+		  	then
+		  	opnr="x"
+			sudo tar -czvvf "${arraymock[0]}"/"$opn148".tar.gz "${tempmock[@]}"
+			else
+			echo -e "\e[91mNot a directory\e[0m"
+			load_delay
+				case "$homekey" in
+				y|Y)opnr="x";;
+				*)opnr="f";;
+				esac
+			fi
+		     done;;
+	    esac;;
+	11)opnr="f"
+	   tempmock=( "${arraymock[@]}" )
+	   	     while [ "$opnr" == "f" ]
+	   	     do
+		     feeder "dest"
+		     	if [[ -d "${arraymock[0]}" ]]
+		  	then
+		  	opnr="x"
+				for opnemt in "${tempmock[@]}"
+				do
+				sudo tar -C "${arraymock[0]}" -xvvf "$opnemt"
+				done
+			else
+			echo -e "\e[91mNot a directory\e[0m"
+			load_delay
+				case "$homekey" in
+				y|Y)opnr="x";;
+				*)opnr="f";;
+				esac
+			fi
+		     done;;
+	    
 	h|H)opnr="f"
 	    homekey="y";;
 	*)echo -e "\e[91mInvalid Choice\e[0m";;

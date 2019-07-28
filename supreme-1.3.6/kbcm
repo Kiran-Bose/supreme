@@ -22,7 +22,7 @@ function szcum ()
 tots=0
 if [[ (-d "$1") || (-f "$1") ]]
 then
-	if [[ "$1" == *"/1000/gvfs/mtp"* ]]
+	if [[ "$1" == *"/$UID/gvfs/mtp"* ]]
 	then
 	IFS=$'\n' read -rd '' -a arraysz <<< `ls -Ral "$1" | awk '{print $5}' | sed 's/[^0-9]*//g'` 
 	else
@@ -58,7 +58,7 @@ while getopts ":cmv" option; do
   	case "${option}" in
 	c)actn="cp -rv";;
 	m)actn="mv -v";;
-	v)echo -e "version 1.0.7" && exit 0;;
+	v)echo -e "version 1.0.8" && exit 0;;
 	\?)kbcmusage && exit 0;;
 	esac
 done
