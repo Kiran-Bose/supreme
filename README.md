@@ -75,7 +75,7 @@ Type 'supreme' and hit enter in the bash terminal. Follow the instructions
                                                   |----Upload to Cloud
                                                   |----Move to Cloud
                                                   |----Properties
-                             			  |----Compress
+						  |----Compress
                                                   |----Extract
                                                   |----Go Home
 
