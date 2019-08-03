@@ -682,6 +682,16 @@ isdir=()
 	newitem=()
 	gdn1="${1:-$cldopt}"
 	gditems=( "$(rclone lsjson "$gdn1")" )
+	chkjq=$(echo "${gditems}" | jq type)
+		if [[ "$chkjq" != '"array"' ]]
+		then
+                unset gdn2
+		opnr="g"
+		oprpt="x"
+		echo -e "\e[91mRemote '${cloudlist[$gdit143]}' is invalid. Try reconfiguring\e[0m"
+		load_delay
+		return
+		fi
 		for row in $(echo "${gditems}" | jq -r '.[] | @base64'); do
 		    _jq() {
 		     echo ${row} | base64 --decode | jq -r ${1}
