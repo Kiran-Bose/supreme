@@ -38,7 +38,7 @@ usb_check
 				do 
 				banner
 				instfmt "Select an option | p [Previous menu] | h [Home]"
-				echo -e "(1)USB File Explorer\n(2)Format\n(3)Sync\n(4)Configure Sync"
+				echo -e "(1)USB File Explorer\n(2)Format\n(3)Sync\n(4)Configure Sync\n(5)Create bootable USB"
 				read opt1
 					case "$opt1" in
 					1)opnr="f"
@@ -86,16 +86,20 @@ usb_check
 						      case "$uc99" in
 						      1)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.fat -n "${vendorname[$uc55]}" -I "$fsys";;
+							sudo mkfs.fat -n "${vendorname[$uc55]}" -I "$fsys"
+							instfmt "Please unplug and plug back device";;
 						      2)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.vfat -n "${vendorname[$uc55]}" -I "$fsys";;
+							sudo mkfs.vfat -n "${vendorname[$uc55]}" -I "$fsys"
+							instfmt "Please unplug and plug back device";;
 						      3)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.ntfs -n "${vendorname[$uc55]}" -I "$fsys";;
+							sudo mkfs.ntfs -n "${vendorname[$uc55]}" -I "$fsys"
+							instfmt "Please unplug and plug back device";;
 						      4)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.ext4 -n "${vendorname[$uc55]}" -I "$fsys";;
+							sudo mkfs.ext4 -n "${vendorname[$uc55]}" -I "$fsys"
+							instfmt "Please unplug and plug back device";;
 						      p|P)opnr="y";;
 						      h|H)opnr="x"
 							  homekey="y";;
@@ -172,6 +176,24 @@ usb_check
 						fi
 					    done;;
 					4)config_sync "usb";;
+					5)opnr="f"
+					  while [[ "$opnr" == "f" ]]
+					  do
+					  fsys=$(df -h "${usbarr[$uc55]}" | awk '{print $1}' | sed 1d)
+					  feeder spec "Select Disk Image"
+						  if [[ "${#arraymock[@]}" != 0 ]]
+						  then
+						  instfmt "Are you sure you want to make ${usbarr[$uc55]} bootable with ${arraymock[0]}?(y/n)"
+						  echo -e "\e[91mWarning: This is irreversible and will erase everything\e[0m"
+						  read uc24
+							  case "$uc24" in
+							  y|Y)opnr="x"
+							      sudo umount "$fsys"
+							      sudo dd bs=4M if="${arraymock[0]}" of="$fsys" conv=fdatasync  status=progress;;
+							  *)opnr="y";;
+							  esac
+						  fi
+					    done;;
 					p|P)opnr="g";;
 					h|H)opnr="x"
 					    homekey="y";;
