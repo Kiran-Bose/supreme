@@ -367,6 +367,8 @@ case "$1" in
 local)instfmt "s [Search] | n [Navigate] | q [Quick access] | p [Previous menu] | h [Home]";;
 dest)instfmt "Select Destination Folder"
      instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]";;
+spec)instfmt "$2"
+     instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]";;
 *)instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]";;
 esac
 read opn1
