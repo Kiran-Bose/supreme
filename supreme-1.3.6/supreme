@@ -146,7 +146,9 @@ usb_check
 									opnr="x"
 										if [[ -d "${genlist[$emt11]}" ]] || [[ -f "${genlist[$emt11]}" ]] && [[ -d "${templist[$emt11]}" ]]
 										then
-										rsync --ignore-existing -rvv --progress "${genlist[$emt11]}" "${templist[$emt11]}" 
+										rsync --ignore-existing -rvv --progress "${genlist[$emt11]}" "${templist[$emt11]}"
+										else
+										echo -e "\e[91mInvalid sync configuration: ${genlist[$emt11]} --> ${templist[$emt11]}\e[0m"										
 										fi
 									fi
 								    done;;
@@ -157,6 +159,8 @@ usb_check
 										if [[ -d "${genlist[$i]}" ]] || [[ -f "${genlist[$i]}" ]] && [[ -d "${templist[$i]}" ]]
 										then
 										rsync --ignore-existing -rvv --progress "${genlist[$i]}" "${templist[$i]}" 
+										else
+										echo -e "\e[91mInvalid sync configuration: ${genlist[$i]} --> ${templist[$i]}\e[0m"										
 										fi
 									   done
 								      return;;
@@ -679,7 +683,7 @@ path=( "${access[0]}"/* )
 										then
 										rsync --ignore-existing -rvv --progress "${genlist[$emt11]}" "${access[0]}${templist[$emt11]}"
 										else
-										echo -e "\e[91mBad sync configuration\e[0m"
+										echo -e "\e[91mInvalid sync configuration: ${genlist[$emt11]} --> ${access[0]}${templist[$emt11]}\e[0m"
 										fi
 									fi
 								    done;;
@@ -694,7 +698,7 @@ path=( "${access[0]}"/* )
 										then
 										rsync --ignore-existing -rvv --progress "${genlist[$i]}" "${access[0]}${templist[$i]}"
 										else
-										echo -e "\e[91mBad sync configuration\e[0m"
+										echo -e "\e[91mInvalid sync configuration: ${genlist[$i]} --> ${access[0]}${templist[$i]}\e[0m"
 										fi
 									   done
 								      return;;
