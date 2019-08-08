@@ -82,7 +82,7 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 					then
 						if [[ $(pgrep -xn cp) || $(pgrep -xn mv) ]]
 						then
-						pass=donothing
+						ptghistory=()
 						else
 						echo -en "\e[44;97;10;82m 100% \e[0m\e[89m \e[0m"
 							for i in `seq 1 $LENGTH`
@@ -130,7 +130,7 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 			fi
 		break
 		fi
-	sleep 0.18
+	#sleep 0.18
 	done
 		if echo "($ptg > 99)" | bc | grep -q 1
 		then
