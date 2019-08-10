@@ -38,7 +38,7 @@ usb_check
 				do 
 				banner
 				instfmt "Select an option | p [Previous menu] | h [Home]"
-				echo -e "(1)USB File Explorer\n(2)Format\n(3)Sync\n(4)Configure Sync"
+				echo -e "(1)USB File Explorer\n(2)Format\n(3)Sync\n(4)Configure Sync\n(5)Create bootable USB"
 				read opt1
 					case "$opt1" in
 					1)opnr="f"
@@ -86,16 +86,20 @@ usb_check
 						      case "$uc99" in
 						      1)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.fat -n "${vendorname[$uc55]}" -I "$fsys";;
+							sudo mkfs.fat -n "${vendorname[$uc55]}" -I "$fsys"
+							instfmt "Please unplug and plug back device";;
 						      2)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.vfat -n "${vendorname[$uc55]}" -I "$fsys";;
+							sudo mkfs.vfat -n "${vendorname[$uc55]}" -I "$fsys"
+							instfmt "Please unplug and plug back device";;
 						      3)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.ntfs -n "${vendorname[$uc55]}" -I "$fsys";;
+							sudo mkfs.ntfs -n "${vendorname[$uc55]}" -I "$fsys"
+							instfmt "Please unplug and plug back device";;
 						      4)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.ext4 -n "${vendorname[$uc55]}" -I "$fsys";;
+							sudo mkfs.ext4 -n "${vendorname[$uc55]}" -I "$fsys"
+							instfmt "Please unplug and plug back device";;
 						      p|P)opnr="y";;
 						      h|H)opnr="x"
 							  homekey="y";;
@@ -142,7 +146,9 @@ usb_check
 									opnr="x"
 										if [[ -d "${genlist[$emt11]}" ]] || [[ -f "${genlist[$emt11]}" ]] && [[ -d "${templist[$emt11]}" ]]
 										then
-										rsync --ignore-existing -rvv --progress "${genlist[$emt11]}" "${templist[$emt11]}" 
+										rsync --ignore-existing -rvv --progress "${genlist[$emt11]}" "${templist[$emt11]}"
+										else
+										echo -e "\e[91mInvalid sync configuration: ${genlist[$emt11]} --> ${templist[$emt11]}\e[0m"										
 										fi
 									fi
 								    done;;
@@ -153,6 +159,8 @@ usb_check
 										if [[ -d "${genlist[$i]}" ]] || [[ -f "${genlist[$i]}" ]] && [[ -d "${templist[$i]}" ]]
 										then
 										rsync --ignore-existing -rvv --progress "${genlist[$i]}" "${templist[$i]}" 
+										else
+										echo -e "\e[91mInvalid sync configuration: ${genlist[$i]} --> ${templist[$i]}\e[0m"										
 										fi
 									   done
 								      return;;
@@ -172,6 +180,24 @@ usb_check
 						fi
 					    done;;
 					4)config_sync "usb";;
+					5)opnr="f"
+					  while [[ "$opnr" == "f" ]]
+					  do
+					  fsys=$(df -h "${usbarr[$uc55]}" | awk '{print $1}' | sed 1d)
+					  feeder spec "Select Disk Image"
+						  if [[ "${#arraymock[@]}" != 0 ]]
+						  then
+						  instfmt "Are you sure you want to make ${usbarr[$uc55]} bootable with ${arraymock[0]}?(y/n)"
+						  echo -e "\e[91mWarning: This is irreversible and will erase everything\e[0m"
+						  read uc24
+							  case "$uc24" in
+							  y|Y)opnr="x"
+							      sudo umount "$fsys"
+							      sudo dd bs=4M if="${arraymock[0]}" of="$fsys" conv=fdatasync  status=progress;;
+							  *)opnr="y";;
+							  esac
+						  fi
+					    done;;
 					p|P)opnr="g";;
 					h|H)opnr="x"
 					    homekey="y";;
@@ -234,7 +260,7 @@ echo -n > /home/"$user"/"$1"
 	echo "${genlist[$i]}" >> /home/"$user"/"$1"
 	echo "${templist[$i]}" >> /home/"$user"/"$1"
 	done
-echo -e "\e[91m${#tempmock[@]} item(s) added to sync configuration\e[0m"
+echo -e "\e[92m${#tempmock[@]} item(s) added to sync configuration\e[0m"
 else
 echo -e "\e[91mNo item added to sync configuration\e[0m"
 fi
@@ -303,7 +329,8 @@ linecount=$( wc -l /home/"$user"/"$1" | cut -d ' ' -f1 )
 		    do
 		    echo "${genlist[$i]}" >> /home/"$user"/"$1"
 		    echo "${templist[$i]}" >> /home/"$user"/"$1"
-		    done;;
+		    done
+		    echo -e "\e[92m✔️ Done\e[0m";;
 		 esac
 	fi
 	else
@@ -657,7 +684,7 @@ path=( "${access[0]}"/* )
 										then
 										rsync --ignore-existing -rvv --progress "${genlist[$emt11]}" "${access[0]}${templist[$emt11]}"
 										else
-										echo -e "\e[91mBad sync configuration\e[0m"
+										echo -e "\e[91mInvalid sync configuration: ${genlist[$emt11]} --> ${access[0]}${templist[$emt11]}\e[0m"
 										fi
 									fi
 								    done;;
@@ -672,7 +699,7 @@ path=( "${access[0]}"/* )
 										then
 										rsync --ignore-existing -rvv --progress "${genlist[$i]}" "${access[0]}${templist[$i]}"
 										else
-										echo -e "\e[91mBad sync configuration\e[0m"
+										echo -e "\e[91mInvalid sync configuration: ${genlist[$i]} --> ${access[0]}${templist[$i]}\e[0m"
 										fi
 									   done
 								      return;;
@@ -1508,6 +1535,7 @@ read cal1
 		    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
 		    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
 		    done
+		    echo -e "\e[92m✔️ Done\e[0m"
 	  	    instfmt "Do you want to add more apps to list? (y/n)"
 	  	    read addnew;;
 		    esac;;
@@ -1574,7 +1602,8 @@ read cal1
 					    do
 					    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
 					    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
-					    done;;
+					    done
+					    echo -e "\e[92m✔️ Done\e[0m";;
 					 esac
 				fi
 			  else
@@ -1866,7 +1895,7 @@ read cqa
 	    0)echo -e "\e[91mNo folder selected\e[0m";;
 	    *)IFS=$SAVEIFS
 	      colorfmt "${templist[@]}"
-	      echo -e "\e[91mAdded $lc folder(s) to list\e[0m"
+	      echo -e "\e[92mAdded $lc folder(s) to list\e[0m"
 	      for emt in "${genlist[@]}"
 	      do
 	      echo "$emt" >> /home/"$user"/.supreme_qaconfig.txt
@@ -1915,7 +1944,8 @@ read cqa
 		   		    SAVEIFS=$IFS
 				    IFS=$(echo -en "\n\b")
 				    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
-				    IFS=$SAVEIFS;;
+				    IFS=$SAVEIFS
+				    echo -e "\e[92m✔️ Done\e[0m";;
 				*)return;;
 				esac
 			  fi
@@ -2064,7 +2094,7 @@ user=$(whoami)
 	banner
 
 	instfmt "Select an option"
-	echo -e "(1)\e[36m🔡\e[0m Manage Apps\n(2)\e[93m📂\e[0m Manage Files \n(3)📱 Manage Phone\n(4)\e[91m🎞\e[0m  Manage USB Device\n(5)\e[94m🌩 \e[0m Manage Cloud\n(6)🔗 Manage Custom Scripts\n(p)⚙  Preferences\n(x)\e[91m✖\e[0m  Exit"
+	echo -e "(1)\e[36m🔡\e[0m Apps\n(2)\e[93m📂\e[0m File Manager \n(3)📱 Phone\n(4)\e[91m🎞\e[0m  USB Device\n(5)\e[94m🌩 \e[0m Cloud Storage\n(6)🔗 Custom Scripts\n(p)⚙  Preferences\n(x)\e[91m✖\e[0m  Exit"
 	read opn2
 		case "$opn2" in
 		1)banner

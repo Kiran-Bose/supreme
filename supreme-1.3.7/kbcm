@@ -54,11 +54,12 @@ EOF
 }
 #------------------------------------------------------------------------------------------------
 OPTIND=1
+unset eqchk
 while getopts ":cmv" option; do
   	case "${option}" in
-	c)actn="cp -rv";;
-	m)actn="mv -v";;
-	v)echo -e "version 1.0.8" && exit 0;;
+	c)actn="cp -r";;
+	m)actn="mv -f";;
+	v)echo -e "version 1.1.0" && exit 0;;
 	\?)kbcmusage && exit 0;;
 	esac
 done
@@ -77,22 +78,78 @@ exit 0
 else
 feedemt=$(echo "$2" | rev | cut -d '/' -f 1 | rev)
 colorfmt "$2 --> $3"
-$actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots" || exit 1
-	if [[ ${PIPESTATUS[0]} == 1 ]]
+	if [[ "$2" == *"/$UID/gvfs/mtp"* ]] || [[ "$3" == *"/$UID/gvfs/mtp"* ]]
 	then
-		tots=$(szcum "$2")
-		if [[ "$tots" == "f" ]]
+		if [[ "$2" != *"/$UID/gvfs/mtp"* ]] && [[ "$actn" == "mv -f" ]]
 		then
-		echo -e "\e[91mSource path not found\e[0m"
-		exit 1
-		elif [[ ! -d "$3" ]]
-		then
-		echo -e "\e[91mDestination path not found\e[0m"
-		exit 1
+		(cp -r "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots";
+			if [[ ${PIPESTATUS[0]} == 1 ]]
+			then
+			echo -e "\e[91m❌️ Failed\e[0m"
+			else
+				if [[ -d "$3"/"$feedemt" ]] || [[ -f "$3"/"$feedemt" ]]
+				then
+					if [[ -d "$2" ]] || [[ -f "$2" ]]
+					then
+					echo -e "Waiting for checks to finish..."
+					eqchk=$(diff -r "$2" "$3"/"$feedemt")
+						if [[ -z "$eqchk" ]]
+						then
+						sudo rm -rf "$2"
+						echo -e "\e[92m✔️ Done\e[0m"
+						unset eqchk
+						else
+						echo -e "\e[91m❌️ Failed\e[0m"
+						fi
+					fi
+				fi
+			fi)
 		else
-		feedemt=$(echo "$2" | rev | cut -d '/' -f 1 | rev)
-		colorfmt "$2 --> $3"
-		sudo $actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots"
+		($actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots";
+			if [[ ${PIPESTATUS[0]} == 1 ]]
+			then
+			echo -e "\e[91m❌️ Failed\e[0m"
+			else
+			echo -e "\e[92m✔️ Done\e[0m"
+			fi)
+		fi
+	else
+	chk3=$(echo "$2" | rev | cut -d/ -f2- | rev )
+	chk4=$(echo "$3" | rev | cut -d/ -f1- | rev )
+	fs3=$(df "$chk3" | awk '{print $1}' | sed 1d)
+	fs4=$(df "$chk4" | awk '{print $1}' | sed 1d)
+		if [[ "$fs3" != "$fs4" ]] && [[ "$actn" == "mv -f" ]]
+		then
+		(sudo cp -r "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots";
+			if [[ ${PIPESTATUS[0]} == 1 ]]
+			then
+			echo -e "\e[91m❌️ Failed\e[0m"
+			else
+				if [[ -d "$3"/"$feedemt" ]] || [[ -f "$3"/"$feedemt" ]]
+				then
+					if [[ -d "$2" ]] || [[ -f "$2" ]]
+					then
+					echo -e "Waiting for checks to finish..."
+					eqchk=$(diff -r "$2" "$3"/"$feedemt")
+						if [[ -z "$eqchk" ]]
+						then
+						sudo rm -rf "$2"
+						echo -e "\e[92m✔️ Done\e[0m"
+						unset eqchk
+						else
+						echo -e "\e[91m❌️ Failed\e[0m"
+						fi
+					fi
+				fi
+			fi)
+		else
+		(sudo $actn "$2" "$3" | kbbar "$2" "$3"/"$feedemt" "$tots";
+			if [[ ${PIPESTATUS[0]} == 1 ]]
+			then
+			echo -e "\e[91m❌️ Failed\e[0m"
+			else
+			echo -e "\e[92m✔️ Done\e[0m"			
+			fi)
 		fi
 	fi
 fi
