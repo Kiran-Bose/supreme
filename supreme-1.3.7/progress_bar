@@ -7,6 +7,7 @@ function kbbar ()
 {
 user=$(whoami)
 ptghistory=()
+loopchk=()
 local i
 local barcols=$(tput cols)
 local LENGTH=$(($barcols-8))
@@ -50,8 +51,10 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 	local LENGTH=$(($barcols-8))	
 		if [[ (-d "$1") || (-f "$1") ]]
 		then
+		loopchk+=($ptg)
 			if [[ (-d "$2") || (-f "$2") ]]
 			then
+			loopchk=()
 				if [[ "$2" == *"/$UID/gvfs/mtp"* ]]
 				then
 				IFS=$'\n' read -rd '' -a arraysz1 <<< `ls -Ral "$2" | awk '{print $5}' | sed 's/[^0-9]*//g'` 
@@ -76,8 +79,7 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 					done
 					echo -e "\n"
 				return
-				elif(($sptg>0)) > /dev/null 2>&1
-				then
+				else
 					if((${#ptghistory[@]}>100)) > /dev/null 2>&1
 					then
 						if [[ $(pgrep -xn cp) || $(pgrep -xn mv) ]]
@@ -107,6 +109,10 @@ fs2=$(df "$chk2" | awk '{print $1}' | sed 1d)
 			else
 			echo
 			echo -e "\e[91mTransfer error/Device disconnected\e[0m"
+			return 1
+			fi
+			if((${#loopchk[@]}>100)) > /dev/null 2>&1
+			then
 			return 1
 			fi
 		else
@@ -149,3 +155,4 @@ fi
 }
 
 #------------------------------------------------------------------------------------------------
+
