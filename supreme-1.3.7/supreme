@@ -260,7 +260,7 @@ echo -n > /home/"$user"/"$1"
 	echo "${genlist[$i]}" >> /home/"$user"/"$1"
 	echo "${templist[$i]}" >> /home/"$user"/"$1"
 	done
-echo -e "\e[91m${#tempmock[@]} item(s) added to sync configuration\e[0m"
+echo -e "\e[92m${#tempmock[@]} item(s) added to sync configuration\e[0m"
 else
 echo -e "\e[91mNo item added to sync configuration\e[0m"
 fi
@@ -329,7 +329,8 @@ linecount=$( wc -l /home/"$user"/"$1" | cut -d ' ' -f1 )
 		    do
 		    echo "${genlist[$i]}" >> /home/"$user"/"$1"
 		    echo "${templist[$i]}" >> /home/"$user"/"$1"
-		    done;;
+		    done
+		    echo -e "\e[92m✔️ Done\e[0m";;
 		 esac
 	fi
 	else
@@ -1534,6 +1535,7 @@ read cal1
 		    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
 		    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
 		    done
+		    echo -e "\e[92m✔️ Done\e[0m"
 	  	    instfmt "Do you want to add more apps to list? (y/n)"
 	  	    read addnew;;
 		    esac;;
@@ -1600,7 +1602,8 @@ read cal1
 					    do
 					    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
 					    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
-					    done;;
+					    done
+					    echo -e "\e[92m✔️ Done\e[0m";;
 					 esac
 				fi
 			  else
@@ -1892,7 +1895,7 @@ read cqa
 	    0)echo -e "\e[91mNo folder selected\e[0m";;
 	    *)IFS=$SAVEIFS
 	      colorfmt "${templist[@]}"
-	      echo -e "\e[91mAdded $lc folder(s) to list\e[0m"
+	      echo -e "\e[92mAdded $lc folder(s) to list\e[0m"
 	      for emt in "${genlist[@]}"
 	      do
 	      echo "$emt" >> /home/"$user"/.supreme_qaconfig.txt
@@ -1941,7 +1944,8 @@ read cqa
 		   		    SAVEIFS=$IFS
 				    IFS=$(echo -en "\n\b")
 				    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
-				    IFS=$SAVEIFS;;
+				    IFS=$SAVEIFS
+				    echo -e "\e[92m✔️ Done\e[0m";;
 				*)return;;
 				esac
 			  fi
