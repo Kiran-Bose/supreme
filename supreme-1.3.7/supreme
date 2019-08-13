@@ -1294,15 +1294,8 @@ read opn11
 		for opnemt in "${arraymock[@]}"
 		do
 			if [[ "$opnemt" = *"/$UID/gvfs/mtp"* ]]
-			then
-				if [[ -d /home/"$user"/Supremetemp ]]
-				then
-				kbcm -m "$opnemt" /home/"$user"/Supremetemp/
-				else
-				mkdir /home/"$user"/Supremetemp
-				kbcm -m "$opnemt" /home/"$user"/Supremetemp/
-				fi 
-			sudo rm -vrf /home/"$user"/Supremetemp/*
+			then 
+			rm -vrf "$opnemt"
 			else
 			sudo rm -vrf "$opnemt"
 			fi
