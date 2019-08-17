@@ -54,14 +54,17 @@ EOF
 }
 #------------------------------------------------------------------------------------------------
 OPTIND=1
-actnskip="y"
+if [[ -z "$actnkey" ]]
+then
+actnow="y"
+fi
 while getopts ":cmv" option; do
   	case "${option}" in
 	c)actn="cp -rf"
 	  lbl="COPY";;
 	m)actn="mv -f"
 	  lbl="MOVE";;
-	v)echo -e "version 1.1.1" && exit 0;;
+	v)echo -e "version 1.1.1-SU" && exit 0;;
 	\?)kbcmusage && exit 0;;
 	esac
 done
@@ -80,12 +83,32 @@ exit 0
 else
 feedemt=$(echo "$2" | rev | cut -d '/' -f 1 | rev)
 colorfmt "$2 --$lbl--> $3"
-	if [[ -d "$3"/"$feedemt" ]] || [[ -f "$3"/"$feedemt" ]]
+	if [[ -d "$3"/"$feedemt" ]] || [[ -f "$3"/"$feedemt" ]] && [[ -z "$actnkey" ]]
 	then
-	echo -e "\e[91m$feedemt exists in $3. Overwrite? (y/n)\e[0m"
-	read actnskip
+	instfmt "$feedemt exists in $3"
+	instfmt "y [Overwrite current] | yy [Overwrite all] | n [Skip current] | nn [Skip all]"
+	read actnfeed
+	actncheck="y"
+		while [[ "$actncheck" == "y" ]]
+		do
+			case "$actnfeed" in
+			y|Y)unset actnkey
+			    actnow="y"
+			    actncheck="n";;
+			yy|YY)actnkey="all"
+			      actnow="y"
+			      actncheck="n";;
+			n|N)unset actnkey
+			    actnow="n"
+			    actncheck="n";;
+			nn|NN)actnkey="all"
+			      actnow="n"
+			      actncheck="n";;
+			*)echo -e "\e[91mInvalid Choice\e[0m";;
+			esac
+		done
 	fi
-	case "$actnskip" in
+	case "$actnow" in
 	y|Y)if [[ "$2" == *"/$UID/gvfs/mtp"* ]] || [[ "$3" == *"/$UID/gvfs/mtp"* ]]
 	    then
 			if [[ "$2" != *"/$UID/gvfs/mtp"* ]] && [[ "$lbl" == "MOVE" ]]
@@ -141,8 +164,9 @@ colorfmt "$2 --$lbl--> $3"
 				echo -e "\e[92m✔️ Done\e[0m"			
 				fi)
 			fi
-	    fi;;
-	*)echo -e "\e[91mSkipping $feedemt\e[0m";;
+	     fi;;
+	*)echo -e "\e[91mSkipping $feedemt\e[0m"
+	  sleep 1;;
 	esac
 fi
 
