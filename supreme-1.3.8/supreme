@@ -25,9 +25,13 @@ arraymock=()
 usb_check
 	if [[ "${#usbarr[@]}" != 0 ]]
 	then
-	colorfmt "${usbarr[@]}"
-	instfmt "Select USB device | h [Home]"
-	read uc55
+		case "${#usbarr[@]}" in
+		1)uc55=0
+		  j=1;;
+		*)colorfmt "${usbarr[@]}"
+		  instfmt "Select USB device | h [Home]"
+	          read uc55;;
+		esac
 	v1=$( echo $(numval "$uc55") )
 		if [[ "$v1" == "p" ]]
 		then
@@ -618,9 +622,13 @@ path=( "${access[0]}"/* )
 	opnr="x"
 	echo -e "\e[91mNo phone found\e[0m"
 	else
-	colorfmt "${path[@]}"
-	instfmt "Select Storage | h [Home]"
-	read ac32
+		case "${#path[@]}" in
+		1)ac32=0
+		  j=1;;
+		*)colorfmt "${path[@]}"
+		  instfmt "Select Storage | h [Home]"
+		  read ac32;;
+		esac
 	v7=$( echo $(numval "$ac32") )
 		if [[ "$v7" == "p" ]]
 		then
@@ -1232,6 +1240,7 @@ fi
 #------------------------------------------------------------------------------------------------
 function operations ()
 {
+unset actnkey
 instfmt "Select an option"
 echo -e "(1) \e[32m⏏\e[0m  Open\n(2) \e[90m📖\e[0m Copy\n(3) \e[95m📑\e[0m Move\n(4) \e[91m🚮\e[0m Delete\n(5) \e[36m📓\e[0m Rename\n(6) \e[94m➡\e[0m  Send to Device\n(7) \e[92m⬆\e[0m  Upload to Cloud\n(8) \e[92m⤴\e[0m  Move to cloud\n(9) \e[96mℹ\e[0m  Properties\e[0m\n(10)\e[91m💼️\e[0m Compress\n(11)\e[36m🗳️\e[0m  Extract\n(h) \e[93m🏠\e[0m Go Home"
 while [ "$opnr" == "e" ]
