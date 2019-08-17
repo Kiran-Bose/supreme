@@ -5,7 +5,7 @@ SUpreme is a command line file manager written in shell script.
 
 SUpreme supports file management operations on phone(android),usb drive,cloud storage and local drive(Tested for ubuntu 18.04).
 
-![Logo](https://github.com/Kiran-Bose/supreme/blob/master/SUpreme-1.3.8_Home.png)
+![Logo](https://github.com/Kiran-Bose/supreme/blob/master/SUpreme-1.3.9_Home.png)
 
 ## Dependencies
 
