@@ -228,7 +228,7 @@ flag=1
 navdoor="NAV"
 navpath="${1:-/}"
 check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
-	if [ "$check" == "*" ]
+	if [[ "$check" == "*" ]] && [[ -d "$navpath" ]]
 	then
 	echo -e "\e[91mFolder empty\e[0m"
 	temppath=()
@@ -248,7 +248,8 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	n|N)instfmt "Select folder to navigate"
 	    read navig2
 	    v1000=$( echo $(numval "$navig2") )
-		if [ "$v1000" == "p" ]
+	    isdirectory "${temppath[$navig2]}"
+		if [[ ("$v1000" == "p") && ("$dcheck" == 1) ]]
 		then
 		navig "${temppath[$navig2]}"
 		fi;;
@@ -703,8 +704,12 @@ isdir=()
 		    isdir+=( "$(_jq '.Size')" )
 
 		done
-	colorfmt "${newitem[@]}"
-	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | r [Select root folder] | n [Navigate] | b [Back] | u [Upload] | f [View folder structure and navigate] | m [Make directory] | e [Empty Trash] | p [Previous menu] | h [Home]" 
+		case "${#newitem[@]}" in
+		0)echo -e "\e[91mFolder empty\e[0m"
+		  instfmt "r [Select root folder] | b [Back] | u [Upload] | m [Make directory] | d [Storage details] | p [Previous menu] | h [Home]";;
+		*)colorfmt "${newitem[@]}"
+		  instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | r [Select root folder] | n [Navigate] | b [Back] | u [Upload] | f [View folder structure and navigate] | m [Make directory] | e [Empty Trash] | d [Storage details] | p [Previous menu] | h [Home]";;
+		esac 
 	read gdn2
 	v122=$( echo $(numval "$gdn2") )
 		case "$gdn2" in
