@@ -137,7 +137,7 @@ navdoor="DOOR"
 optdir1="${1:-D}"
 instfmt "enter wildcard(s)"
 read mockwc
-IFS=', ' read -a mockopt <<< "$mockwc"
+IFS=',' read -a mockopt <<< "$mockwc"
 fso="y"
 opnr="e"
 while [[ "$opnr" == "e" ]]
@@ -240,7 +240,7 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	dividerarray+=( "$Q" )	
 	done
 	colorfmt "${dividerarray[@]}"
-	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | n [Navigate] | s [Search] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]" 
+	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | r [Select root folder] | n [Navigate] | s [Search] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]" 
 	fi
 	read navig1
 	v11=$( echo $(numval "$navig1") )
@@ -297,6 +297,10 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	    *)opnr="y"
 	    esac
 	    return;;
+	r|R)srchopt=(0)
+	    temppath=(/)
+	    actionitems
+	    reconfirm;;
 	*)if [ "$v11" == "p" ]
 	  then
 	  IFS=', ' read -r -a srchopt <<< "$navig1"
