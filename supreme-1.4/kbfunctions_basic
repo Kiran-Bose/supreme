@@ -47,18 +47,18 @@ IFS=$(echo -en "\n\b")
 for srchemt in "${srcharr[@]}"
 do
 	case "$optdir1" in
-	D)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /mnt /home/"$user"/Downloads /home/"$user"/Documents /home/"$user"/Pictures /home/"$user"/Music /home/"$user"/Videos /media/"$user" -iname  "*$srchemt*"`
+	D)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /mnt /home/"$user"/Downloads /home/"$user"/Documents /home/"$user"/Pictures /home/"$user"/Music /home/"$user"/Videos /media/"$user" -iname  "*$srchemt*" 2>/dev/null`
 	  arraysrch+=( "${arraystep[@]}" );;
-	NOUSB)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /mnt /home/"$user"/Downloads /home/"$user"/Documents /home/"$user"/Pictures /home/"$user"/Music /home/"$user"/Videos -iname  "*$srchemt*"`
+	NOUSB)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /mnt /home/"$user"/Downloads /home/"$user"/Documents /home/"$user"/Pictures /home/"$user"/Music /home/"$user"/Videos -iname  "*$srchemt*" 2>/dev/null`
 	      arraysrch+=( "${arraystep[@]}" );;
-	USBONLY)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /media/"$user" -iname  "*$srchemt*"`
+	USBONLY)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /media/"$user" -iname  "*$srchemt*" 2>/dev/null`
 		arraysrch+=( "${arraystep[@]}" );;
 	UD)if [[ -z "$srch11" ]]
 	   then
 	   instfmt "Input Path"
 	   read srch11
 	   fi
-	   IFS=$'\n' read -rd '' -a arraystep <<< `sudo find "$srch11" -iname  "*$srchemt*"`
+	   IFS=$'\n' read -rd '' -a arraystep <<< `sudo find "$srch11" -iname  "*$srchemt*" 2>/dev/null`
 	   arraysrch+=( "${arraystep[@]}" );;
 	*)return;;
 	esac
