@@ -621,15 +621,15 @@ arraysrch=()
 arraystep=()
 SAVEIFS=$IFS
 case "$optdir1" in
-D)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "/mnt|/home/$user/Downloads|/home/$user/Documents|/home/$user/Pictures|/home/$user/Music|/home/$user/Videos|/media/$user"`;;
-NOUSB)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "/mnt|/home/$user/Downloads|/home/$user/Documents|/home/$user/Pictures|/home/$user/Music|/home/$user/Videos"`;;
-USBONLY)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "/media/$user"`;;
+D)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -ibe "$@" | egrep "/mnt|/home/$user/Downloads|/home/$user/Documents|/home/$user/Pictures|/home/$user/Music|/home/$user/Videos|/media/$user"`;;
+NOUSB)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -ibe "$@" | egrep "/mnt|/home/$user/Downloads|/home/$user/Documents|/home/$user/Pictures|/home/$user/Music|/home/$user/Videos"`;;
+USBONLY)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -ibe "$@" | egrep "/media/$user"`;;
 UD)if [[ -z "$srch11" ]]
    then
    instfmt "Input Path"
    read srch11
    fi
-   IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "$srch11"`;;
+   IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -ibe "$@" | egrep "$srch11"`;;
 *)return;;
 esac
 IFS=$SAVEIFS
