@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.3.9"
+currentversion="1.4"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -47,18 +47,18 @@ IFS=$(echo -en "\n\b")
 for srchemt in "${srcharr[@]}"
 do
 	case "$optdir1" in
-	D)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /mnt /home/"$user"/Downloads /home/"$user"/Documents /home/"$user"/Pictures /home/"$user"/Music /home/"$user"/Videos /media/"$user" -iname  "*$srchemt*"`
+	D)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /mnt /home/"$user"/Downloads /home/"$user"/Documents /home/"$user"/Pictures /home/"$user"/Music /home/"$user"/Videos /media/"$user" -iname  "*$srchemt*" 2>/dev/null`
 	  arraysrch+=( "${arraystep[@]}" );;
-	NOUSB)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /mnt /home/"$user"/Downloads /home/"$user"/Documents /home/"$user"/Pictures /home/"$user"/Music /home/"$user"/Videos -iname  "*$srchemt*"`
+	NOUSB)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /mnt /home/"$user"/Downloads /home/"$user"/Documents /home/"$user"/Pictures /home/"$user"/Music /home/"$user"/Videos -iname  "*$srchemt*" 2>/dev/null`
 	      arraysrch+=( "${arraystep[@]}" );;
-	USBONLY)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /media/"$user" -iname  "*$srchemt*"`
+	USBONLY)IFS=$'\n' read -rd '' -a arraystep <<< `sudo find /media/"$user" -iname  "*$srchemt*" 2>/dev/null`
 		arraysrch+=( "${arraystep[@]}" );;
 	UD)if [[ -z "$srch11" ]]
 	   then
 	   instfmt "Input Path"
 	   read srch11
 	   fi
-	   IFS=$'\n' read -rd '' -a arraystep <<< `sudo find "$srch11" -iname  "*$srchemt*"`
+	   IFS=$'\n' read -rd '' -a arraystep <<< `sudo find "$srch11" -iname  "*$srchemt*" 2>/dev/null`
 	   arraysrch+=( "${arraystep[@]}" );;
 	*)return;;
 	esac
@@ -137,7 +137,7 @@ navdoor="DOOR"
 optdir1="${1:-D}"
 instfmt "enter wildcard(s)"
 read mockwc
-IFS=', ' read -a mockopt <<< "$mockwc"
+IFS=',' read -a mockopt <<< "$mockwc"
 fso="y"
 opnr="e"
 while [[ "$opnr" == "e" ]]
@@ -177,7 +177,7 @@ arraymock=()
 			then
 				if [[ -d "${arraysrch[$srch71]}" ]]
 				then
-				navig "${arraysrch[$srch71]}"
+				pnavig "${arraysrch[$srch71]}"
 				else
 				echo -e "\e[91mNot a directory\e[0m"
 				opnr="e"
@@ -219,6 +219,7 @@ echo -e "\e[91mSelected ${#arraymock[@]} item(s)\e[0m"
 #------------------------------------------------------------------------------------------------
 function navig ()
 {
+unset homekey
 opnr="e"
 while [[ "$opnr" == "e" ]]
 do
@@ -236,11 +237,19 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	else
 	temppath=("$navpath"/*)
 	for ((i=0; i<${#temppath[@]}; i++)); do
+	temppath[$i]=$(echo "${temppath[$i]}" | tr -s /)
 	Q=$( echo "(${i}) ${temppath[$i]}" | rev | cut -d '/' -f 1 | rev )
 	dividerarray+=( "$Q" )	
 	done
 	colorfmt "${dividerarray[@]}"
-	instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | n [Navigate] | s [Search] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]" 
+	case "$2" in
+	local)instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | r [Select root folder] | n [Navigate] | s [Search] | q [Quick access] | b [Back] | m [Make directory] | f [Make file] | h [Home]";;
+	dest)instfmt "Select Destination Folder"
+	     instfmt "Select item | r [Select root folder] | n [Navigate] | s [Search] | q [Quick access] | b [Back] | m [Make directory] | f [Make file] | h [Home]";;
+	spec)instfmt "$3"
+	     instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | r [Select root folder] | n [Navigate] | s [Search] | q [Quick access] | b [Back] | m [Make directory] | f [Make file] | h [Home]";;
+	*)instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | r [Select root folder] | n [Navigate] | s [Search] | q [Quick access] | b [Back] | m [Make directory] | f [Make file] | h [Home]";;
+	esac 
 	fi
 	read navig1
 	v11=$( echo $(numval "$navig1") )
@@ -292,11 +301,162 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	    navig "$navpath";;
 	h|H)opnr="x"
 	    homekey="y";;
-	p|P)case $opn1 in
-	    q|Q)opnr="e";;
-	    *)opnr="y"
-	    esac
-	    return;;
+	r|R)srchopt=(0)
+	    temppath=(/)
+	    actionitems
+	    reconfirm;;
+	q|Q)opnr="f"
+	    while [[ "$opnr" == "f" ]]
+	    do
+	    quick
+		if [ "${#quickarray[@]}" != 0 ]
+		then
+		instfmt "Select an option | p [Previous menu] | h [Home]"
+		read opn15
+		v101=$( echo $(numval "$opn15") )
+			case "$opn15" in
+			p|P)opnr="e";;
+			h|H)opnr="x"
+			    homekey="y";;
+			*)if [[ "$v101" == "p" ]]
+			  then
+				  if (($opn15<$j)) > /dev/null 2>&1
+				  then
+				  pnavig "${quickarray[$opn15]}"
+				  fi
+			  fi;;
+			esac
+		else
+		opnr="x"
+		return
+		fi
+	    done;;
+	*)if [ "$v11" == "p" ]
+	  then
+	  IFS=', ' read -r -a srchopt <<< "$navig1"
+	  actionitems
+	  reconfirm
+	  fi;;
+	esac
+done
+}
+
+#------------------------------------------------------------------------------------------------
+function pnavig ()
+{
+unset homekey
+opnr="e"
+while [[ "$opnr" == "e" ]]
+do
+dividerarray=()
+arraymock=()
+flag=1
+navdoor="NAV"
+navpath="${1:-/}"
+check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
+	if [[ "$check" == "*" ]] && [[ -d "$navpath" ]]
+	then
+	echo -e "\e[91mFolder empty\e[0m"
+	temppath=()
+	instfmt "b [Back] | m [Make directory] | f [Make file] | h [home]"
+	else
+	temppath=("$navpath"/*)
+	for ((i=0; i<${#temppath[@]}; i++)); do
+	temppath[$i]=$(echo "${temppath[$i]}" | tr -s /)
+	Q=$( echo "(${i}) ${temppath[$i]}" | rev | cut -d '/' -f 1 | rev )
+	dividerarray+=( "$Q" )	
+	done
+	colorfmt "${dividerarray[@]}"
+	case "$2" in
+	local)instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | r [Select root folder] | n [Navigate] | s [Search] | q [Quick access] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]";;
+	dest)instfmt "Select Destination Folder"
+	     instfmt "Select item | r [Select root folder] | n [Navigate] | s [Search] | q [Quick access] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]";;
+	spec)instfmt "$3"
+	     instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | r [Select root folder] | n [Navigate] | s [Search] | q [Quick access] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]";;
+	*)instfmt "Select item(s) | a [Select all] | z [Inverse selection] | w [Range selection] | r [Select root folder] | n [Navigate] | s [Search] | q [Quick access] | b [Back] | m [Make directory] | f [Make file] | p [Previous menu] | h [Home]";;
+	esac 
+	fi
+	read navig1
+	v11=$( echo $(numval "$navig1") )
+	case "$navig1" in
+	n|N)instfmt "Select folder to navigate"
+	    read navig2
+	    v1000=$( echo $(numval "$navig2") )
+	    isdirectory "${temppath[$navig2]}"
+		if [[ ("$v1000" == "p") && ("$dcheck" == 1) ]]
+		then
+		pnavig "${temppath[$navig2]}"
+		fi;;
+	s|S)if [[ "$navpath" = *"/$UID/gvfs/mtp"* ]]
+	    then
+	    echo -e "\e[91mSearch not supported on current directory\e[0m"
+	    sleep 1
+	    else
+	    srch11="$navpath"
+	    door UD
+	    sleep 1
+	    unset srch11
+		case "$srch1" in
+		p|P)opnr="e"
+		    srch11="$navpath";;
+		esac
+	    fi;;
+	b|B)backpath="`echo "$navpath" | rev | cut -d/ -f2- | rev`"
+	    pnavig "$backpath";;
+	a|A)srchopt=()
+	    for ((i=0; i<${#temppath[@]}; i++)); do
+	    srchopt+=( "$i" )
+	    done
+	    actionitems
+	    reconfirm
+	    v11="p";;
+	z|Z)invslct "${temppath[@]}"
+	    reconfirm
+	    v11="p";;
+	w|W)rangeslct "${temppath[@]}"
+	    reconfirm
+	    v11="p";;
+	m|M)instfmt "Enter name for new directory"
+	    read navignd
+		mkdir "$navpath"/"$navignd" > /dev/null 2>&1 || sudo mkdir "$navpath"/"$navignd" > /dev/null 2>&1
+	    pnavig "$navpath";;
+	f|F)instfmt "Enter file name"
+	    read navignf
+		touch "$navpath"/"$navignf" > /dev/null 2>&1 || sudo touch "$navpath"/"$navignf"  > /dev/null 2>&1
+	    pnavig "$navpath";;
+	h|H)opnr="x"
+	    homekey="y";;
+	p|P)opnr="f";;
+	r|R)srchopt=(0)
+	    temppath=(/)
+	    actionitems
+	    reconfirm;;
+	q|Q)opnr="f"
+	    while [[ "$opnr" == "f" ]]
+	    do
+	    quick
+		if [ "${#quickarray[@]}" != 0 ]
+		then
+		instfmt "Select an option | p [Previous menu] | h [Home]"
+		read opn15
+		v101=$( echo $(numval "$opn15") )
+			case "$opn15" in
+			p|P)opnr="e";;
+			h|H)opnr="x"
+			    homekey="y";;
+			*)if [[ "$v101" == "p" ]]
+			  then
+				  if (($opn15<$j)) > /dev/null 2>&1
+				  then
+				  pnavig "${quickarray[$opn15]}"
+				  fi
+			  fi;;
+			esac
+		else
+		opnr="x"
+		return
+		fi
+	    done;;
 	*)if [ "$v11" == "p" ]
 	  then
 	  IFS=', ' read -r -a srchopt <<< "$navig1"
@@ -355,75 +515,6 @@ return
 fi
 }
 
-#------------------------------------------------------------------------------------------------
-function feeder ()
-{
-unset homekey
-opnr="y"
-while [[ "$opnr" == "y" ]]
-do
-banner
-arraymock=()
-case "$1" in
-local)instfmt "s [Search] | n [Navigate] | q [Quick access] | p [Previous menu] | h [Home]";;
-dest)instfmt "Select Destination Folder"
-     instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]";;
-spec)instfmt "$2"
-     instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]";;
-*)instfmt "s [Search] | n [Navigate] | q [Quick access] | h [Home]";;
-esac
-read opn1
-	case "$opn1" in
-	s|S)banner
-	    instfmt "Select an option | p [Previous menu] | h [Home]"
-	    echo -e "(1)Default (limited number of folders)\n(2)Path specific (Opt for 2 and enter '/' to search entire system)"
-	    read opn4
-	    case "$opn4" in
-	    1)opnr="x"
-	      door;;
-	    2)opnr="x"
-	      door UD
-	      unset srch11;;
-	    p|P)opnr="y";;
-	    h|H)opnr="x"
-		homekey="y";;
-	    esac;;
-	n|N)opnr="x"
-	    navig /;;
-	h|H)opnr="x"
-	    homekey="y";;
-	p|P)case "$1" in
-	    local)opnr="g";;
-	    esac;;
-	q|Q)opnr="e"
-	    while [[ "$opnr" == "e" ]]
-	    do
-	    quick
-		if [ "${#quickarray[@]}" != 0 ]
-		then
-		instfmt "Select an option | p [Previous menu] | h [Home]"
-		read opn15
-		v101=$( echo $(numval "$opn15") )
-			case "$opn15" in
-			p|P)opnr="y";;
-			h|H)opnr="x"
-			    homekey="y";;
-			*)if [[ "$v101" == "p" ]]
-			  then
-				  if (($opn15<$j)) > /dev/null 2>&1
-				  then
-				  navig "${quickarray[$opn15]}"
-				  fi
-			  fi;;
-			esac
-		else
-		opnr="x"
-		return
-		fi
-	    done;;
-	esac
-done
-}
 #------------------------------------------------------------------------------------------------
 function rangeslct ()
 {
@@ -530,15 +621,15 @@ arraysrch=()
 arraystep=()
 SAVEIFS=$IFS
 case "$optdir1" in
-D)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "/mnt|/home/$user/Downloads|/home/$user/Documents|/home/$user/Pictures|/home/$user/Music|/home/$user/Videos|/media/$user"`;;
-NOUSB)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "/mnt|/home/$user/Downloads|/home/$user/Documents|/home/$user/Pictures|/home/$user/Music|/home/$user/Videos"`;;
-USBONLY)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "/media/$user"`;;
+D)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -ibe "$@" | egrep "/mnt|/home/$user/Downloads|/home/$user/Documents|/home/$user/Pictures|/home/$user/Music|/home/$user/Videos|/media/$user"`;;
+NOUSB)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -ibe "$@" | egrep "/mnt|/home/$user/Downloads|/home/$user/Documents|/home/$user/Pictures|/home/$user/Music|/home/$user/Videos"`;;
+USBONLY)IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -ibe "$@" | egrep "/media/$user"`;;
 UD)if [[ -z "$srch11" ]]
    then
    instfmt "Input Path"
    read srch11
    fi
-   IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -i "$@" | egrep "$srch11"`;;
+   IFS=$'\n' read -rd '' -a arraysrch <<< `sudo locate -ibe "$@" | egrep "$srch11"`;;
 *)return;;
 esac
 IFS=$SAVEIFS
@@ -752,7 +843,7 @@ isdir=()
 		    oprpt="n"
 		    opnr="x"
 		    homekey="y";;
-		u|U)feeder "local"
+		u|U)pnavig / "local"
 		    if [[ "$homekey" != "y" ]]
 		    then
 		    cloudupload

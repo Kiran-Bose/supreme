@@ -45,36 +45,16 @@ usb_check
 				echo -e "(1)USB File Explorer\n(2)Format\n(3)Sync\n(4)Configure Sync\n(5)Create bootable USB"
 				read opt1
 					case "$opt1" in
-					1)opnr="f"
-					  while [[ "$opnr" == "f" ]]
-					  do
-					  banner
-					  instfmt "s [Search] | n [Navigate] | p [Previous menu] | h [Home]"
-					  read uc11
-						  case "$uc11" in
-						  s|S)opnr="x"
-						      srch11="${usbarr[$uc55]}"
-						      door UD
-						      unset srch11
-						      case "$srch1" in
-						      p|P)opnr="f"
-						      esac;;
-						  n|N)opnr="x"
-						      navig "${usbarr[$uc55]}"
-						      case "$navig1" in
-						      p|P)opnr="f"
-						      esac;;
-						  p|P)opnr="y"
-						      unset arraymock;;
-						  h|H)opnr="x"
-						      homekey="y";;
-						  esac
-					  done
-					  if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
-					  then
-					  opnr="e"
-					  operations
-					  fi;;
+					1)banner
+					  pnavig "${usbarr[$uc55]}"
+					  case "$navig1" in
+					  p|P)opnr="y";;
+					  *)if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
+					    then
+					    opnr="e"
+					    operations
+					    fi;;
+					  esac;;
 					2)fsys=$(df -h "${usbarr[$uc55]}" | awk '{print $1}' | sed 1d)
 					  instfmt "Are you sure you want to format ${usbarr[$uc55]}?(y/n)"
 					  echo -e "\e[91mWarning: This is irreversible and will erase everything\e[0m"
@@ -184,11 +164,11 @@ usb_check
 						fi
 					    done;;
 					4)config_sync "usb";;
-					5)opnr="f"
-					  while [[ "$opnr" == "f" ]]
+					5)opnr="h"
+					  while [[ "$opnr" == "h" ]]
 					  do
 					  fsys=$(df -h "${usbarr[$uc55]}" | awk '{print $1}' | sed 1d)
-					  feeder spec "Select Disk Image"
+					  pnavig / spec "Select Disk Image"
 						  if [[ "${#arraymock[@]}" != 0 ]]
 						  then
 						  instfmt "Are you sure you want to make ${usbarr[$uc55]} bootable with ${arraymock[0]}?(y/n)"
@@ -201,6 +181,9 @@ usb_check
 							  *)opnr="y";;
 							  esac
 						  fi
+						  case "$navig1" in
+					  	  p|P)opnr="y";;
+						  esac
 					    done;;
 					p|P)opnr="g";;
 					h|H)opnr="x"
@@ -383,8 +366,8 @@ read cps1
 		      echo -e "(1)Phone\n(2)Local"
 		      read cfgsync11
 			case "$cfgsync11" in
-			1)navig "$storage";;
-			2)feeder "local"
+			1)pnavig "$storage";;
+			2)pnavig / "local"
 			  case "$opn1" in
 			  p|P)opnr="f";;
 			  h|H)unset navig1;;
@@ -403,8 +386,8 @@ read cps1
 		      echo -e "(1)USB Device\n(2)Local"
 		      read cfgsync21
 			case "$cfgsync21" in
-			1)navig "${usbarr[$uc55]}";;
-			2)feeder "local"
+			1)pnavig "${usbarr[$uc55]}";;
+			2)pnavig / "local"
 			  case "$opn1" in
 			  p|P)opnr="f";;
 			  h|H)unset navig1;;
@@ -440,7 +423,7 @@ read cps1
 					      unset cldopt;;
 					  esac
 				  done;;
-				2)feeder "local"
+				2)pnavig / "local"
 				  case "$opn1" in
 				  p|P)opnr="f";;
 				  h|H)unset navig1;;
@@ -477,7 +460,7 @@ read cps1
 		      	      echo -e "(1)Phone\n(2)Local"
 		      	      read cfgsync12
 				case "$cfgsync12" in
-				1)navig "$storage"
+				1)pnavig "$storage"
 				  isdirectory "${arraymock[0]}"
 				  	if [[ "${#arraymock[@]}" != 0 ]]
 					then
@@ -488,7 +471,7 @@ read cps1
 			  			fi
 					arraymock=("${tempswap[@]}")
 					fi;;
-				2)feeder "local"
+				2)pnavig / "local"
 				  case "$opn1" in
 				  p|P)opnr="f";;
 				  h|H)unset navig1;;
@@ -508,9 +491,9 @@ read cps1
 		      	    echo -e "(1)USB Device\n(2)Local"
 		      	    read cfgsync22
 				case "$cfgsync22" in
-				1)navig "${usbarr[$uc55]}"
+				1)pnavig "${usbarr[$uc55]}"
 				  isdirectory "${arraymock[0]}";;
-				2)feeder "local"
+				2)pnavig / "local"
 				  case "$opn1" in
 				  p|P)opnr="f";;
 				  h|H)unset navig1;;
@@ -558,7 +541,7 @@ read cps1
 						    unset cldopt;;
 					 	esac
 					done;;
-				      2)feeder "local"
+				      2)pnavig / "local"
 					isdirectory "${arraymock[0]}"
 					case "$opn1" in
 					p|P)opnr="e";;
@@ -643,12 +626,15 @@ path=( "${access[0]}"/* )
 					echo -e "(1)Phone File Explorer\n(2)Sync\n(3)Configure Sync"
 					read ac1
 					case "$ac1" in
-					1)navig "$storage"
-					  if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
-					  then
-					  opnr="e"
-					  operations
-					  fi;;
+					1)pnavig "$storage"
+					  case "$navig1" in
+					  p|P)opnr="y";;
+					  *)if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
+					    then
+					    opnr="e"
+					    operations
+					    fi;;
+					  esac;;
 					2)opnr="h"
 					  while [[ "$opnr" == "h" ]]
 					  do
@@ -1119,7 +1105,7 @@ instfmt "Rclone-SUpreme Bridge"
 			 then
 			 tempsortfile=( "${sortfile[@]}" )
 		  	 tempsortdir=( "${sortdir[@]}" )
-		  	 feeder "dest"
+		  	 navig / "dest"
 				 if [ "${#arraymock[@]}" != 0 ]
 				 then
 					if [ "$gdn1" == "$cldopt" ]
@@ -1157,7 +1143,7 @@ instfmt "Rclone-SUpreme Bridge"
 				case $gdit55 in
 				1)selectcloud
 				  cloudnavig;;
-				2)feeder;;
+				2)navig /;;
 				*)return;;
 				esac
 				if [[ "$homekey" == "y" ]] || [[ -z "$cldopt" ]]
@@ -1256,7 +1242,7 @@ read opn11
 	  tempmock=( "${arraymock[@]}" )
 	  while [ "$opnr" == "f" ]
 	  do
-	  feeder "dest"
+	  navig / "dest"
 		  if [[ -d "${arraymock[0]}" ]]
 		  then
 		  opnr="x"
@@ -1269,7 +1255,10 @@ read opn11
 		  load_delay
 			case "$homekey" in
 			y|Y)opnr="x";;
-			*)opnr="f";;
+			*)case "$navig1" in
+			  p|P)opnr="x";;
+			  *)opnr="f";;
+			  esac
 			esac
 		  fi
 	  done;;
@@ -1277,7 +1266,7 @@ read opn11
 	  tempmock=( "${arraymock[@]}" )
 	  while [ "$opnr" == "f" ]
 	  do
-	  feeder "dest"
+	  navig / "dest"
 		  if [[ -d "${arraymock[0]}" ]]
 		  then
 		  opnr="x"
@@ -1291,7 +1280,10 @@ read opn11
 		  load_delay
 			case "$homekey" in
 			y|Y)opnr="x";;
-			*)opnr="f";;
+			*)case "$navig1" in
+			  p|P)opnr="x";;
+			  *)opnr="f";;
+			  esac
 			esac
 		  fi
 	  done;;
@@ -1420,7 +1412,7 @@ read opn11
 	   *)tempmock=( "${arraymock[@]}" )
 		     while [ "$opnr" == "f" ]
 	   	     do
-		     feeder "dest"
+		     navig / "dest"
 		     	if [[ -d "${arraymock[0]}" ]]
 		  	then
 		  	opnr="x"
@@ -1439,7 +1431,7 @@ read opn11
 	   tempmock=( "${arraymock[@]}" )
 	   	     while [ "$opnr" == "f" ]
 	   	     do
-		     feeder "dest"
+		     navig / "dest"
 		     	if [[ -d "${arraymock[0]}" ]]
 		  	then
 		  	opnr="x"
@@ -1869,7 +1861,7 @@ instfmt "Select an option | p [Previous menu] | h [Home]"
 echo -e "(1)Add folder(s) to list\n(2)Remove folder(s) from list"
 read cqa
 	case $cqa in
-	1)feeder
+	1)pnavig /
 	  case "${#arraymock[@]}" in
 	  0)opnr="x";;
 	  *)opnr="x"
@@ -2105,7 +2097,7 @@ user=$(whoami)
 		2)opnr="y"
 	          while [ "$opnr" == "y" ]
 		  do
-		  feeder
+		  navig /
 			if [ "${#arraymock[@]}" != 0 ]
 			then
 			opnr="e"
