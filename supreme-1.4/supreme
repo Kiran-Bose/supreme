@@ -45,36 +45,16 @@ usb_check
 				echo -e "(1)USB File Explorer\n(2)Format\n(3)Sync\n(4)Configure Sync\n(5)Create bootable USB"
 				read opt1
 					case "$opt1" in
-					1)opnr="f"
-					  while [[ "$opnr" == "f" ]]
-					  do
-					  banner
-					  instfmt "s [Search] | n [Navigate] | p [Previous menu] | h [Home]"
-					  read uc11
-						  case "$uc11" in
-						  s|S)opnr="x"
-						      srch11="${usbarr[$uc55]}"
-						      door UD
-						      unset srch11
-						      case "$srch1" in
-						      p|P)opnr="f"
-						      esac;;
-						  n|N)opnr="x"
-						      navig "${usbarr[$uc55]}"
-						      case "$navig1" in
-						      p|P)opnr="f"
-						      esac;;
-						  p|P)opnr="y"
-						      unset arraymock;;
-						  h|H)opnr="x"
-						      homekey="y";;
-						  esac
-					  done
-					  if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
-					  then
-					  opnr="e"
-					  operations
-					  fi;;
+					1)banner
+					  pnavig "${usbarr[$uc55]}"
+					  case "$navig1" in
+					  p|P)opnr="y";;
+					  *)if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
+					    then
+					    opnr="e"
+					    operations
+					    fi;;
+					  esac;;
 					2)fsys=$(df -h "${usbarr[$uc55]}" | awk '{print $1}' | sed 1d)
 					  instfmt "Are you sure you want to format ${usbarr[$uc55]}?(y/n)"
 					  echo -e "\e[91mWarning: This is irreversible and will erase everything\e[0m"
@@ -184,11 +164,11 @@ usb_check
 						fi
 					    done;;
 					4)config_sync "usb";;
-					5)opnr="f"
-					  while [[ "$opnr" == "f" ]]
+					5)opnr="h"
+					  while [[ "$opnr" == "h" ]]
 					  do
 					  fsys=$(df -h "${usbarr[$uc55]}" | awk '{print $1}' | sed 1d)
-					  feeder spec "Select Disk Image"
+					  pnavig / spec "Select Disk Image"
 						  if [[ "${#arraymock[@]}" != 0 ]]
 						  then
 						  instfmt "Are you sure you want to make ${usbarr[$uc55]} bootable with ${arraymock[0]}?(y/n)"
@@ -201,6 +181,9 @@ usb_check
 							  *)opnr="y";;
 							  esac
 						  fi
+						  case "$navig1" in
+					  	  p|P)opnr="y";;
+						  esac
 					    done;;
 					p|P)opnr="g";;
 					h|H)opnr="x"

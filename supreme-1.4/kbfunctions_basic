@@ -843,7 +843,7 @@ isdir=()
 		    oprpt="n"
 		    opnr="x"
 		    homekey="y";;
-		u|U)feeder "local"
+		u|U)pnavig / "local"
 		    if [[ "$homekey" != "y" ]]
 		    then
 		    cloudupload
