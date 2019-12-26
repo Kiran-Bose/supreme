@@ -1372,7 +1372,7 @@ read opn11
 	  done;;
 	7)opnr="f"
 	  rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
-	  if [[ "$rcver" != "v1.4"* ]]
+	  if [[ "$rcver" != "v1.5"* ]]
 	  then
 	  curl https://rclone.org/install.sh | sudo bash
 	  fi
@@ -2112,7 +2112,7 @@ user=$(whoami)
 		5)banner
 		  cloudconfig
 		  rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
-			if [[ "$rcver" != "v1.4"* ]]
+			if [[ "$rcver" != "v1.5"* ]]
 			then
 			curl https://rclone.org/install.sh | sudo bash
 			fi
