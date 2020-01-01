@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.4.2"
+currentversion="1.4.4"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -850,7 +850,7 @@ isdir=()
 		    fi;;
 		b|B)backpath="`echo "$gdn1" | rev | cut -d/ -f2- | rev`"
 		    cloudnavig "$backpath";;
-		f|F)rclone tree $gdn1 -d --full-path
+		f|F)rclone tree "$gdn1" -d --full-path
 		    instfmt "Enter path | p [Previous menu] | h [Home]"
 		    read gdn18
 		    case "$gdn18" in
@@ -862,12 +862,12 @@ isdir=()
 		    	oprpt="n"
 		    	opnr="x"
 		    	homekey="y";;
-		    *)cloudnavig $gdn1"$gdn18";;
+		    *)cloudnavig "$gdn1""$gdn18";;
 		    esac;;
 		m|M)instfmt "Enter name for new directory"
 		    read gdnnd
-		    rclone mkdir $gdn1/"$gdnnd"
-		    cloudnavig $gdn1;;
+		    rclone mkdir "$gdn1"/"$gdnnd"
+		    cloudnavig "$gdn1";;
 		z|Z)invslct "${newitem[@]}"
 		    reconfirm "h";;
 		w|W)rangeslct "${newitem[@]}"
