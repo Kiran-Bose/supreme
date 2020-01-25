@@ -46,14 +46,11 @@ usb_check
 				read opt1
 					case "$opt1" in
 					1)banner
+					  opflag=1
 					  pnavig "${usbarr[$uc55]}"
+					  opflag=0
 					  case "$navig1" in
 					  p|P)opnr="y";;
-					  *)if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
-					    then
-					    opnr="e"
-					    operations
-					    fi;;
 					  esac;;
 					2)fsys=$(df -h "${usbarr[$uc55]}" | awk '{print $1}' | sed 1d)
 					  instfmt "Are you sure you want to format ${usbarr[$uc55]}?(y/n)"
@@ -127,7 +124,7 @@ usb_check
 								    do
 								    	if(($emt11<${#genlist[@]})) > /dev/null 2>&1
 									then
-									opnr="x"
+									opnr="y"
 										if [[ -d "${genlist[$emt11]}" ]] || [[ -f "${genlist[$emt11]}" ]] && [[ -d "${templist[$emt11]}" ]]
 										then
 										rsync --ignore-existing -rvv --progress "${genlist[$emt11]}" "${templist[$emt11]}"
@@ -135,9 +132,10 @@ usb_check
 										echo -e "\e[91mInvalid sync configuration: ${genlist[$emt11]} --> ${templist[$emt11]}\e[0m"										
 										fi
 									fi
-								    done;;
+								    done
+								  load_delay;;
 								*)case $ac6 in
-								  a|A)opnr="x"
+								  a|A)opnr="y"
 									  for ((i=0; i<${#genlist[@]}; i++))
 									  do
 										if [[ -d "${genlist[$i]}" ]] || [[ -f "${genlist[$i]}" ]] && [[ -d "${templist[$i]}" ]]
@@ -147,7 +145,7 @@ usb_check
 										echo -e "\e[91mInvalid sync configuration: ${genlist[$i]} --> ${templist[$i]}\e[0m"										
 										fi
 									   done
-								      return;;
+								      load_delay;;
 								  p|P)opnr="y";;
 								  h|H)opnr="x"
 								      homekey="y";;
@@ -155,12 +153,14 @@ usb_check
 								esac
 							    fi
 							else
-							opnr="x"
+							opnr="y"
 							echo -e "\e[91mSync folder(s) not configured\e[0m"
+							load_delay
 							fi
 						else
-						opnr="x"
+						opnr="y"
 						echo -e "\e[91mSync folder(s) not configured\e[0m"
+						load_delay
 						fi
 					    done;;
 					4)config_sync "usb";;
@@ -626,14 +626,11 @@ path=( "${access[0]}"/* )
 					echo -e "(1)Phone File Explorer\n(2)Sync\n(3)Configure Sync"
 					read ac1
 					case "$ac1" in
-					1)pnavig "$storage"
+					1)opflag=1
+					  pnavig "$storage"
+					  opflag=0
 					  case "$navig1" in
 					  p|P)opnr="y";;
-					  *)if [[ ("$v11" == "p") && ("${#arraymock[@]}" != 0) ]]
-					    then
-					    opnr="e"
-					    operations
-					    fi;;
 					  esac;;
 					2)opnr="h"
 					  while [[ "$opnr" == "h" ]]
@@ -670,7 +667,7 @@ path=( "${access[0]}"/* )
 								    do
 								    	if(($emt11<${#genlist[@]})) > /dev/null 2>&1
 									then
-									opnr="x"
+									opnr="y"
 										if [[ -d "${access[0]}${genlist[$emt11]}" ]] || [[ -f "${access[0]}${genlist[$emt11]}" ]] && [[ -d "${templist[$emt11]}" ]]
 										then
 										rsync --ignore-existing -rvv --progress "${access[0]}${genlist[$emt11]}" "${templist[$emt11]}"
@@ -681,9 +678,10 @@ path=( "${access[0]}"/* )
 										echo -e "\e[91mInvalid sync configuration: ${genlist[$emt11]} --> ${access[0]}${templist[$emt11]}\e[0m"
 										fi
 									fi
-								    done;;
+								    done
+								  load_delay;;
 								*)case $ac6 in
-								  a|A)opnr="x"
+								  a|A)opnr="y"
 									  for ((i=0; i<${#genlist[@]}; i++))
 									  do
 										if [[ -d "${access[0]}${genlist[$i]}" ]] || [[ -f "${access[0]}${genlist[$i]}" ]] && [[ -d "${templist[$i]}" ]]
@@ -696,7 +694,7 @@ path=( "${access[0]}"/* )
 										echo -e "\e[91mInvalid sync configuration: ${genlist[$i]} --> ${access[0]}${templist[$i]}\e[0m"
 										fi
 									   done
-								      return;;
+								      load_delay;;
 								  p|P)opnr="y";;
 								  h|H)opnr="x"
 								      homekey="y";;
@@ -704,12 +702,14 @@ path=( "${access[0]}"/* )
 								esac
 							    fi
 							else
-							opnr="x"
+							opnr="y"
 							echo -e "\e[91mSync folder(s) not configured\e[0m"
+							load_delay
 							fi
 						else
-						opnr="x"
+						opnr="y"
 						echo -e "\e[91mSync folder(s) not configured\e[0m"
+						load_delay
 						fi
 					    done;;
 					3)config_sync "phone";;
@@ -1221,239 +1221,6 @@ else
 echo -e "\e[41;97;10;85mEnter any key\e[0m"
 read delay
 fi
-}
-
-#------------------------------------------------------------------------------------------------
-function operations ()
-{
-unset actnkey
-instfmt "Select an option"
-echo -e "(1) \e[32m⏏\e[0m  Open\n(2) \e[90m📖\e[0m Copy\n(3) \e[95m📑\e[0m Move\n(4) \e[91m🚮\e[0m Delete\n(5) \e[36m📓\e[0m Rename\n(6) \e[94m➡\e[0m  Send to Device\n(7) \e[92m⬆\e[0m  Upload to Cloud\n(8) \e[92m⤴\e[0m  Move to cloud\n(9) \e[96mℹ\e[0m  Properties\e[0m\n(10)\e[91m💼️\e[0m Compress\n(11)\e[36m🗳️\e[0m  Extract\n(h) \e[93m🏠\e[0m Go Home"
-while [ "$opnr" == "e" ]
-do
-read opn11
-	case $opn11 in
-	1)opnr="f"
-	  for opnemt in "${arraymock[@]}"
-	  do
-	  xdg-open "$opnemt" > /dev/null 2>&1
-	  done;;
-	2)opnr="f"
-	  tempmock=( "${arraymock[@]}" )
-	  while [ "$opnr" == "f" ]
-	  do
-	  navig / "dest"
-		  if [[ -d "${arraymock[0]}" ]]
-		  then
-		  opnr="x"
-			for opnemt in "${tempmock[@]}"
-			do
-			kbcm -c "$opnemt" "${arraymock[0]}"
-			done
-		  else
-		  echo -e "\e[91mNot a directory\e[0m"
-		  load_delay
-			case "$homekey" in
-			y|Y)opnr="x";;
-			*)case "$navig1" in
-			  p|P)opnr="x";;
-			  *)opnr="f";;
-			  esac
-			esac
-		  fi
-	  done;;
-	3)opnr="f"
-	  tempmock=( "${arraymock[@]}" )
-	  while [ "$opnr" == "f" ]
-	  do
-	  navig / "dest"
-		  if [[ -d "${arraymock[0]}" ]]
-		  then
-		  opnr="x"
-			for opnemt in "${tempmock[@]}"
-			do
-			qbar=0
-			kbcm -m "$opnemt" "${arraymock[0]}"
-			done
-		  else
-		  echo -e "\e[91mNot a directory\e[0m"
-		  load_delay
-			case "$homekey" in
-			y|Y)opnr="x";;
-			*)case "$navig1" in
-			  p|P)opnr="x";;
-			  *)opnr="f";;
-			  esac
-			esac
-		  fi
-	  done;;
-	4)opnr="f"
-	  instfmt "Are you sure you want to delete the file(s)?(y/n)"
-	  read opn032
-	  if [ "$opn032" == "y" ]
-	  then 
-		for opnemt in "${arraymock[@]}"
-		do
-			if [[ "$opnemt" = *"/$UID/gvfs/mtp"* ]]
-			then 
-			rm -vrf "$opnemt"
-			else
-			sudo rm -vrf "$opnemt"
-			fi
-		done
-	  fi;;
-	5)opnr="f"
-	  if [[ "${#arraymock[@]}" != 0 ]]
-          then
-	  instfmt "Select an option | h [Home]"
-      	  echo -e "(1)Auto rename\n(2)Normal rename"
-	  read ren
-		case "$ren" in
-		1)instfmt "Are you sure you want to auto rename ${#arraymock[@]} files?(y/n)"
-		  read renres
-		  case "$renres" in 
-		  y|Y)instfmt "Enter Common name"
-		      read rencom
-		      for ((t=0; t<${#arraymock[@]}; t++))
-		      do
-		      R=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f2- | rev )
-		      number=$(($t+1))
-		      mv "${arraymock[$t]}" "$R"/"$rencom$number"
-		      done;;
-		   esac;;
-		 2)for ((t=0; t<${#arraymock[@]}; t++))
-		   do
-		   Q=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f 1 | rev )
-		   R=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f2- | rev )
-		   instfmt "Current Name: $Q"
-		   instfmt "Enter New Name"
-		   read newname
-		   instfmt "Are you sure you want to rename $Q to $newname?(y/n)"
-		   read opn88
-			if [ "$opn88" == "y" ]
-			then
-			mv "${arraymock[$t]}" "$R"/"$newname"
-			fi
-		   done;;
-		  h|H)opnr="x"
-		      homekey="y";;
-		esac
-	  fi;;
-	6)opnr="f"
-	  while [ "$opnr" == "f" ]
-	  do
-	  banner
-	  quick f
-		  if [ "${#quickarray[@]}" != 0 ]
-		  then
-		  instfmt "Select Device | h [Home]"
-			read opn99
-			v111=$( echo $(numval "$opn99") )
-			if [[ ("$v111" == "p") ]]
-			then
-				if (($opn99<$j)) > /dev/null 2>&1
-			  	then
-				opnr="x"
-					for opnemt in "${arraymock[@]}"
-					do
-					kbcm -c "$opnemt" "${quickarray[$opn99]}"
-					done
-				else
-				echo -e "\e[91mBad input\e[0m"
-				fi
-			elif [ "$opn99" == "h" ]
-			then
-			opnr="x"
-			homekey="y"
-			fi
-		  else
-		  return
-		  fi
-	  done;;
-	7)opnr="f"
-	  rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
-	  if [[ "$rcver" != "v1.5"* ]]
-	  then
-	  curl https://rclone.org/install.sh | sudo bash
-	  fi
-	  selectcloud "local"
-	  cloudupload;;
-	8)opnr="f"
-	  selectcloud "local"
-	  if [[ -z "$cldopt" ]]
-	  then
-	  return
-	  else
-	  tempmock=( "${arraymock[@]}" )
-	  cloudnavig
-	  cldactn="move"
-	  	if [[ ("$gdn1" == "$cldopt") && ("${#arraymock[@]}" == 0) ]]
-		then
-		rcfeed rmc "" "$gdn1"
-		else
-		rcfeed rmc "" "$gdn1"/"${arraymock[0]}" "" 5 
-		fi
-	  fi;;
-	9)opnr="f"
-	  for opnemt in "${arraymock[@]}"
-	  do
-		for ((i=0; i<$col; i++))
-		do
-		echo -en "_"
-		done
-	  det "$opnemt"
-	  done;;
-	10)opnr="f"
-	   instfmt "Enter a name for compressed file | h [Home]"
-	   read opn148
-	   case $opn148 in
-	   h|H)opnr="x"
-	       homekey="y";;
-	   *)tempmock=( "${arraymock[@]}" )
-		     while [ "$opnr" == "f" ]
-	   	     do
-		     navig / "dest"
-		     	if [[ -d "${arraymock[0]}" ]]
-		  	then
-		  	opnr="x"
-			sudo tar -czvvf "${arraymock[0]}"/"$opn148".tar.gz "${tempmock[@]}"
-			else
-			echo -e "\e[91mNot a directory\e[0m"
-			load_delay
-				case "$homekey" in
-				y|Y)opnr="x";;
-				*)opnr="f";;
-				esac
-			fi
-		     done;;
-	    esac;;
-	11)opnr="f"
-	   tempmock=( "${arraymock[@]}" )
-	   	     while [ "$opnr" == "f" ]
-	   	     do
-		     navig / "dest"
-		     	if [[ -d "${arraymock[0]}" ]]
-		  	then
-		  	opnr="x"
-				for opnemt in "${tempmock[@]}"
-				do
-				sudo tar -C "${arraymock[0]}" -xvvf "$opnemt"
-				done
-			else
-			echo -e "\e[91mNot a directory\e[0m"
-			load_delay
-				case "$homekey" in
-				y|Y)opnr="x";;
-				*)opnr="f";;
-				esac
-			fi
-		     done;;
-	    
-	h|H)opnr="f"
-	    homekey="y";;
-	*)echo -e "\e[91mInvalid Choice\e[0m";;
-	esac
-done
 }
 
 #------------------------------------------------------------------------------------------------
@@ -2083,6 +1850,7 @@ user=$(whoami)
 	echo -e "\e[91msupreme doesn't work for root user\e[0m"
 	else
 	unset homekey
+	opflag=0
 	qbar=1
 	flag=0
 	banner
@@ -2097,12 +1865,9 @@ user=$(whoami)
 		2)opnr="y"
 	          while [ "$opnr" == "y" ]
 		  do
+		  opflag=1
 		  navig /
-			if [ "${#arraymock[@]}" != 0 ]
-			then
-			opnr="e"
-			operations
-			fi
+		  opflag=0
 		  done
 		  load_delay;;
 		3)andcop

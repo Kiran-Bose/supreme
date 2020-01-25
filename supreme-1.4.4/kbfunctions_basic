@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.4.4"
+currentversion="1.5-Beta"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -34,6 +34,254 @@ fcheck=1
 else
 fcheck=0
 fi
+}
+
+#------------------------------------------------------------------------------------------------
+function operations ()
+{
+unset actnkey
+instfmt "Select an option"
+echo -e "(1) \e[32m⏏\e[0m  Open\n(2) \e[92m▶\e[0m  Play\n(3) \e[90m📖\e[0m Copy\n(4) \e[95m📑\e[0m Move\n(5) \e[91m🚮\e[0m Delete\n(6) \e[36m📓\e[0m Rename\n(7) \e[94m➡\e[0m  Send to Device\n(8) \e[92m⬆\e[0m  Upload to Cloud\n(9) \e[92m⤴\e[0m  Move to cloud\n(10) \e[96mℹ\e[0m Properties\e[0m\n(11)\e[91m💼️\e[0m Compress\n(12)\e[36m🗳️\e[0m  Extract\n(b) 🔙️ Back\n(h) \e[93m🏠\e[0m Go Home"
+while [ "$opnr" == "opkey" ]
+do
+read opn11
+	case $opn11 in
+	1)opnr="e"
+	  for opnemt in "${arraymock[@]}"
+	  do
+	  xdg-open "$opnemt" > /dev/null 2>&1
+	  done;;
+	2)opnr="e"
+	  for opnemt in "${arraymock[@]}"
+	  do
+	  smplayer -fullscreen -add-to-playlist "$opnemt"
+	  done;;
+	3)opnr="m"
+	  tempmock=( "${arraymock[@]}" )
+	  while [ "$opnr" == "m" ]
+	  do
+	  opflag=0
+	  navig / "dest"
+		  if [[ -d "${arraymock[0]}" ]]
+		  then
+		  opnr="e"
+			for opnemt in "${tempmock[@]}"
+			do
+			kb_cm -c "$opnemt" "${arraymock[0]}"
+			done
+		  else
+		  echo -e "\e[91mNot a directory\e[0m"
+		  load_delay
+			case "$homekey" in
+			y|Y)opnr="x";;
+			*)case "$navig1" in
+			  p|P)opnr="x";;
+			  *)opnr="e";;
+			  esac
+			esac
+		  fi
+	  opflag=1
+	  done;;
+	4)opnr="m"
+	  tempmock=( "${arraymock[@]}" )
+	  while [ "$opnr" == "m" ]
+	  do
+	  opflag=0
+	  navig / "dest"
+		  if [[ -d "${arraymock[0]}" ]]
+		  then
+		  opnr="e"
+			for opnemt in "${tempmock[@]}"
+			do
+			qbar=0
+			kb_cm -m "$opnemt" "${arraymock[0]}"
+			done
+		  else
+		  echo -e "\e[91mNot a directory\e[0m"
+		  load_delay
+			case "$homekey" in
+			y|Y)opnr="x";;
+			*)case "$navig1" in
+			  p|P)opnr="x";;
+			  *)opnr="e";;
+			  esac
+			esac
+		  fi
+	  opflag=1
+	  done;;
+	5)opnr="e"
+	  instfmt "Are you sure you want to delete the file(s)?(y/n)"
+	  read opn032
+	  if [ "$opn032" == "y" ]
+	  then 
+		for opnemt in "${arraymock[@]}"
+		do
+			if [[ "$opnemt" = *"/$UID/gvfs/mtp"* ]]
+			then 
+			rm -vrf "$opnemt"
+			else
+			sudo rm -vrf "$opnemt"
+			fi
+		done
+	  load_delay
+	  fi;;
+	6)opnr="e"
+	  if [[ "${#arraymock[@]}" != 0 ]]
+          then
+	  instfmt "Select an option | h [Home]"
+      	  echo -e "(1)Auto rename\n(2)Normal rename"
+	  read ren
+		case "$ren" in
+		1)instfmt "Are you sure you want to auto rename ${#arraymock[@]} files?(y/n)"
+		  read renres
+		  case "$renres" in 
+		  y|Y)instfmt "Enter Common name"
+		      read rencom
+		      for ((t=0; t<${#arraymock[@]}; t++))
+		      do
+		      R=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f2- | rev )
+		      number=$(($t+1))
+		      mv "${arraymock[$t]}" "$R"/"$rencom$number"
+		      done;;
+		   esac;;
+		 2)for ((t=0; t<${#arraymock[@]}; t++))
+		   do
+		   Q=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f 1 | rev )
+		   R=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f2- | rev )
+		   instfmt "Current Name: $Q"
+		   instfmt "Enter New Name"
+		   read newname
+		   instfmt "Are you sure you want to rename $Q to $newname?(y/n)"
+		   read opn88
+			if [ "$opn88" == "y" ]
+			then
+			mv "${arraymock[$t]}" "$R"/"$newname"
+			fi
+		   done;;
+		  h|H)opnr="x"
+		      homekey="y";;
+		esac
+	  fi;;
+	7)opnr="m"
+	  while [ "$opnr" == "m" ]
+	  do
+	  banner
+	  quick f
+		  if [ "${#quickarray[@]}" != 0 ]
+		  then
+		  instfmt "Select Device | h [Home]"
+			read opn99
+			v111=$( echo $(numval "$opn99") )
+			if [[ ("$v111" == "p") ]]
+			then
+				if (($opn99<$j)) > /dev/null 2>&1
+			  	then
+				opnr="e"
+					for opnemt in "${arraymock[@]}"
+					do
+					kb_cm -c "$opnemt" "${quickarray[$opn99]}"
+					done
+				else
+				echo -e "\e[91mBad input\e[0m"
+				fi
+			elif [ "$opn99" == "h" ]
+			then
+			opnr="x"
+			homekey="y"
+			fi
+		  else
+		  return
+		  fi
+	  done;;
+	8)opnr="e"
+	  rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
+	  if [[ "$rcver" != "v1.5"* ]]
+	  then
+	  curl https://rclone.org/install.sh | sudo bash
+	  fi
+	  selectcloud "local"
+	  cloudupload;;
+	8)opnr="e"
+	  selectcloud "local"
+	  if [[ -z "$cldopt" ]]
+	  then
+	  return
+	  else
+	  tempmock=( "${arraymock[@]}" )
+	  cloudnavig
+	  cldactn="move"
+	  	if [[ ("$gdn1" == "$cldopt") && ("${#arraymock[@]}" == 0) ]]
+		then
+		rcfeed rmc "" "$gdn1"
+		else
+		rcfeed rmc "" "$gdn1"/"${arraymock[0]}" "" 5 
+		fi
+	  fi;;
+	10)opnr="e"
+	  for opnemt in "${arraymock[@]}"
+	  do
+		for ((i=0; i<$col; i++))
+		do
+		echo -en "_"
+		done
+	  det "$opnemt"
+	  done
+	  load_delay;;
+	11)opnr="m"
+	   instfmt "Enter a name for compressed file | h [Home]"
+	   read opn148
+	   case $opn148 in
+	   h|H)opnr="x"
+	       homekey="y";;
+	   *)tempmock=( "${arraymock[@]}" )
+		     while [ "$opnr" == "m" ]
+	   	     do
+		     opflag=0
+		     navig / "dest"
+		     	if [[ -d "${arraymock[0]}" ]]
+		  	then
+		  	opnr="e"
+			sudo tar -czvvf "${arraymock[0]}"/"$opn148".tar.gz "${tempmock[@]}"
+			else
+			echo -e "\e[91mNot a directory\e[0m"
+			load_delay
+				case "$homekey" in
+				y|Y)opnr="x";;
+				*)opnr="e";;
+				esac
+			fi
+		     opflag=1
+		     done;;
+	    esac;;
+	12)opnr="m"
+	   tempmock=( "${arraymock[@]}" )
+	   	     while [ "$opnr" == "m" ]
+	   	     do
+		     opflag=0
+		     navig / "dest"
+		     	if [[ -d "${arraymock[0]}" ]]
+		  	then
+		  	opnr="e"
+				for opnemt in "${tempmock[@]}"
+				do
+				sudo tar -C "${arraymock[0]}" -xvvf "$opnemt"
+				done
+			else
+			echo -e "\e[91mNot a directory\e[0m"
+			load_delay
+				case "$homekey" in
+				y|Y)opnr="x";;
+				*)opnr="e";;
+				esac
+			fi
+		     opflag=1
+		     done;;
+	b|B)opnr="e";;   
+	h|H)opnr="x"
+	    homekey="y";;
+	*)echo -e "\e[91mInvalid Choice\e[0m";;
+	esac
+done
 }
 
 #------------------------------------------------------------------------------------------------
@@ -163,13 +411,25 @@ arraymock=()
 		    done
 		    actionitems
 		    reconfirm
-		    v11="p";;
+		    v11="p"
+		    	if [[ $opflag -eq 1 ]]
+			then
+		  	optrigger
+			fi;;
 		z|Z)invslct "${arraysrch[@]}"
 		    reconfirm
-		    v11="p";;
+		    v11="p"
+		    	if [[ $opflag -eq 1 ]]
+			then
+		  	optrigger
+			fi;;
 		w|W)rangeslct "${arraysrch[@]}"
 		    reconfirm
-		    v11="p";;
+		    v11="p"
+		    	if [[ $opflag -eq 1 ]]
+			then
+		  	optrigger
+			fi;;
 		n|N)instfmt "Select folder to navigate"
 	    	    read srch71
 	   	    v71=$( echo $(numval "$srch71") )
@@ -195,7 +455,11 @@ arraymock=()
 			if [ "$v11" == "p" ]
 			then
 			actionitems
-			reconfirm	
+			reconfirm
+				if [ $opflag -eq 1 ]
+				then
+			  	optrigger
+				fi	
 			fi;;
 		esac
 	else
@@ -214,6 +478,19 @@ mockres=$(echo "${slctin[@]}" | tr ';' '\n' | sort -nr)
 IFS=$'\n' read -rd '' -a arraymock <<< "$mockres"
 colorfmt "${arraymock[@]}"
 echo -e "\e[91mSelected ${#arraymock[@]} item(s)\e[0m"
+}
+
+#------------------------------------------------------------------------------------------------
+function optrigger ()
+{
+case "$recfm1" in
+y|Y)if [ "${#arraymock[@]}" != 0 ]
+    then
+    opnr="opkey"
+    operations
+    fi;;
+*)opnr="$tempopnr";;
+esac
 }
 
 #------------------------------------------------------------------------------------------------
@@ -284,13 +561,25 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	    done
 	    actionitems
 	    reconfirm
-	    v11="p";;
+	    v11="p"
+		if [[ $opflag -eq 1 ]]
+		then
+	  	optrigger
+		fi;;
 	z|Z)invslct "${temppath[@]}"
 	    reconfirm
-	    v11="p";;
+	    v11="p"
+		if [[ $opflag -eq 1 ]]
+		then
+	  	optrigger
+		fi;;
 	w|W)rangeslct "${temppath[@]}"
 	    reconfirm
-	    v11="p";;
+	    v11="p"
+		if [[ $opflag -eq 1 ]]
+		then
+	  	optrigger
+		fi;;
 	m|M)instfmt "Enter name for new directory"
 	    read navignd
 		mkdir "$navpath"/"$navignd" > /dev/null 2>&1 || sudo mkdir "$navpath"/"$navignd" > /dev/null 2>&1
@@ -304,7 +593,11 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	r|R)srchopt=(0)
 	    temppath=(/)
 	    actionitems
-	    reconfirm;;
+	    reconfirm
+		if [[ $opflag -eq 1 ]]
+		then
+	  	optrigger
+		fi;;
 	q|Q)opnr="f"
 	    while [[ "$opnr" == "f" ]]
 	    do
@@ -336,6 +629,10 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	  IFS=', ' read -r -a srchopt <<< "$navig1"
 	  actionitems
 	  reconfirm
+		if [[ $opflag -eq 1 ]]
+		then
+	  	optrigger
+		fi
 	  fi;;
 	esac
 done
@@ -409,13 +706,25 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	    done
 	    actionitems
 	    reconfirm
-	    v11="p";;
+	    v11="p"
+		if [[ $opflag -eq 1 ]]
+		then
+	  	optrigger
+		fi;;
 	z|Z)invslct "${temppath[@]}"
 	    reconfirm
-	    v11="p";;
+	    v11="p"
+		if [[ $opflag -eq 1 ]]
+		then
+	  	optrigger
+		fi;;
 	w|W)rangeslct "${temppath[@]}"
 	    reconfirm
-	    v11="p";;
+	    v11="p"
+		if [[ $opflag -eq 1 ]]
+		then
+	  	optrigger
+		fi;;
 	m|M)instfmt "Enter name for new directory"
 	    read navignd
 		mkdir "$navpath"/"$navignd" > /dev/null 2>&1 || sudo mkdir "$navpath"/"$navignd" > /dev/null 2>&1
@@ -430,7 +739,11 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	r|R)srchopt=(0)
 	    temppath=(/)
 	    actionitems
-	    reconfirm;;
+	    reconfirm
+		if [[ $opflag -eq 1 ]]
+		then
+	  	optrigger
+		fi;;
 	q|Q)opnr="f"
 	    while [[ "$opnr" == "f" ]]
 	    do
@@ -462,6 +775,10 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	  IFS=', ' read -r -a srchopt <<< "$navig1"
 	  actionitems
 	  reconfirm
+		if [[ $opflag -eq 1 ]]
+		then
+	  	optrigger
+		fi
 	  fi;;
 	esac
 done
