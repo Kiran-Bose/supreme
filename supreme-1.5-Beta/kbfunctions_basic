@@ -41,7 +41,7 @@ function operations ()
 {
 unset actnkey
 instfmt "Select an option"
-echo -e "(1) \e[32m⏏\e[0m  Open\n(2) \e[92m▶\e[0m  Play\n(3) \e[90m📖\e[0m Copy\n(4) \e[95m📑\e[0m Move\n(5) \e[91m🚮\e[0m Delete\n(6) \e[36m📓\e[0m Rename\n(7) \e[94m➡\e[0m  Send to Device\n(8) \e[92m⬆\e[0m  Upload to Cloud\n(9) \e[92m⤴\e[0m  Move to cloud\n(10) \e[96mℹ\e[0m Properties\e[0m\n(11)\e[91m💼️\e[0m Compress\n(12)\e[36m🗳️\e[0m  Extract\n(b) 🔙️ Back\n(h) \e[93m🏠\e[0m Go Home"
+echo -e "(1) \e[32m⏏\e[0m  Open\n(2) \e[90m📖\e[0m Copy\n(3) \e[95m📑\e[0m Move\n(4) \e[91m🚮\e[0m Delete\n(5) \e[36m📓\e[0m Rename\n(6) \e[94m➡\e[0m  Send to Device\n(7) \e[92m⬆\e[0m  Upload to Cloud\n(8) \e[92m⤴\e[0m  Move to cloud\n(9) \e[96mℹ\e[0m  Properties\e[0m\n(10)\e[91m💼️\e[0m Compress\n(11)\e[36m🗳️\e[0m  Extract\n(b) 🔙️ Back\n(h) \e[93m🏠\e[0m Go Home"
 while [ "$opnr" == "opkey" ]
 do
 read opn11
@@ -50,66 +50,64 @@ read opn11
 	  for opnemt in "${arraymock[@]}"
 	  do
 	  xdg-open "$opnemt" > /dev/null 2>&1
-	  done;;
-	2)opnr="e"
-	  for opnemt in "${arraymock[@]}"
+	  done
+	  load_delay;;
+	2)opnr="m"
+	  tempmock=( "${arraymock[@]}" )
+	  while [ "$opnr" == "m" ]
 	  do
-	  smplayer -fullscreen -add-to-playlist "$opnemt"
+	  opflag=0
+	  pnavig / "dest"
+		  if [[ -d "${arraymock[0]}" ]]
+		  then
+		  opnr="e"
+			for opnemt in "${tempmock[@]}"
+			do
+			kbcm -c "$opnemt" "${arraymock[0]}"
+			done
+		  load_delay
+		  else
+			case "$homekey" in
+			y|Y)opnr="x";;
+			*)case "$navig1" in
+			  p|P)opnr="e";;
+			  *)echo -e "\e[91mNot a directory\e[0m"
+			    opnr="m"
+			    load_delay;;
+			  esac
+			esac
+		  fi
+	  opflag=1
 	  done;;
 	3)opnr="m"
 	  tempmock=( "${arraymock[@]}" )
 	  while [ "$opnr" == "m" ]
 	  do
 	  opflag=0
-	  navig / "dest"
-		  if [[ -d "${arraymock[0]}" ]]
-		  then
-		  opnr="e"
-			for opnemt in "${tempmock[@]}"
-			do
-			kb_cm -c "$opnemt" "${arraymock[0]}"
-			done
-		  else
-		  echo -e "\e[91mNot a directory\e[0m"
-		  load_delay
-			case "$homekey" in
-			y|Y)opnr="x";;
-			*)case "$navig1" in
-			  p|P)opnr="x";;
-			  *)opnr="e";;
-			  esac
-			esac
-		  fi
-	  opflag=1
-	  done;;
-	4)opnr="m"
-	  tempmock=( "${arraymock[@]}" )
-	  while [ "$opnr" == "m" ]
-	  do
-	  opflag=0
-	  navig / "dest"
+	  pnavig / "dest"
 		  if [[ -d "${arraymock[0]}" ]]
 		  then
 		  opnr="e"
 			for opnemt in "${tempmock[@]}"
 			do
 			qbar=0
-			kb_cm -m "$opnemt" "${arraymock[0]}"
+			kbcm -m "$opnemt" "${arraymock[0]}"
 			done
-		  else
-		  echo -e "\e[91mNot a directory\e[0m"
 		  load_delay
+		  else
 			case "$homekey" in
 			y|Y)opnr="x";;
 			*)case "$navig1" in
-			  p|P)opnr="x";;
-			  *)opnr="e";;
+			  p|P)opnr="e";;
+			  *)echo -e "\e[91mNot a directory\e[0m"
+			    opnr="m"
+			    load_delay;;
 			  esac
 			esac
 		  fi
 	  opflag=1
 	  done;;
-	5)opnr="e"
+	4)opnr="e"
 	  instfmt "Are you sure you want to delete the file(s)?(y/n)"
 	  read opn032
 	  if [ "$opn032" == "y" ]
@@ -125,7 +123,7 @@ read opn11
 		done
 	  load_delay
 	  fi;;
-	6)opnr="e"
+	5)opnr="e"
 	  if [[ "${#arraymock[@]}" != 0 ]]
           then
 	  instfmt "Select an option | h [Home]"
@@ -162,7 +160,7 @@ read opn11
 		      homekey="y";;
 		esac
 	  fi;;
-	7)opnr="m"
+	6)opnr="m"
 	  while [ "$opnr" == "m" ]
 	  do
 	  banner
@@ -179,8 +177,9 @@ read opn11
 				opnr="e"
 					for opnemt in "${arraymock[@]}"
 					do
-					kb_cm -c "$opnemt" "${quickarray[$opn99]}"
+					kbcm -c "$opnemt" "${quickarray[$opn99]}"
 					done
+				load_delay
 				else
 				echo -e "\e[91mBad input\e[0m"
 				fi
@@ -193,18 +192,19 @@ read opn11
 		  return
 		  fi
 	  done;;
-	8)opnr="e"
-	  rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
+	7)rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
 	  if [[ "$rcver" != "v1.5"* ]]
 	  then
 	  curl https://rclone.org/install.sh | sudo bash
 	  fi
 	  selectcloud "local"
-	  cloudupload;;
-	8)opnr="e"
-	  selectcloud "local"
+	  cloudupload
+	  load_delay
+	  opnr="e";;
+	8)selectcloud "local"
 	  if [[ -z "$cldopt" ]]
 	  then
+	  opnr="e"
 	  return
 	  else
 	  tempmock=( "${arraymock[@]}" )
@@ -216,8 +216,10 @@ read opn11
 		else
 		rcfeed rmc "" "$gdn1"/"${arraymock[0]}" "" 5 
 		fi
+	  load_delay
+	  opnr="e"
 	  fi;;
-	10)opnr="e"
+	9)opnr="e"
 	  for opnemt in "${arraymock[@]}"
 	  do
 		for ((i=0; i<$col; i++))
@@ -227,7 +229,7 @@ read opn11
 	  det "$opnemt"
 	  done
 	  load_delay;;
-	11)opnr="m"
+	10)opnr="m"
 	   instfmt "Enter a name for compressed file | h [Home]"
 	   read opn148
 	   case $opn148 in
@@ -237,28 +239,32 @@ read opn11
 		     while [ "$opnr" == "m" ]
 	   	     do
 		     opflag=0
-		     navig / "dest"
+		     pnavig / "dest"
 		     	if [[ -d "${arraymock[0]}" ]]
 		  	then
 		  	opnr="e"
 			sudo tar -czvvf "${arraymock[0]}"/"$opn148".tar.gz "${tempmock[@]}"
-			else
-			echo -e "\e[91mNot a directory\e[0m"
 			load_delay
+			else
 				case "$homekey" in
 				y|Y)opnr="x";;
-				*)opnr="e";;
+				*)case "$navig1" in
+			  	  p|P)opnr="e";;
+			  	  *)echo -e "\e[91mNot a directory\e[0m"
+			    	    opnr="m"
+			    	   load_delay;;
+			  	  esac
 				esac
 			fi
 		     opflag=1
 		     done;;
 	    esac;;
-	12)opnr="m"
+	11)opnr="m"
 	   tempmock=( "${arraymock[@]}" )
 	   	     while [ "$opnr" == "m" ]
 	   	     do
 		     opflag=0
-		     navig / "dest"
+		     pnavig / "dest"
 		     	if [[ -d "${arraymock[0]}" ]]
 		  	then
 		  	opnr="e"
@@ -266,12 +272,16 @@ read opn11
 				do
 				sudo tar -C "${arraymock[0]}" -xvvf "$opnemt"
 				done
-			else
-			echo -e "\e[91mNot a directory\e[0m"
 			load_delay
+			else
 				case "$homekey" in
 				y|Y)opnr="x";;
-				*)opnr="e";;
+				*)case "$navig1" in
+			  	  p|P)opnr="e";;
+			  	  *)echo -e "\e[91mNot a directory\e[0m"
+			    	    opnr="m"
+			    	   load_delay;;
+			  	  esac
 				esac
 			fi
 		     opflag=1

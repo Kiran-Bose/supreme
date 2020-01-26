@@ -163,7 +163,9 @@ usb_check
 						load_delay
 						fi
 					    done;;
-					4)config_sync "usb";;
+					4)config_sync "usb"
+					  opnr="y"
+					  load_delay;;
 					5)opnr="h"
 					  while [[ "$opnr" == "h" ]]
 					  do
@@ -175,9 +177,10 @@ usb_check
 						  echo -e "\e[91mWarning: This is irreversible and will erase everything\e[0m"
 						  read uc24
 							  case "$uc24" in
-							  y|Y)opnr="x"
+							  y|Y)opnr="y"
 							      sudo umount "$fsys"
-							      sudo dd bs=4M if="${arraymock[0]}" of="$fsys" conv=fdatasync  status=progress;;
+							      sudo dd bs=4M if="${arraymock[0]}" of="$fsys" conv=fdatasync  status=progress
+							      load_delay;;
 							  *)opnr="y";;
 							  esac
 						  fi
@@ -712,7 +715,9 @@ path=( "${access[0]}"/* )
 						load_delay
 						fi
 					    done;;
-					3)config_sync "phone";;
+					3)config_sync "phone"
+					  opnr="y"
+					  load_delay;;
 					p|P)opnr="g";;
 					h|H)opnr="x"
 				    	    homekey="y";;
@@ -918,8 +923,157 @@ esac
 }
 
 #------------------------------------------------------------------------------------------------
+function cloud_case ()
+{
+case "$srch1" in
+h|H)oprpt="x";;
+esac
+case "$navig1" in
+h|H)oprpt="x";;
+esac
+case "$opn1" in
+h|H)oprpt="x";;
+p|P)oprpt="g";;
+esac
+case "$range1" in
+h|H)oprpt="x";;
+esac
+case "$srch27" in
+h|H)oprpt="x";;
+esac
+case "$gdn2" in
+p|P)unset gdn1
+selectcloud;;
+esac
+}
+
+#------------------------------------------------------------------------------------------------
+function cloud_operations ()
+{
+case "$1" in
+DOWNLOAD)if [ "${#arraymock[@]}" != 0 ]
+	 then
+	 tempsortfile=( "${sortfile[@]}" )
+  	 tempsortdir=( "${sortdir[@]}" )
+  	 pnavig / "dest"
+	 cloud_case
+		 if [ "${#arraymock[@]}" != 0 ]
+		 then
+			if [ "$gdn1" == "$cldopt" ]
+			then
+			rcfeed copy $cldopt "${arraymock[0]}" "" 5
+			else
+			rcfeed copy "$gdn1" "${arraymock[0]}" 4 5
+			fi
+		 load_delay
+		 fi
+  	 fi;;
+DELETE)if [ "${#arraymock[@]}" != 0 ]
+       then
+       instfmt "Are you sure you want to delete the selected files from $gdn1?(y/n)"
+       read gdit63
+		case "$gdit63" in
+		y|Y)if [ "$gdn1" == "$cldopt" ]
+		    then
+		    rcfeed delete $cldopt
+		    else
+		    rcfeed delete "$gdn1" "" 4
+		    fi
+		    load_delay;;
+		esac
+  	fi;;
+COPY|MOVE)tempsortdir=( "${sortdir[@]}" )
+	  tempsortfile=( "${sortfile[@]}" )
+	  gdntemp="$gdn1"
+	  cldtemp="$cldopt"
+	  if [[ ("${#tempsortdir[@]}" == 0) && ("${#tempsortfile[@]}" == 0) ]]
+	  then
+	  return
+	  else
+	  instfmt "Select Destination"
+	  echo -e "(1)cloud\n(2)local"
+	  read gdit55
+		case $gdit55 in
+		1)selectcloud
+		  cloudnavig;;
+		2)pnavig /
+		  cloud_case;;
+		*)return;;
+		esac
+		if [[ "$homekey" == "y" ]] || [[ -z "$cldopt" ]]
+		then
+		cloud_case
+		return
+		else
+			case $1 in
+			MOVE)cldactn="move";;
+			COPY)cldactn="copy";;
+			*)return;;
+			esac
+			case "$gdit55" in
+			2)if [ "$gdn1" == "$cldopt" ]
+			  then
+				if [ "${#arraymock[@]}" == 0 ]
+				then
+				echo -e "\e[91mNo destination directory selected\e[0m"
+				load_delay
+				else
+				rcfeed $cldactn "$gdn1" "${arraymock[0]}" "" 5
+				load_delay
+				fi
+			  else
+				if [ "${#arraymock[@]}" == 0 ]
+				then
+				echo -e "\e[91mNo destination directory selected\e[0m"
+				load_delay
+				else
+				rcfeed $cldactn "$gdn1" "${arraymock[0]}" 4 5
+				load_delay
+				fi
+			  fi;;
+			1)if [[ ("$gdn1" == "$cldopt") && ("$gdntemp" == "$cldtemp") ]]
+			  then
+			  instfmt "Source:$gdntemp --> Destination:$gdn1${arraymock[0]}"
+				if [ "${#arraymock[@]}" == 0 ]
+				then
+				rcfeed $cldactn "$gdntemp" "$gdn1"
+				load_delay
+				else
+				rcfeed $cldactn "$gdntemp" "$gdn1""${arraymock[0]}" "" 5
+				load_delay
+				fi
+			  elif [[ ("$gdn1" != "$cldopt") && ("$gdntemp" == "$cldtemp") ]]
+			  then
+			  instfmt "Source:$gdntemp --> Destination:$gdn1/${arraymock[0]}"
+			  rcfeed $cldactn "$gdntemp" "$gdn1"/"${arraymock[0]}" "" 5
+			  load_delay
+			  elif [[ ("$gdn1" == "$cldopt") && ("$gdntemp" != "$cldtemp") ]]
+			  then
+			  instfmt "Source:$gdntemp --> Destination:$gdn1${arraymock[0]}"
+				if [ "${#arraymock[@]}" == 0 ]
+				then
+				rcfeed $cldactn "$gdntemp" "$gdn1" 4
+				load_delay
+				else
+				rcfeed $cldactn "$gdntemp" "$gdn1""${arraymock[0]}" 4 5 
+				load_delay
+				fi
+			  elif [[ ("$gdn1" != "$cldopt") && ("$gdntemp" != "$cldtemp") ]]
+			  then
+			  instfmt "Source:$gdntemp --> Destination:$gdn1/${arraymock[0]}"
+			  rcfeed $cldactn "$gdntemp" "$gdn1"/"${arraymock[0]}" 4 5
+			  load_delay
+			  fi;;
+			esac
+		fi
+	  fi;;	
+esac
+}
+
+#------------------------------------------------------------------------------------------------
 function cloudit ()
 {
+unset gdn1
 opnr="g"
 while [[ "$opnr" == "g" ]]
 do
@@ -935,30 +1089,13 @@ instfmt "Rclone-SUpreme Bridge"
 	echo -e "(1)Cloud File Explorer\n(2)Sync\n(3)Configure Sync\n(4)Configure Cloud"
 	read cldit
 		case "$cldit" in
-		1)selectcloud
+		1)unset gdn1
+		  selectcloud
 		  oprpt="g"
 		  while [[ "$oprpt" == "g" ]] && [[ ! -z "$cldopt" ]]
 		  do
-		  cloudnavig
-			  case "$srch1" in
-			  h|H)oprpt="x";;
-			  esac
-			  case "$navig1" in
-			  h|H)oprpt="x";;
-			  esac
-			  case "$opn1" in
-			  h|H)oprpt="x";;
-			  p|P)oprpt="g";;
-			  esac
-			  case "$range1" in
-			  h|H)oprpt="x";;
-	    		  esac
-			  case "$srch27" in
-		          h|H)oprpt="x";;
-	    		  esac
-			  case "$gdn2" in
-			  p|P)selectcloud;;
-			  esac
+		  cloudnavig "$gdn1"
+		  cloud_case	  
 			  if [ "${#arraymock[@]}" != 0 ]
 			  then
 			  instfmt "Select an option"
@@ -998,17 +1135,17 @@ instfmt "Rclone-SUpreme Bridge"
 						*)oprpt="g"
 						  sudo rm -rf /home/"$user"/Supremetemp/*;;
 						esac;;
-					2)oprpt="n"
-					  gdit1="DOWNLOAD";;
-					3)oprpt="n"
-					  gdit1="COPY";;
-					4)oprpt="n"
-					  gdit1="MOVE";;
-					5)oprpt="n"
-					  gdit1="DELETE";;
-					h|H)oprpt="n"
+					2)oprpt="g"
+					  cloud_operations "DOWNLOAD";;
+					3)oprpt="g"
+					  cloud_operations "COPY";;
+					4)oprpt="g"
+					  cloud_operations "MOVE";;
+					5)oprpt="g"
+					  cloud_operations "DELETE";;
+					h|H)oprpt="g"
 					    homekey="y";;
-					*)oprpt="n"
+					*)oprpt="g"
 					  echo -e "\e[91mBad input\e[0m";;
 					esac
 				done
@@ -1050,7 +1187,7 @@ instfmt "Rclone-SUpreme Bridge"
 				    do
 				    	if(($emt11<${#genlist[@]})) > /dev/null 2>&1
 					then
-					opnr="x"
+					opnr="g"
 					tempdir=$( echo "${genlist[$emt11]}" | rev | cut -d '/' -f 1 | rev )
 					testdf=($(rclone ls "${genlist[$emt11]}" | awk '{print $2}'))
 						if [[ "${testdf[0]}" == "$tempdir" ]] || [[ -f "${genlist[$emt11]}" ]]
@@ -1058,11 +1195,12 @@ instfmt "Rclone-SUpreme Bridge"
 						rclone copy "${genlist[$emt11]}" "${templist[$emt11]}" -Pv
 						else
 						rclone copy "${genlist[$emt11]}" "${templist[$emt11]}/$tempdir" -Pv
-						fi 
+						fi
 					fi
-				    done;;
+				    done
+				 load_delay;;
 				*)case $ac6 in
-				  a|A)opnr="x"
+				  a|A)opnr="g"
 					  for ((i=0; i<${#genlist[@]}; i++))
 					  do
 					  tempdir=$( echo "${genlist[$i]}" | rev | cut -d '/' -f 1 | rev )
@@ -1074,7 +1212,7 @@ instfmt "Rclone-SUpreme Bridge"
 						  rclone copy "${genlist[$i]}" "${templist[$i]}/$tempdir" -Pv
 						  fi 
 					  done
-				      return;;
+				     load_delay;;
 				  p|P)opnr="g";;
 				  h|H)opnr="x"
 				      homekey="y";;
@@ -1082,131 +1220,32 @@ instfmt "Rclone-SUpreme Bridge"
 				esac
 			    fi
 			else
-			opnr="x"
+			opnr="g"
 			echo -e "\e[91mSync folder(s) not configured\e[0m"
+			load_delay
 			fi
 		  else
-		  opnr="x"
+		  opnr="g"
 		  echo -e "\e[91mSync folder(s) not configured\e[0m"
+		  load_delay
 		  fi
 		  done;;
 		3)config_sync "cloud"
-		  case "$cps1" in
-		  p|P)opnr="g";;
-		  esac;;
-		4)opnr="x"
+		  opnr="g"
+		  load_delay;;
+		4)opnr="g"
 		  checkInternet || return
-		  rclone config;;
+		  rclone config
+		  load_delay;;
 		h|H)opnr="x"
 		    homekey="y";;	
 		esac 
-		case "$gdit1" in
-		DOWNLOAD)if [ "${#arraymock[@]}" != 0 ]
-			 then
-			 tempsortfile=( "${sortfile[@]}" )
-		  	 tempsortdir=( "${sortdir[@]}" )
-		  	 navig / "dest"
-				 if [ "${#arraymock[@]}" != 0 ]
-				 then
-					if [ "$gdn1" == "$cldopt" ]
-					then
-					rcfeed copy $cldopt "${arraymock[0]}" "" 5
-					else
-					rcfeed copy "$gdn1" "${arraymock[0]}" 4 5
-					fi
-				 fi
-		  	 fi;;
-		DELETE)if [ "${#arraymock[@]}" != 0 ]
-		       then
-		       instfmt "Are you sure you want to delete the selected files from $gdn1?(y/n)"
-		       read gdit63
-				case "$gdit63" in
-				y|Y)if [ "$gdn1" == "$cldopt" ]
-				    then
-				    rcfeed delete $cldopt
-				    else
-				    rcfeed delete "$gdn1" "" 4
-				    fi;;
-				esac
-		  	fi;;
-		COPY|MOVE)tempsortdir=( "${sortdir[@]}" )
-			  tempsortfile=( "${sortfile[@]}" )
-			  gdntemp="$gdn1"
-			  cldtemp="$cldopt"
-			  if [[ ("${#tempsortdir[@]}" == 0) && ("${#tempsortfile[@]}" == 0) ]]
-			  then
-			  return
-			  else
-			  instfmt "Select Destination"
-			  echo -e "(1)cloud\n(2)local"
-			  read gdit55
-				case $gdit55 in
-				1)selectcloud
-				  cloudnavig;;
-				2)navig /;;
-				*)return;;
-				esac
-				if [[ "$homekey" == "y" ]] || [[ -z "$cldopt" ]]
-				then
-				return
-				else
-					case $gdit1 in
-					MOVE)cldactn="move";;
-					COPY)cldactn="copy";;
-					*)return;;
-					esac
-					case "$gdit55" in
-					2)if [ "$gdn1" == "$cldopt" ]
-					  then
-						if [ "${#arraymock[@]}" == 0 ]
-						then
-						echo -e "\e[91mNo destination directory selected\e[0m"
-						else
-						rcfeed $cldactn "$gdn1" "${arraymock[0]}" "" 5
-						fi
-					  else
-						if [ "${#arraymock[@]}" == 0 ]
-						then
-						echo -e "\e[91mNo destination directory selected\e[0m"
-						else
-						rcfeed $cldactn "$gdn1" "${arraymock[0]}" 4 5
-						fi
-					  fi;;
-					1)if [[ ("$gdn1" == "$cldopt") && ("$gdntemp" == "$cldtemp") ]]
-					  then
-					  instfmt "Source:$gdntemp --> Destination:$gdn1${arraymock[0]}"
-						if [ "${#arraymock[@]}" == 0 ]
-						then
-						rcfeed $cldactn "$gdntemp" "$gdn1"
-						else
-						rcfeed $cldactn "$gdntemp" "$gdn1""${arraymock[0]}" "" 5
-						fi
-					  elif [[ ("$gdn1" != "$cldopt") && ("$gdntemp" == "$cldtemp") ]]
-					  then
-					  instfmt "Source:$gdntemp --> Destination:$gdn1/${arraymock[0]}"
-					  rcfeed $cldactn "$gdntemp" "$gdn1"/"${arraymock[0]}" "" 5
-					  elif [[ ("$gdn1" == "$cldopt") && ("$gdntemp" != "$cldtemp") ]]
-					  then
-					  instfmt "Source:$gdntemp --> Destination:$gdn1${arraymock[0]}"
-						if [ "${#arraymock[@]}" == 0 ]
-						then
-						rcfeed $cldactn "$gdntemp" "$gdn1" 4
-						else
-						rcfeed $cldactn "$gdntemp" "$gdn1""${arraymock[0]}" 4 5 
-						fi
-					  elif [[ ("$gdn1" != "$cldopt") && ("$gdntemp" != "$cldtemp") ]]
-					  then
-					  instfmt "Source:$gdntemp --> Destination:$gdn1/${arraymock[0]}"
-					  rcfeed $cldactn "$gdntemp" "$gdn1"/"${arraymock[0]}" 4 5
-					  fi;;
-					esac
-				fi
-			  fi;;	
-		esac
+		
 	sudo rm -rf /home/"$user"/Supremetemp/*
 	unset gdit1
 	else
 	echo -e "\e[91mCloud Storage not configured\e[0m"
+	load_delay
 	fi
 done
 }
@@ -1421,12 +1460,13 @@ read appvar
 		case "$v808" in
 		p)if(($opn209<$a)) > /dev/null 2>&1
 		  then
-		  opnr="e"
 			   if command -v ${executionlist[$opn209]} &>/dev/null; then
 			   ${executionlist[$opn209]}
 			   else
 		  	   echo -e "\e[91m${appnamelist[$opn209]} [${executionlist[$opn209]}] not installed\e[0m"
 		  	   fi
+		   opnr="y"
+		   load_delay
 		   fi;;
 		*)case "$opn209" in
 		  h|H)opnr="e"
@@ -1435,7 +1475,9 @@ read appvar
 		  esac;;
 		esac
 	  done;;
-	2)config_applist;;
+	2)config_applist
+	  opnr="y"
+	  load_delay;;
 	h|H)opnr="e"
 	    homekey="y";;
 	esac
@@ -1463,12 +1505,14 @@ then
 		done
         	read csopt
 	else
-	opnr="x"
+	opnr="g"
 	echo -e "\e[91mNo script added\e[0m"
+	load_delay
 	fi
 else
-opnr="x"
+opnr="g"
 echo -e "\e[91mNo script added\e[0m"
+load_delay
 fi
 }
 
@@ -1483,19 +1527,20 @@ instfmt "Select an option | h [Home]"
 echo -e "(1)Add script\n(2)Remove script(s)\n(3)Modify script\n(4)Execute script\n(5)Run Commands"
 read cs1
 	case "$cs1" in
-	1)opnr="x"
-	  if [[ -d /home/"$user"/.supreme_cs ]]
+	1)if [[ -d /home/"$user"/.supreme_cs ]]
 	  then
 	  instfmt "Enter file name"
 	  read csfn
 	  sudo touch /home/"$user"/.supreme_cs/"$csfn"
 	  sudo xdg-open /home/"$user"/.supreme_cs/"$csfn"
+	  load_delay
 	  else
 	  sudo mkdir /home/"$user"/.supreme_cs
 	  instfmt "Enter file name"
 	  read csfn
 	  sudo touch /home/"$user"/.supreme_cs/"$csfn"
 	  sudo xdg-open /home/"$user"/.supreme_cs/"$csfn"
+	  load_delay
 	  fi;;
 	2)opnr="f"
 	  while [[ "$opnr" == "f" ]]
@@ -1506,7 +1551,7 @@ read cs1
 	  IFS=', ' read -r -a srchopt <<< "$csopt"
 	  if [[ "$v180" == "p" ]]
 	  then
-	  opnr="x"
+	  opnr="g"
 	  actionitems
 		  if [[ "${#arraymock[@]}" != 0 ]]
 		  then
@@ -1516,8 +1561,9 @@ read cs1
 			  y|Y)for csemt in "${arraymock[@]}"
 			      do
 			      sudo rm -vrf "$csemt"
-			      done;;
-			  *)return;;
+			      done
+			      load_delay;;
+			  *)opnr="g";;
 			  esac
 		   fi
 	   else
@@ -1539,6 +1585,8 @@ read cs1
 	  	if (("$csopt"<$i)) > /dev/null 2>&1
 		then
 	  	sudo xdg-open "${genlist[$csopt]}"
+		load_delay
+		opnr="g"
 		fi
 	  else
 	   	case "$csopt" in
@@ -1571,12 +1619,13 @@ read cs1
 				    h|H)csrpt="n"
 				        opnr="x"
 				        homekey="y";;
-				    *)opnr="x"
+				    *)opnr="g"
 				      $cscmd
 				      instfmt "Do you want to continue executing your script?(y/n)"
 				      read csrpt;;
 				    esac;;
-				*)csrpt="n";;
+				*)opnr="g"
+				  csrpt="n";;
 				esac
 			else
 			csrpt="n"
@@ -1602,7 +1651,8 @@ read cs1
 		      opnr="g";;
 		  h|H)opnr="x"
 		      csrpt="n";;
-		  *)$cs11
+		  *)opnr="g"
+		    $cs11
 		    instfmt "Do you want to continue with other commands?(y/n)"
 		    read csrpt;;
 		  esac
@@ -1630,8 +1680,12 @@ read cqa
 	case $cqa in
 	1)pnavig /
 	  case "${#arraymock[@]}" in
-	  0)opnr="x";;
-	  *)opnr="x"
+	  0)case $navig1 in
+	    h|H)opnr="x"
+	      homekey="y";;
+	    *)opnr="g";;
+	    esac;;
+	  *)opnr="g"
 	    lc=0
 	    for emt in "${arraymock[@]}"
 	    do
@@ -1653,14 +1707,16 @@ read cqa
 	    echo -n > /home/"$user"/.supreme_qaconfig.txt 
 	    fi
 	    case "${#genlist[@]}" in
-	    0)echo -e "\e[91mNo folder selected\e[0m";;
+	    0)echo -e "\e[91mNo folder selected\e[0m"
+	      load_delay;;
 	    *)IFS=$SAVEIFS
 	      colorfmt "${templist[@]}"
 	      echo -e "\e[92mAdded $lc folder(s) to list\e[0m"
 	      for emt in "${genlist[@]}"
 	      do
 	      echo "$emt" >> /home/"$user"/.supreme_qaconfig.txt
-	      done;;
+	      done
+	      load_delay;;
 	    esac
 	  esac;;
 	2)opnr="h"
@@ -1669,7 +1725,7 @@ read cqa
 	  banner
 	  genlist=()
 	  arraymock=()
-	  wc -l /home/"$user"/.supreme_qaconfig.txt > /dev/null 2>&1 || { echo -e "\e[91mNo folder added\e[0m"; return; }
+	  wc -l /home/"$user"/.supreme_qaconfig.txt > /dev/null 2>&1 || { echo -e "\e[91mNo folder added\e[0m"; opnr="g"; load_delay; }
 	  linecount=$( wc -l /home/"$user"/.supreme_qaconfig.txt | cut -d ' ' -f1 )
 		  if [[ -f /home/"$user"/.supreme_qaconfig.txt ]] && [[ "$linecount" != 0 ]]
 		  then
@@ -1701,13 +1757,14 @@ read cqa
 			  instfmt "Do you want to remove selected folder(s) from list?(y/n)"
 			  read cqa2
 		     	  	case "$cqa2" in
-				y|Y)opnr="x"
+				y|Y)opnr="g"
 		   		    SAVEIFS=$IFS
 				    IFS=$(echo -en "\n\b")
 				    genlist=( $(printf "%s\n" "${genlist[@]}" "${arraymock[@]}" | sort | uniq -u) )
 				    IFS=$SAVEIFS
-				    echo -e "\e[92m✔️ Done\e[0m";;
-				*)return;;
+				    echo -e "\e[92m✔️ Done\e[0m"
+				    load_delay;;
+				*)opnr="h";;
 				esac
 			  fi
 		  echo -n > /home/"$user"/.supreme_qaconfig.txt
@@ -1716,8 +1773,9 @@ read cqa
 			  echo "$emt" >> /home/"$user"/.supreme_qaconfig.txt
 			  done
 		  else
-		  opnr="x"
+		  opnr="g"
 		  echo -e "\e[91mNo folder added\e[0m"
+		  load_delay
 		  fi
 	  done;;
 	p|P)opnr="g";;
@@ -1742,7 +1800,7 @@ read thm
 	chmod 666 /home/"$user"/.supremetheme.txt
 	fi
 	case "$thm" in
-	1)opnr="x"
+	1)opnr="g"
 	  echo -n > /home/"$user"/.supremetheme.txt
 	  echo pri=\""\e[44m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo sec=\""\e[46m \e[0m"\" >> /home/"$user"/.supremetheme.txt
@@ -1754,8 +1812,9 @@ read thm
 	  echo cfmtp1fill=\""\e[44m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo cfmtp2fill=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo ifmt=\""\e[44;37;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmtfill=\""\e[44m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
-	2)opnr="x"
+	  echo ifmtfill=\""\e[44m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  load_delay;;
+	2)opnr="g"
 	  echo -n > /home/"$user"/.supremetheme.txt
 	  echo pri=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo sec=\""\e[47m \e[0m"\" >> /home/"$user"/.supremetheme.txt
@@ -1767,8 +1826,9 @@ read thm
 	  echo cfmtp1fill=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo cfmtp2fill=\""\e[104m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo ifmt=\""\e[107;90;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmtfill=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
-	3)opnr="x"
+	  echo ifmtfill=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  load_delay;;
+	3)opnr="g"
 	  echo -n > /home/"$user"/.supremetheme.txt
 	  echo pri=\""\e[103m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo sec=\""\e[43m \e[0m"\" >> /home/"$user"/.supremetheme.txt
@@ -1780,8 +1840,9 @@ read thm
 	  echo cfmtp1fill=\""\e[43m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo cfmtp2fill=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo ifmt=\""\e[103;30;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmtfill=\""\e[103m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
-	4)opnr="x"
+	  echo ifmtfill=\""\e[103m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  load_delay;;
+	4)opnr="g"
 	  echo -n > /home/"$user"/.supremetheme.txt
 	  echo pri=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo sec=\""\e[102m \e[0m"\" >> /home/"$user"/.supremetheme.txt
@@ -1793,8 +1854,9 @@ read thm
 	  echo cfmtp1fill=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo cfmtp2fill=\""\e[107m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo ifmt=\""\e[42;97;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmtfill=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
-	5)opnr="x"
+	  echo ifmtfill=\""\e[42m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  load_delay;;
+	5)opnr="g"
 	  echo -n > /home/"$user"/.supremetheme.txt
 	  echo pri=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo sec=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt
@@ -1806,9 +1868,11 @@ read thm
 	  echo cfmtp1fill=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo cfmtp2fill=\""\e[40m \e[0m"\" >> /home/"$user"/.supremetheme.txt
 	  echo ifmt=\""\e[100;36;1;82m"\" >> /home/"$user"/.supremetheme.txt
-	  echo ifmtfill=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt;;
-	6)opnr="x"
-	  sudo rm -f /home/"$user"/.supremetheme.txt;;
+	  echo ifmtfill=\""\e[100m \e[0m"\" >> /home/"$user"/.supremetheme.txt
+	  load_delay;;
+	6)opnr="g"
+	  sudo rm -f /home/"$user"/.supremetheme.txt
+	  load_delay;;
 	p|P)opnr="g";;
 	h|H)opnr="x"
 	    homekey="y";;
@@ -1860,8 +1924,7 @@ user=$(whoami)
 	read opn2
 		case "$opn2" in
 		1)banner
-		  manage_apps
-		  load_delay;;
+		  manage_apps;;
 		2)opnr="y"
 	          while [ "$opnr" == "y" ]
 		  do
@@ -1870,10 +1933,8 @@ user=$(whoami)
 		  opflag=0
 		  done
 		  load_delay;;
-		3)andcop
-		  load_delay;;
-		4)usbcop
-		  load_delay;;
+		3)andcop;;
+		4)usbcop;;
 		5)banner
 		  cloudconfig
 		  rcver=$( rclone -V | sed -n 1p | cut -d ' ' -f2 )
@@ -1888,8 +1949,7 @@ user=$(whoami)
 		  load_delay;;
 		6)custom_scripts
 		  load_delay;;
-		p|P)preferences
-		    load_delay;;
+		p|P)preferences;;
 		x|X)again="n"
 		    instfmt "To report bug: mail to kiran.vkvr@gmail.com or visit https://github.com/Kiran-Bose/supreme"
 		    exec bash
