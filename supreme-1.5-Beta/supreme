@@ -68,26 +68,29 @@ usb_check
 						      1)opnr="x"
 							sudo umount "$fsys"
 							sudo mkfs.fat -n "${vendorname[$uc55]}" -I "$fsys"
-							instfmt "Please unplug and plug back device";;
+							instfmt "Please unplug and plug back device"
+							load_delay;;
 						      2)opnr="x"
 							sudo umount "$fsys"
 							sudo mkfs.vfat -n "${vendorname[$uc55]}" -I "$fsys"
-							instfmt "Please unplug and plug back device";;
+							instfmt "Please unplug and plug back device"
+							load_delay;;
 						      3)opnr="x"
 							sudo umount "$fsys"
 							sudo mkfs.ntfs -n "${vendorname[$uc55]}" -I "$fsys"
-							instfmt "Please unplug and plug back device";;
+							instfmt "Please unplug and plug back device"
+							load_delay;;
 						      4)opnr="x"
 							sudo umount "$fsys"
 							sudo mkfs.ext4 -n "${vendorname[$uc55]}" -I "$fsys"
-							instfmt "Please unplug and plug back device";;
+							instfmt "Please unplug and plug back device"
+							load_delay;;
 						      p|P)opnr="y";;
 						      h|H)opnr="x"
 							  homekey="y";;
 						      esac
 					      done;;
-					  *)opnr="x"
-					    return;;
+					  *)opnr="y";;
 					  esac;;
 					3)opnr="h"
 					  while [[ "$opnr" == "h" ]]
@@ -164,8 +167,15 @@ usb_check
 						fi
 					    done;;
 					4)config_sync "usb"
-					  opnr="y"
-					  load_delay;;
+					  case $homekey in
+					  y|Y)opnr="x";;
+					  *)opnr="y"
+					    case $cps1 in
+					    p|P)unset cps1;;
+					    *)load_delay
+					      unset cps1;;
+					    esac;;
+					  esac;;
 					5)opnr="h"
 					  while [[ "$opnr" == "h" ]]
 					  do
@@ -177,7 +187,7 @@ usb_check
 						  echo -e "\e[91mWarning: This is irreversible and will erase everything\e[0m"
 						  read uc24
 							  case "$uc24" in
-							  y|Y)opnr="y"
+							  y|Y)opnr="x"
 							      sudo umount "$fsys"
 							      sudo dd bs=4M if="${arraymock[0]}" of="$fsys" conv=fdatasync  status=progress
 							      load_delay;;
@@ -203,6 +213,7 @@ usb_check
 		fi
 	else
 	echo -e "\e[91mNo USB Device Found\e[0m"
+	load_delay
 	return
 	fi
 done
@@ -259,6 +270,7 @@ fi
 #------------------------------------------------------------------------------------------------
 function sync_rem ()
 {
+unset homekey
 if [[ -f /home/"$user"/"$1" ]]
 then
 wc -l /home/"$user"/"$1" > /dev/null 2>&1 || { echo -e "\e[91mNo sync configuration found\e[0m"; return; }
@@ -336,6 +348,7 @@ fi
 #------------------------------------------------------------------------------------------------
 function config_sync ()
 {
+unset homekey
 opnr="e"
 while [[ "$opnr" == "e" ]]
 do
@@ -716,8 +729,15 @@ path=( "${access[0]}"/* )
 						fi
 					    done;;
 					3)config_sync "phone"
-					  opnr="y"
-					  load_delay;;
+					  case $homekey in
+					  y|Y)opnr="x";;
+					  *)opnr="y"
+					    case $cps1 in
+					    p|P)unset cps1;;
+					    *)load_delay
+					      unset cps1;;
+					    esac;;
+					  esac;;
 					p|P)opnr="g";;
 					h|H)opnr="x"
 				    	    homekey="y";;
@@ -1231,8 +1251,15 @@ instfmt "Rclone-SUpreme Bridge"
 		  fi
 		  done;;
 		3)config_sync "cloud"
-		  opnr="g"
-		  load_delay;;
+		  case $homekey in
+		  y|Y)opnr="x";;
+		  *)opnr="g"
+		    case $cps1 in
+		    p|P)unset cps1;;
+		    *)load_delay
+		      unset cps1;;
+		    esac;;
+		  esac;;
 		4)opnr="g"
 		  checkInternet || return
 		  rclone config
@@ -1279,7 +1306,6 @@ echo -e "(1)Add app(s) to list\n(2)Remove app(s) from list"
 read cal1
 	case $cal1 in
 	1)addnew="y"
-	  opnr="x"
 	  while [[ "$addnew" == "y" ]]
 	  do
 	  banner
@@ -1290,14 +1316,16 @@ read cal1
 		case "$cal2" in
 		p|P)opnr="e"
 		    addnew="n";;
-		h|H)addnew="n"
+		h|H)opnr="x"
+		    addnew="n"
 		    homekey="y";;
 		*)instfmt "Enter display name for app | p [Previous Menu] | h [Home]"
 	          read cal3
 		  case "$cal3" in
 		  p|P)opnr="e"
 		      addnew="n";;
-		  h|H)addnew="n"
+		  h|H)opnr="x"
+		      addnew="n"
 		      homekey="y";;
 		  *)if [[ -z $cal3 ]] || [[ "$cal3" == "" ]]; then
 		    cal3=$cal2
@@ -1316,6 +1344,8 @@ read cal1
 			if [[ "$emt" == "#+-$cal3" ]]
 			then
 			echo -e "\e[91mApp with display name $cal3 already exists. Try a different name\e[0m"
+			load_delay
+			opnr="y"
 			return
 			fi
 		    done
@@ -1323,7 +1353,9 @@ read cal1
 		    do
 		  	if [[ "$emt" == "-#$cal2" ]]
 			then
-			echo -e "\e[91mApp with Command $cal3 already exists\e[0m"
+			echo -e "\e[91mApp with Command $cal2 already exists\e[0m"
+			load_delay
+			opnr="y"
 			return
 			fi
 		    done	
@@ -1350,7 +1382,7 @@ read cal1
 	  remlist=()
 		  if [[ -f /home/"$user"/.supreme_app_config ]]
 		  then
-		  wc -l /home/"$user"/.supreme_app_config > /dev/null 2>&1 || { echo -e "\e[91mNo app added to list\e[0m"; return; }
+		  wc -l /home/"$user"/.supreme_app_config > /dev/null 2>&1 || { echo -e "\e[91mNo app added to list\e[0m"; load_delay; opnr="y"; return; }
 		  linecount=$( wc -l /home/"$user"/.supreme_app_config | cut -d ' ' -f1 )
 			  if [[ "$linecount" != 0 ]]
 			  then
@@ -1386,8 +1418,7 @@ read cal1
 			  	instfmt "Are you sure you want to remove selected app(s) from list?(y/n)"
 				read cal5
 				  	case "$cal5" in
-					y|Y)opnr="x"
-					    SAVEIFS=$IFS
+					y|Y)SAVEIFS=$IFS
 					    IFS=$(echo -en "\n\b")
 					    for emt in "${srchopt[@]}"
 					    do
@@ -1403,16 +1434,20 @@ read cal1
 					    echo "${genlist[$i]}" >> /home/"$user"/.supreme_app_config
 					    echo "${templist[$i]}" >> /home/"$user"/.supreme_app_config
 					    done
-					    echo -e "\e[92m✔️ Done\e[0m";;
+					    echo -e "\e[92m✔️ Done\e[0m"
+					    opnr="y"
+					    load_delay;;
 					 esac
 				fi
 			  else
-			  opnr="x"
+			  opnr="y"
 			  echo -e "\e[91mNo app added to list\e[0m"
+			  load_delay
 			  fi
 		  else
-		  opnr="x"
+		  opnr="y"
 		  echo -e "\e[91mNo app added to list\e[0m"
+		  load_delay
 		  fi
 	  done;;
 	h|H)opnr="x"
@@ -1475,9 +1510,7 @@ read appvar
 		  esac;;
 		esac
 	  done;;
-	2)config_applist
-	  opnr="y"
-	  load_delay;;
+	2)config_applist;;
 	h|H)opnr="e"
 	    homekey="y";;
 	esac
