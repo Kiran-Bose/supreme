@@ -374,16 +374,6 @@ read recfm1
 	y|Y)opnr="x";;
 	*)opnr="$tempopnr";;
 	esac
-elif [[ "$homekey" != "y" ]]
-then
-instfmt "Do you want to continue?(y/n)"
-read recfm2
-	case "$recfm2" in
-	y|Y)opnr="$tempopnr";;
-	*)opnr="x"
-	  homekey="y"
-	  oprpt="x";;
-esac
 fi
 }
 
@@ -857,8 +847,7 @@ read range1
 	case "$range1" in
 	h|H)homekey="y"
 	    opnr="x";;
-	b|B)homekey="y"
-	    opnr="$newopnr";;
+	b|B)opnr="$newopnr";;
 	*)trarr=()
 	  trarr1=()
 	  srchopt=()
@@ -922,8 +911,7 @@ v27=$( echo $(numval "$srch27") )
 	case "$srch27" in
 	h|H)homekey="y"
 	    opnr="x";;
-	b|B)homekey="y"
-	    opnr="$newopnr";;
+	b|B)opnr="$newopnr";;
 	*)if [ "$v27" == "p" ]
 	  then
 	  IFS=', ' read -r -a invopt <<< "$srch27"

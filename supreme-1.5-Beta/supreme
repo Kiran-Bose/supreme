@@ -1164,7 +1164,8 @@ instfmt "Rclone-SUpreme Bridge"
 					  cloud_operations "MOVE";;
 					5)oprpt="g"
 					  cloud_operations "DELETE";;
-					h|H)oprpt="g"
+					h|H)oprpt="n"
+					    opnr="x"
 					    homekey="y";;
 					*)oprpt="g"
 					  echo -e "\e[91mBad input\e[0m";;
@@ -1236,6 +1237,7 @@ instfmt "Rclone-SUpreme Bridge"
 				     load_delay;;
 				  p|P)opnr="g";;
 				  h|H)opnr="x"
+				      oprpt="n"
 				      homekey="y";;
 				  esac;;
 				esac
@@ -1266,6 +1268,7 @@ instfmt "Rclone-SUpreme Bridge"
 		  rclone config
 		  load_delay;;
 		h|H)opnr="x"
+		    oprpt="n"
 		    homekey="y";;	
 		esac 
 		
@@ -1965,8 +1968,7 @@ user=$(whoami)
 		  opflag=1
 		  navig /
 		  opflag=0
-		  done
-		  load_delay;;
+		  done;;
 		3)andcop;;
 		4)usbcop;;
 		5)banner
@@ -1981,8 +1983,7 @@ user=$(whoami)
 			cloudit
 			fi
 		  load_delay;;
-		6)custom_scripts
-		  load_delay;;
+		6)custom_scripts;;
 		p|P)preferences;;
 		x|X)again="n"
 		    instfmt "To report bug: mail to kiran.vkvr@gmail.com or visit https://github.com/Kiran-Bose/supreme"
