@@ -620,6 +620,7 @@ path=( "${access[0]}"/* )
 	then
 	opnr="x"
 	echo -e "\e[91mNo phone found\e[0m"
+	load_delay
 	else
 		case "${#path[@]}" in
 		1)ac32=0
