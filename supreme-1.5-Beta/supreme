@@ -1588,7 +1588,6 @@ read cs1
 	  IFS=', ' read -r -a srchopt <<< "$csopt"
 	  if [[ "$v180" == "p" ]]
 	  then
-	  opnr="g"
 	  actionitems
 		  if [[ "${#arraymock[@]}" != 0 ]]
 		  then
@@ -1599,6 +1598,7 @@ read cs1
 			      do
 			      sudo rm -vrf "$csemt"
 			      done
+			      opnr="g"
 			      load_delay;;
 			  *)opnr="g";;
 			  esac
@@ -1677,9 +1677,9 @@ read cs1
 	  fi
 	  done;;
 	5)csrpt="y"
-	  homekey="y"
 	  while [ "$csrpt" == "y" ]
 	  do
+	  homekey="y"
 	  instfmt "Enter command | p [Previous menu] | h [Home]"
 	  read cs11
 		  case "$cs11" in
@@ -1688,7 +1688,8 @@ read cs1
 		      opnr="g";;
 		  h|H)opnr="x"
 		      csrpt="n";;
-		  *)opnr="g"
+		  *)unset homekey
+		    opnr="g"
 		    $cs11
 		    instfmt "Do you want to continue with other commands?(y/n)"
 		    read csrpt;;
