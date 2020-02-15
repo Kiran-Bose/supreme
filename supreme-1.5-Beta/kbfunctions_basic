@@ -374,6 +374,9 @@ read recfm1
 	y|Y)opnr="x";;
 	*)opnr="$tempopnr";;
 	esac
+else
+opnr="$tempopnr"
+load_delay
 fi
 }
 
