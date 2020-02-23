@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.5"
+currentversion="1.5.2"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -413,21 +413,27 @@ arraymock=()
 		    srchopt+=( "$i" )
 		    done
 		    actionitems
-		    reconfirm
+		    reconfirm "$opnr"
 		    v11="p"
 		    	if [[ $opflag -eq 1 ]]
 			then
 		  	optrigger
 			fi;;
 		z|Z)invslct "${arraysrch[@]}"
-		    reconfirm
+			case "$srch27" in
+			b|B|h|H)pass=donothing;;
+			*)reconfirm "$opnr";;
+			esac
 		    v11="p"
 		    	if [[ $opflag -eq 1 ]]
 			then
 		  	optrigger
 			fi;;
 		w|W)rangeslct "${arraysrch[@]}"
-		    reconfirm
+			case "$range1" in
+			b|B|h|H)pass=donothing;;
+			*)reconfirm "$opnr";;
+			esac
 		    v11="p"
 		    	if [[ $opflag -eq 1 ]]
 			then
@@ -458,7 +464,7 @@ arraymock=()
 			if [ "$v11" == "p" ]
 			then
 			actionitems
-			reconfirm
+			reconfirm "$opnr"
 				if [ $opflag -eq 1 ]
 				then
 			  	optrigger
@@ -492,7 +498,6 @@ y|Y)if [ "${#arraymock[@]}" != 0 ]
     opnr="opkey"
     operations
     fi;;
-*)opnr="$tempopnr";;
 esac
 }
 
@@ -564,21 +569,27 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	    srchopt+=( "$i" )
 	    done
 	    actionitems
-	    reconfirm
+	    reconfirm "$opnr"
 	    v11="p"
 		if [[ $opflag -eq 1 ]]
 		then
 	  	optrigger
 		fi;;
 	z|Z)invslct "${temppath[@]}"
-	    reconfirm
+		case "$srch27" in
+		b|B|h|H)pass=donothing;;
+		*)reconfirm "$opnr";;
+		esac
 	    v11="p"
 		if [[ $opflag -eq 1 ]]
 		then
 	  	optrigger
 		fi;;
 	w|W)rangeslct "${temppath[@]}"
-	    reconfirm
+		case "$range1" in
+		b|B|h|H)pass=donothing;;
+		*)reconfirm "$opnr";;
+		esac
 	    v11="p"
 		if [[ $opflag -eq 1 ]]
 		then
@@ -597,7 +608,7 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	r|R)srchopt=(0)
 	    temppath=(/)
 	    actionitems
-	    reconfirm
+	    reconfirm "$opnr"
 		if [[ $opflag -eq 1 ]]
 		then
 	  	optrigger
@@ -632,7 +643,7 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	  then
 	  IFS=', ' read -r -a srchopt <<< "$navig1"
 	  actionitems
-	  reconfirm
+	  reconfirm "$opnr"
 		if [[ $opflag -eq 1 ]]
 		then
 	  	optrigger
@@ -710,21 +721,27 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	    srchopt+=( "$i" )
 	    done
 	    actionitems
-	    reconfirm
+	    reconfirm "$opnr"
 	    v11="p"
 		if [[ $opflag -eq 1 ]]
 		then
 	  	optrigger
 		fi;;
 	z|Z)invslct "${temppath[@]}"
-	    reconfirm
+		case "$srch27" in
+		b|B|h|H)pass=donothing;;
+		*)reconfirm "$opnr";;
+		esac
 	    v11="p"
 		if [[ $opflag -eq 1 ]]
 		then
 	  	optrigger
 		fi;;
 	w|W)rangeslct "${temppath[@]}"
-	    reconfirm
+		case "$range1" in
+		b|B|h|H)pass=donothing;;
+		*)reconfirm "$opnr";;
+		esac
 	    v11="p"
 		if [[ $opflag -eq 1 ]]
 		then
@@ -744,7 +761,7 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	r|R)srchopt=(0)
 	    temppath=(/)
 	    actionitems
-	    reconfirm
+	    reconfirm "$opnr"
 		if [[ $opflag -eq 1 ]]
 		then
 	  	optrigger
@@ -779,7 +796,7 @@ check=$( echo "$navpath"/* | rev | cut -d '/' -f 1 | rev )
 	  then
 	  IFS=', ' read -r -a srchopt <<< "$navig1"
 	  actionitems
-	  reconfirm
+	  reconfirm "$opnr"
 		if [[ $opflag -eq 1 ]]
 		then
 	  	optrigger
@@ -1190,16 +1207,22 @@ isdir=()
 		    rclone mkdir "$gdn1"/"$gdnnd"
 		    cloudnavig "$gdn1";;
 		z|Z)invslct "${newitem[@]}"
-		    reconfirm "h";;
+	    		case "$srch27" in
+			b|B|h|H)pass=donothing;;
+			*)reconfirm "$opnr";;
+			esac;;
 		w|W)rangeslct "${newitem[@]}"
-		    reconfirm "h";;
+		    	case "$range1" in
+			b|B|h|H)pass=donothing;;
+			*)reconfirm "$opnr";;
+			esac;;
 		a|A)srchopt=()
 		    for ((i=0; i<${#newitem[@]}; i++)); do
 		    srchopt+=( "$i" )
 		    done
 		    actionitems
 		    dfsort
-		    reconfirm "h";;
+		    reconfirm "$opnr";;
 		r|R)opnr="x"
 		    syncflag=1
 		    colorfmt "$cldopt"
@@ -1208,11 +1231,10 @@ isdir=()
 		p|P)opnr="e";;
 		*)if [ "$v122" == "p" ]
 		  then
-		  opnr="x"
 		  IFS=', ' read -r -a srchopt <<< "$gdn2"
 		  actionitems
 		  dfsort
-		  reconfirm "h"
+		  reconfirm "$opnr"
 		  fi;;
 		esac
 	fi
