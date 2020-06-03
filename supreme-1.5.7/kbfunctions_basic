@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.5.3"
+currentversion="1.5.7"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -1016,7 +1016,7 @@ vendor+=( "$(_jq '.vendor')" )
 done
 for ((i=0; i<${#hotplug[@]}; i++))
 do
-	if [[ "${hotplug[$i]}" == 1 ]]
+	if [[ "${hotplug[$i]}" == 1 ]] || [[ "${hotplug[$i]}" == "true" ]]
 	then
 		if [[ "${mountpoint[$i]}" != "null" ]]
 		then
@@ -1036,7 +1036,7 @@ vendor+=( "$(_jq '.vendor')" )
 done
 for ((i=0; i<${#hotplug[@]}; i++))
 do
-	if [[ "${hotplug[$i]}" == 1 ]]
+	if [[ "${hotplug[$i]}" == 1 ]] || [[ "${hotplug[$i]}" == "true" ]]
 	then
 		if [[ "${mountpoint[$i]}" != "null" ]]
 		then

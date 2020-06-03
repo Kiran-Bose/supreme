@@ -1718,9 +1718,8 @@ read cqa
 	case $cqa in
 	1)pnavig /
 	  case "${#arraymock[@]}" in
-	  0)case $navig1 in
-	    h|H)opnr="x"
-	      homekey="y";;
+	  0)case "$opnr$homekey" in
+	    xy|XY|xY|Xy)pass=donothing;;
 	    *)opnr="g";;
 	    esac;;
 	  *)opnr="g"
