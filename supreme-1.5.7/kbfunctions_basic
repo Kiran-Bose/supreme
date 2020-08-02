@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.5.7"
+currentversion="1.6"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -1002,8 +1002,8 @@ hotplug=()
 mountpoint=()
 vendor=()
 vendorname=()
-lsblk -O --json > /dev/null 2>&1 || { echo -e "\e[91mlsblk error occured\e[0m" >&2; return 1; }
-usbdev=( "$(lsblk -O --json)" )
+lsblk -o hotplug,vendor,mountpoint --json > /dev/null 2>&1 || { echo -e "\e[91mlsblk error occured\e[0m" >&2; return 1; }
+usbdev=( "$(lsblk -o hotplug,vendor,mountpoint --json)" )
 for row in $(echo "${usbdev}" | jq -r '.blockdevices[].children[]? | @base64'); do
 _jq() 
 {
@@ -1272,6 +1272,25 @@ done
 }
 
 #------------------------------------------------------------------------------------------------
+function menufmt ()
+{
+menustring="$@"
+strlen=${#menustring}
+adj=$(($col/2-$strlen))
+strextra=$(($adj-6))
+adjfill=$(($col/4-6))
+echo -en "$logopri$menustring\e[0m"
+for ((a=0; a<$adj; a++))
+do
+echo -en "$logopri \e[0m"
+done
+for ((b=0; b<$adjfill; b++))
+do
+echo -en "$pri \e[0m"
+done
+}
+
+#------------------------------------------------------------------------------------------------
 function colorfmt ()
 {
 banner
@@ -1346,19 +1365,87 @@ echo
 }
 
 #------------------------------------------------------------------------------------------------
-function def_theme ()
+function theme_selector ()
 {
-pri="\e[100m \e[0m"
-sec="\e[101m \e[0m"
-logopri="\e[101;93;1;82m"
-logosec="\e[103;91;1;82m"
-userpri="\e[101;97;1;82m"
-cfmtp1="\e[100;37;1;82m"
-cfmtp2="\e[47;90;1;82m"
-cfmtp1fill="\e[100m \e[0m"
-cfmtp2fill="\e[47m \e[0m"
-ifmt="\e[100;93;1;82m"
-ifmtfill="\e[100m \e[0m"
+themeid="d"
+	if [[ -f /home/"$user"/.supremetheme.txt ]]
+	then
+	themeid=`cat /home/"$user"/.supremetheme.txt`
+	fi
+	case $themeid in
+	1)pri="\e[44m \e[0m"
+	  sec="\e[46m \e[0m"
+	  logopri="\e[46;37;1;82m"
+	  logosec="\e[47;34;1;82m"
+	  userpri="\e[46;97;1;82m"
+	  cfmtp1="\e[44;93;1;82m"
+	  cfmtp2="\e[100;96;1;82m"
+	  cfmtp1fill="\e[44m \e[0m"
+	  cfmtp2fill="\e[100m \e[0m"
+	  ifmt="\e[44;37;1;82m"
+	  ifmtfill="\e[44m \e[0m"
+	  ;;
+	2)pri="\e[107m \e[0m"
+	  sec="\e[47m \e[0m"
+	  logopri="\e[47;30;1;82m"
+	  logosec="\e[46;97;1;82m"
+	  userpri="\e[47;91;1;82m"
+	  cfmtp1="\e[107;30;1;82m"
+	  cfmtp2="\e[104;97;1;82m"
+	  cfmtp1fill="\e[107m \e[0m"
+	  cfmtp2fill="\e[104m \e[0m"
+	  ifmt="\e[107;90;1;82m"
+	  ifmtfill="\e[107m \e[0m"
+	  ;;
+	3)pri="\e[103m \e[0m"
+	  sec="\e[43m \e[0m"
+	  logopri="\e[43;97;1;82m"
+	  logosec="\e[44;93;1;82m"
+	  userpri="\e[43;31;1;82m"
+	  cfmtp1="\e[43;30;1;82m"
+	  cfmtp2="\e[100;93;1;82m"
+	  cfmtp1fill="\e[43m \e[0m"
+	  cfmtp2fill="\e[100m \e[0m"
+	  ifmt="\e[103;30;1;82m"
+	  ifmtfill="\e[103m \e[0m"
+	  ;;
+	4)pri="\e[42m \e[0m"
+	  sec="\e[102m \e[0m"
+	  logopri="\e[102;30;1;82m"
+	  logosec="\e[43;97;1;82m"
+	  userpri="\e[102;90;1;82m"
+	  cfmtp1="\e[42;93;1;82m"
+	  cfmtp2="\e[107;30;1;82m"
+	  cfmtp1fill="\e[42m \e[0m"
+	  cfmtp2fill="\e[107m \e[0m"
+	  ifmt="\e[42;97;1;82m"
+	  ifmtfill="\e[42m \e[0m"
+	  ;;
+	5)pri="\e[100m \e[0m"
+	  sec="\e[40m \e[0m"
+	  logopri="\e[40;97;1;82m"
+	  logosec="\e[100;37;1;82m"
+	  userpri="\e[40;93;1;82m"
+	  cfmtp1="\e[100;37;1;82m"
+	  cfmtp2="\e[40;97;1;82m"
+	  cfmtp1fill="\e[100m \e[0m"
+	  cfmtp2fill="\e[40m \e[0m"
+	  ifmt="\e[100;36;1;82m"
+	  ifmtfill="\e[100m \e[0m"
+	  ;;
+	*)pri="\e[100m \e[0m"
+	  sec="\e[101m \e[0m"
+	  logopri="\e[101;93;1;82m"
+	  logosec="\e[103;91;1;82m"
+	  userpri="\e[101;97;1;82m"
+	  cfmtp1="\e[100;37;1;82m"
+	  cfmtp2="\e[47;90;1;82m"
+	  cfmtp1fill="\e[100m \e[0m"
+	  cfmtp2fill="\e[47m \e[0m"
+	  ifmt="\e[100;93;1;82m"
+	  ifmtfill="\e[100m \e[0m"
+	  ;;
+	esac
 }
 
 #------------------------------------------------------------------------------------------------
@@ -1368,26 +1455,8 @@ block=0
 tput reset
 user=$(whoami)
 col=$(tput cols)
-if [[ -f /home/"$user"/.supremetheme.txt ]]
-then
-chmod 444 /home/"$user"/.supremetheme.txt
-	while read line; do
-		case "$line" in
-		*sudo*|*source*|*rm*|*.*|*dd*|*cp*|*mv*|*purge*|*delete*|*python*|*make*|*install*|*chmod*|*chown*)
-		def_theme
-		block=1;;
-		esac
-	done < /home/"$user"/.supremetheme.txt
-	case $block in
-	0)paracount=$( wc -l /home/"$user"/.supremetheme.txt | cut -d ' ' -f1 )
-	  case $paracount in
-	  11). /home/"$user"/.supremetheme.txt;;
-	  *)def_theme;;
-	  esac;;
-	esac
-else
-def_theme
-fi
+
+theme_selector
 
 for ((i=0; i<$col; i++))
 do
