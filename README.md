@@ -5,7 +5,7 @@ SUpreme is a command line file manager written in shell script.
 
 SUpreme supports file management operations on phone(android),usb drive,cloud storage and local drive(Tested for ubuntu 18.04).
 
-![Logo](https://github.com/Kiran-Bose/supreme/blob/master/SUpreme-1.5_Home.png)
+![Logo](https://github.com/Kiran-Bose/supreme/blob/master/SUpreme-1.5.7_Home.png)
 
 ## Dependencies
 
@@ -158,7 +158,7 @@ install
 <details>
 <summary>Apt Package Manager</summary>
 
-### For bionic and xenial
+### For Focal,bionic and xenial
 
 ```bash
 sudo add-apt-repository ppa:kiran.kb/supreme
@@ -180,7 +180,7 @@ sudo apt-get install supreme
 #### If it throws error, run the following
 
 ```bash
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E021E2DC3302D8CE
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C3FE0D5AC91EF80C
 sudo apt-get update
 sudo apt-get install supreme
 ```
