@@ -180,7 +180,7 @@ sudo apt-get install supreme
 #### If it throws error, run the following
 
 ```bash
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E021E2DC3302D8CE
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C3FE0D5AC91EF80C
 sudo apt-get update
 sudo apt-get install supreme
 ```
