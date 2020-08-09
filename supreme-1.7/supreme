@@ -67,22 +67,42 @@ usb_check
 						      case "$uc99" in
 						      1)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.fat -n "${vendorname[$uc55]}" -I "$fsys"
+							vn="${vendorname[$uc55]}"
+								if [[ "${vendorname[$uc55]}" == "null" ]]
+								then
+								vn="New Volume"
+								fi
+							sudo mkfs.fat -n "$vn" -I "$fsys"
 							instfmt "Please unplug and plug back device"
 							load_delay;;
 						      2)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.vfat -n "${vendorname[$uc55]}" -I "$fsys"
+							vn="${vendorname[$uc55]}"
+								if [[ "${vendorname[$uc55]}" == "null" ]]
+								then
+								vn="New Volume"
+								fi
+							sudo mkfs.vfat -n "$vn" -I "$fsys"
 							instfmt "Please unplug and plug back device"
 							load_delay;;
 						      3)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.ntfs -n "${vendorname[$uc55]}" -I "$fsys"
+							vn="${vendorname[$uc55]}"
+								if [[ "${vendorname[$uc55]}" == "null" ]]
+								then
+								vn="New Volume"
+								fi
+							sudo mkfs.ntfs -n "$vn" -I "$fsys"
 							instfmt "Please unplug and plug back device"
 							load_delay;;
 						      4)opnr="x"
 							sudo umount "$fsys"
-							sudo mkfs.ext4 -n "${vendorname[$uc55]}" -I "$fsys"
+							vn="${vendorname[$uc55]}"
+								if [[ "${vendorname[$uc55]}" == "null" ]]
+								then
+								vn="New Volume"
+								fi
+							sudo mkfs.ext4 -n "$vn" -I "$fsys"
 							instfmt "Please unplug and plug back device"
 							load_delay;;
 						      p|P)opnr="y";;
@@ -1905,8 +1925,8 @@ user=$(whoami)
 	qbar=1
 	flag=0
 	banner
-
 	instfmt "Select an option"
+	echo
 	echo -e "(1)\e[36m🔡\e[0m `menufmt "Apps"`\n(2)\e[93m📂\e[0m `menufmt "File Manager"`\n(3)📱 `menufmt "Phone"`\n(4)\e[91m🎞\e[0m  `menufmt "USB Device"`\n(5)\e[94m🌩 \e[0m `menufmt "Cloud Storage"`\n(6)🔗 `menufmt "Custom Scripts"`\n(p)⚙  `menufmt "Preferences"`\n(x)\e[91m✖\e[0m  `menufmt "Exit"`"
 	read opn2
 		case "$opn2" in

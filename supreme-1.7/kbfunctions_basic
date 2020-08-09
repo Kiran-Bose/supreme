@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.6"
+currentversion="1.7"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -998,22 +998,22 @@ done
 function usb_check ()
 {
 usbarr=()
+vendorname=()
 hotplug=()
 mountpoint=()
 vendor=()
-vendorname=()
-lsblk -o hotplug,vendor,mountpoint --json > /dev/null 2>&1 || { echo -e "\e[91mlsblk error occured\e[0m" >&2; return 1; }
-usbdev=( "$(lsblk -o hotplug,vendor,mountpoint --json)" )
-for row in $(echo "${usbdev}" | jq -r '.blockdevices[].children[]? | @base64'); do
-_jq() 
-{
-echo ${row} | base64 --decode | jq -r ${1}
-}
-
-hotplug+=( "$(_jq '.hotplug')" )
-mountpoint+=( "$(_jq '.mountpoint')" )
-vendor+=( "$(_jq '.vendor')" )
-done
+hotplug2=()
+mountpoint2=()
+vendor2=()
+lsblk -o name,hotplug,mountpoint,vendor --json > /dev/null 2>&1 || { echo -e "\e[91mlsblk error occured\e[0m" >&2; return 1; }
+	if ! [[ -f /home/"$user"/usbcheck.json ]]
+	then
+	touch /home/"$user"/usbcheck.json
+	fi
+lsblk -o name,hotplug,mountpoint,vendor --json | jq '.' > /home/"$user"/usbcheck.json
+hotplug=(  $( cat /home/"$user"/usbcheck.json | jq -r '.blockdevices[]? | .hotplug') )
+mountpoint=(  $( cat /home/"$user"/usbcheck.json | jq -r '.blockdevices[]? | .mountpoint') )
+vendor=(  $( cat /home/"$user"/usbcheck.json | jq -r '.blockdevices[]? | .vendor') )
 for ((i=0; i<${#hotplug[@]}; i++))
 do
 	if [[ "${hotplug[$i]}" == 1 ]] || [[ "${hotplug[$i]}" == "true" ]]
@@ -1025,23 +1025,17 @@ do
 		fi
 	fi
 done
-for row in $(echo "${usbdev}" | jq -r '.blockdevices[]? | @base64'); do
-_jq() 
-{
-echo ${row} | base64 --decode | jq -r ${1}
-}
-hotplug+=( "$(_jq '.hotplug')" )
-mountpoint+=( "$(_jq '.mountpoint')" )
-vendor+=( "$(_jq '.vendor')" )
-done
-for ((i=0; i<${#hotplug[@]}; i++))
+hotplug2=(  $( cat /home/"$user"/usbcheck.json | jq -r '.blockdevices[].children[]? | .hotplug') )
+mountpoint2=(  $( cat /home/"$user"/usbcheck.json | jq -r '.blockdevices[].children[]? | .mountpoint') )
+vendor2=(  $( cat /home/"$user"/usbcheck.json | jq -r '.blockdevices[].children[]? | .vendor') )
+for ((i=0; i<${#hotplug2[@]}; i++))
 do
-	if [[ "${hotplug[$i]}" == 1 ]] || [[ "${hotplug[$i]}" == "true" ]]
+	if [[ "${hotplug2[$i]}" == 1 ]] || [[ "${hotplug2[$i]}" == "true" ]]
 	then
-		if [[ "${mountpoint[$i]}" != "null" ]]
+		if [[ "${mountpoint2[$i]}" != "null" ]]
 		then
-		usbarr+=( "${mountpoint[$i]}" )
-		vendorname+=( "${vendor[$i]}" )
+		usbarr+=( "${mountpoint2[$i]}" )
+		vendorname+=( "${vendor2[$i]}" )
 		fi
 	fi
 done
