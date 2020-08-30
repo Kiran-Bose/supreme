@@ -42,7 +42,8 @@ usb_check
 				do 
 				banner
 				instfmt "Select an option | p [Previous menu] | h [Home]"
-				echo -e "(1)USB File Explorer\n(2)Format\n(3)Sync\n(4)Configure Sync\n(5)Create bootable USB"
+				uclist=("USB File Explorer" "Format" "Sync" "Configure Sync" "Create bootable USB")
+				submenufmt "${uclist[@]}"
 				read opt1
 					case "$opt1" in
 					1)banner
@@ -62,7 +63,8 @@ usb_check
 					      do
 					      banner
 					      instfmt "Select a File System | p [Previous menu] | h [Home]"
-					      echo -e "(1)FAT\n(2)vFat\n(3)NTFS\n(4)EXT4"
+					      fslist=("FAT" "vFat" "NTFS" "EXT4")
+					      submenufmt "${fslist[@]}"
 					      read uc99
 						      case "$uc99" in
 						      1)opnr="x"
@@ -384,7 +386,8 @@ remlist=()
 tracker=0
 banner
 instfmt "Select an option | p [Previous menu] | h [Home]"
-echo -e "(1)Add sync folder(s)/file(s) to list\n(2)Remove sync folder(s)/file(s) from list"
+coslist=("Add sync item(s) to list" "Remove sync item(s) from list")
+submenufmt "${coslist[@]}"
 read cps1
 	case $cps1 in
 	1)opnr="y"
@@ -399,7 +402,8 @@ read cps1
 		      do
 		      banner
 		      instfmt "Select Source | p [Previous menu] | h [Home]"
-		      echo -e "(1)Phone\n(2)Local"
+		      solist=("Phone" "Local")
+		      submenufmt "${solist[@]}"
 		      read cfgsync11
 			case "$cfgsync11" in
 			1)pnavig "$storage";;
@@ -419,7 +423,8 @@ read cps1
 		      do
 		      banner
 		      instfmt "Select Source | p [Previous menu] | h [Home]"
-		      echo -e "(1)USB Device\n(2)Local"
+		      solist=("USB Device" "Local")
+		      submenufmt "${solist[@]}"
 		      read cfgsync21
 			case "$cfgsync21" in
 			1)pnavig "${usbarr[$uc55]}";;
@@ -439,7 +444,8 @@ read cps1
 		      do
 		      banner
 		      instfmt "Select Source | p [Previous menu] | h [Home]"
-		      echo -e "(1)Cloud\n(2)Local"
+		      solist=("Cloud" "Local")
+		      submenufmt "${solist[@]}"
 		      read cfgsync1
 			      	case "$cfgsync1" in
 				1)opnr="h"
@@ -493,7 +499,8 @@ read cps1
 		              do
 		      	      banner
 		      	      instfmt "Select Destination | p [Previous menu] | h [Home]"
-		      	      echo -e "(1)Phone\n(2)Local"
+		      	      sdlist=("Phone" "Local")
+		      	      submenufmt "${sdlist[@]}"
 		      	      read cfgsync12
 				case "$cfgsync12" in
 				1)pnavig "$storage"
@@ -524,7 +531,8 @@ read cps1
 		      	    do
 		      	    banner
 		      	    instfmt "Select Destination | p [Previous menu] | h [Home]"
-		      	    echo -e "(1)USB Device\n(2)Local"
+		      	    sdlist=("USB Device" "Local")
+		      	    submenufmt "${sdlist[@]}"
 		      	    read cfgsync22
 				case "$cfgsync22" in
 				1)pnavig "${usbarr[$uc55]}"
@@ -546,7 +554,8 @@ read cps1
 			      do
 			      banner
 			      instfmt "Select Destination | p [Previous menu] | h [Home]"
-			      echo -e "(1)Cloud\n(2)Local"
+			      sdlist=("Cloud" "Local")
+			      submenufmt "${sdlist[@]}"
 			      read cfgsync2
 				      case "$cfgsync2" in
 				      1)opnr="h"
@@ -660,7 +669,8 @@ path=( "${access[0]}"/* )
 				do 
 				banner
 					instfmt "Select an option | p [Previous menu] | h [Home]"
-					echo -e "(1)Phone File Explorer\n(2)Sync\n(3)Configure Sync"
+					aclist=("Phone File Explorer" "Sync" "Configure Sync")
+					submenufmt "${aclist[@]}"
 					read ac1
 					case "$ac1" in
 					1)opflag=1
@@ -1032,7 +1042,8 @@ COPY|MOVE)tempsortdir=( "${sortdir[@]}" )
 	  return
 	  else
 	  instfmt "Select Destination"
-	  echo -e "(1)cloud\n(2)local"
+	  sdlist=("cloud" "local")
+	  submenufmt "${sdlist[@]}"
 	  read gdit55
 		case $gdit55 in
 		1)selectcloud
@@ -1127,7 +1138,8 @@ instfmt "Rclone-SUpreme Bridge"
 	sudo rm -rf /home/"$user"/Supremetemp/*
 	unset gdit1
 	instfmt "Select an option | h [Home]"
-	echo -e "(1)Cloud File Explorer\n(2)Sync\n(3)Configure Sync\n(4)Configure Cloud"
+	cditlist=("Cloud File Explorer" "Sync" "Configure Sync" "Configure Cloud")
+	submenufmt "${cditlist[@]}"
 	read cldit
 		case "$cldit" in
 		1)unset gdn1
@@ -1326,7 +1338,8 @@ arraymock=()
 remlist=()
 banner
 instfmt "Select an option | p [Previous menu] | h [Home]"
-echo -e "(1)Add app(s) to list\n(2)Remove app(s) from list"
+calist=("Add app(s) to list" "Remove app(s) from list")
+submenufmt "${calist[@]}"
 read cal1
 	case $cal1 in
 	1)addnew="y"
@@ -1491,7 +1504,8 @@ banner
 genlist=()
 templist=()
 instfmt "Select an option | h [home]"
-echo -e "(1)Open Apps\n(2)Configure App List"
+malist=("Open Apps" "Configure App List")
+submenufmt "${malist[@]}"
 read appvar
 	case $appvar in
 	1)appnamelist=( "\e[94m🌐\e[0m Fire Fox" "\e[93m📅\e[0m Calculator" "🛠  Settings" )
@@ -1581,7 +1595,8 @@ while [[ "$opnr" == "g" ]]
 do
 banner
 instfmt "Select an option | h [Home]"
-echo -e "(1)Add script\n(2)Remove script(s)\n(3)Modify script\n(4)Execute script\n(5)Run Commands"
+cuslist=("Add script" "Remove script(s)" "Modify script" "Execute script" "Run Commands")
+submenufmt "${cuslist[@]}"
 read cs1
 	case "$cs1" in
 	1)if [[ -d /home/"$user"/.supreme_cs ]]
@@ -1733,7 +1748,8 @@ genlist=()
 arraymock=()
 navdoor="GEN"
 instfmt "Select an option | p [Previous menu] | h [Home]"
-echo -e "(1)Add folder(s) to list\n(2)Remove folder(s) from list"
+cqlist=("Add folder(s) to list" "Remove folder(s) from list")
+submenufmt "${cqlist[@]}"
 read cqa
 	case $cqa in
 	1)pnavig /
@@ -1899,7 +1915,8 @@ while [[ "$opnr" == "g" ]]
 do
 banner
 instfmt "Select an option | h [Home]"
-echo -e "(1)Configure Quick Access Folders\n(2)Themes"
+prelist=("Configure Quick Access Folders" "Themes")
+submenufmt "${prelist[@]}"
 read prfn
 	case $prfn in
 	1)config_qa;;

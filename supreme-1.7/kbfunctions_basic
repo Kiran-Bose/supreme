@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.7"
+currentversion="1.8"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -124,10 +124,13 @@ read opn11
 	  load_delay
 	  fi;;
 	5)opnr="e"
+	  unset rencom
+	  unset extvar
 	  if [[ "${#arraymock[@]}" != 0 ]]
           then
 	  instfmt "Select an option | h [Home]"
-      	  echo -e "(1)Auto rename\n(2)Normal rename"
+      	  renlist=("Auto rename" "Normal rename")
+      	  submenufmt "${renlist[@]}"
 	  read ren
 		case "$ren" in
 		1)instfmt "Are you sure you want to auto rename ${#arraymock[@]} files?(y/n)"
@@ -135,11 +138,44 @@ read opn11
 		  case "$renres" in 
 		  y|Y)instfmt "Enter Common name"
 		      read rencom
+		      instfmt "Select an option"
+      	  	      extlist=("Retain Extension" "Ignore Extension" "New Extension")
+      	  	      submenufmt "${extlist[@]}"
+      	  	      read extvar
+      	  	      case $extvar in
+      	  	      1)extflag="R";;
+      	  	      2)extflag="I";;
+      	  	      3)extflag="N"
+      	  	        instfmt "Enter New Extension"
+      	  	        read newext;;
+      	  	      esac
+      
 		      for ((t=0; t<${#arraymock[@]}; t++))
 		      do
 		      R=$( echo "${arraymock[$t]}" | rev | cut -d '/' -f2- | rev )
+		      filename=$(basename -- "${arraymock[$t]}")
+		      of="$filename"
+		      extension="${filename##*.}"
+	              filename="${filename%.*}"
+	              blame=0
+	              	if [[ "$of" == "$extension" ]]
+	              	then 
+	              	blame=1
+	              	fi
 		      number=$(($t+1))
-		      mv "${arraymock[$t]}" "$R"/"$rencom$number"
+		      	if [[ -f "$R"/"$rencom$number" ]] || [[ -d "$R"/"$rencom$number" ]]
+		      	then
+		      	pass="donothing"
+		      	else
+		      		case "$extflag" in
+		      		R)case $blame in
+		      		  0)mv "${arraymock[$t]}" "$R"/"$rencom$number.$extension";;
+		      		  *)mv "${arraymock[$t]}" "$R"/"$rencom$number";;
+		      		  esac;;
+		      		I)mv "${arraymock[$t]}" "$R"/"$rencom$number";;
+		      		N)mv "${arraymock[$t]}" "$R"/"$rencom$number.$newext";;
+		      		esac
+		      	fi
 		      done;;
 		   esac;;
 		 2)for ((t=0; t<${#arraymock[@]}; t++))
@@ -1270,9 +1306,8 @@ function menufmt ()
 {
 menustring="$@"
 strlen=${#menustring}
-adj=$(($col/2-$strlen))
-strextra=$(($adj-6))
-adjfill=$(($col/4-6))
+adj=$(($col*3/4-$strlen))
+adjfill=$(($col/8-3))
 echo -en "$logopri$menustring\e[0m"
 for ((a=0; a<$adj; a++))
 do
@@ -1282,6 +1317,32 @@ for ((b=0; b<$adjfill; b++))
 do
 echo -en "$pri \e[0m"
 done
+}
+
+#------------------------------------------------------------------------------------------------
+function submenufmt ()
+{
+echo
+SAVEIFS=$IFS
+IFS=$(echo -en "\n\b")
+smarray=( "$@" )
+for ((j=0; j<${#smarray[@]}; j++))
+do
+tempfmt="($(($j+1)))${smarray[$j]}"
+strlen=${#tempfmt}
+adj=$(($col*3/4-$strlen))
+adjfill=$(($col/8))
+echo -en "$logopri$tempfmt\e[0m"
+	for ((a=0; a<$adj; a++))
+	do
+	echo -en "$logopri \e[0m"
+	done
+	for ((b=0; b<$adjfill; b++))
+	do
+	echo -en "$pri \e[0m"
+	done
+done
+IFS=$SAVEIFS
 }
 
 #------------------------------------------------------------------------------------------------
