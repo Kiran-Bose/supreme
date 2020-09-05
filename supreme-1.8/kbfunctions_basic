@@ -2,7 +2,7 @@
 #kiran.vkvr@gmail.com
 #https://github.com/Kiran-Bose/supreme
 
-currentversion="1.8"
+currentversion="1.8.1"
 #------------------------------------------------------------------------------------------------
 function numval ()
 {
@@ -1341,6 +1341,7 @@ echo -en "$logopri$tempfmt\e[0m"
 	do
 	echo -en "$pri \e[0m"
 	done
+	echo
 done
 IFS=$SAVEIFS
 }
